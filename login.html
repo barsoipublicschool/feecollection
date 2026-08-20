@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Barsoi Public School Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 15px; }
+        
+        .login-card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
+        .login-card h2 { color: var(--p); margin: 0 0 5px; font-size: 22px; font-weight: 700; }
+        .login-card p { color: #666; font-size: 13px; margin-bottom: 25px; }
+        
+        .form-group { text-align: left; margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 13px; font-weight: 600; color: #333; margin-bottom: 6px; }
+        .form-group input, .form-group select { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; outline: none; transition: 0.3s; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--p); box-shadow: 0 0 5px rgba(26, 35, 126, 0.2); }
+        
+        .btn-login { width: 100%; background: var(--p); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+        .btn-login:hover { background: #0d1259; }
+        
+        .footer-text { margin-top: 20px; font-size: 11px; color: #888; }
+    </style>
+</head>
+<body>
+
+<div class="login-card">
+    <h2>BARSOI PUBLIC SCHOOL</h2>
+    <p>QUAZITOLA, BARSOI (KATIHAR)</p>
+    
+    <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+            <label for="userRole">Login Role</label>
+            <select id="userRole" required>
+                <option value="operator">Counter Staff / Operator</option>
+                <option value="admin">Administrator / Principal</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="text" id="username" placeholder="Enter Username" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter Password" required>
+        </div>
+
+        <button type="submit" class="btn-login">LOGIN NOW 🔐</button>
+    </form>
+
+    <div class="footer-text">
+        Fees Management Portal &copy; 2026
+    </div>
+</div>
+
+<script>
+    // डिफ़ॉल्ट यूजर क्रेडेंशियल्स (आप इन्हें अपनी इच्छानुसार बदल सकते हैं)
+    const USERS = {
+        "admin": { pass: "admin123", roleName: "Administrator", dashboard: "index.html" },
+        "staff": { pass: "staff123", roleName: "Counter Staff", dashboard: "index.html" }
+    };
+
+    function handleLogin(e) {
+        e.preventDefault();
+
+        const role = document.getElementById('userRole').value;
+        const user = document.getElementById('username').value.trim().toLowerCase();
+        const pass = document.getElementById('password').value;
+
+        // क्रेडेंशियल चेक करें
+        if (USERS[user] && USERS[user].pass === pass) {
+            
+            // रोल वेरिफिकेशन
+            if (role === 'admin' && user !== 'admin') {
+                Swal.fire('Access Denied', 'Invalid credentials for Admin login!', 'error');
+                return;
+            }
+
+            // लॉगिन सेशन स्टोर करें
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userRole', role);
+            sessionStorage.setItem('userName', USERS[user].roleName);
+
+            Swal.fire({
+                icon: 'success',
+                title: 'Login Successful!',
+                text: `Welcome, ${USERS[user].roleName}`,
+                timer: 1200,
+                showConfirmButton: false
+            }).then(() => {
+                // मुख्य डैशबोर्ड / पेज पर रिडायरेक्ट करें
+                window.location.href = USERS[user].dashboard;
+            });
+
+        } else {
+            Swal.fire('Login Failed', 'Incorrect Username or Password', 'error');
+        }
+    }
+
+    // अगर यूज़र पहले से लॉगिन है तो डायरेक्ट रीडायरेक्ट करें
+    window.onload = () => {
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            window.location.href = 'index.html';
+        }
+    };
+</script>
+
+</body>
+</html>
