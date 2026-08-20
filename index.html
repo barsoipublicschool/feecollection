@@ -51,10 +51,17 @@
     
     // Load data on startup
     window.onload = function() {
-        fetch('<?= ScriptApp.getService().getUrl() ?>?action=getReminderData')
-        .then(res => res.json())
-        .then(data => { reminderRawData = data; updateView(); });
-    };
+    // Apne Google Apps Script Web App ka URL yahan paste karein
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeBytEuHQQjspTk_ZKUiqF5wPupUNDoDgDCxnlM5AmImzu9xPSam-p0v_TTYq1jHit/exec";
+
+    fetch(`${SCRIPT_URL}?action=getReminderData`)
+    .then(res => res.json())
+    .then(data => { 
+        reminderRawData = data; 
+        updateView(); 
+    })
+    .catch(err => console.error("Data Fetch Error:", err));
+};
 
     function updateView() {
         const cFilter = document.getElementById('classFilter').value;
