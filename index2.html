@@ -68,7 +68,8 @@
 <div class="nav no-print">
     <button id="btn-nav-entry" class="active" onclick="showView('entry')">NEW ENTRY</button>
     <button id="btn-nav-search" onclick="showView('search')">SEARCH RECORD</button>
-    <button id="btn-nav-report" onclick="showView('report')">REMINDERS</button>
+    <!-- REMINDERS पर क्लिक करते ही उसी विंडो में Direct URL खुलेगा -->
+    <button id="btn-nav-report" onclick="openRemindersUrl()">REMINDERS</button>
 </div>
 
 <!-- ENTRY VIEW -->
@@ -239,6 +240,11 @@
             if(data && Array.isArray(data)) allRecords = data;
         } catch(e) { console.log("Init load failed"); }
     };
+
+    // REMINDERS tab redirect function
+    function openRemindersUrl() {
+        window.location.href = "https://barsoipublicschool.github.io/feecollection";
+    }
 
     // Helper: Formats Date object or string to DD/MM/YYYY
     function formatDateDDMMYYYY(dateObj) {
