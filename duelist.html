@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defaulters & Due List - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; --danger: #c62828; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: var(--p); text-align: center; margin-top: 0; }
+        
+        .filter-section { display: flex; gap: 12px; justify-content: center; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        select, input[type="text"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-print { background: #2e7d32; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: #fff5f5; border-left: 4px solid var(--danger); padding: 12px 15px; border-radius: 4px; }
+        .card h4 { margin: 0; font-size: 12px; color: #666; }
+        .card p { margin: 5px 0 0; font-size: 18px; font-weight: bold; color: var(--danger); }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .report-table th { background: var(--p); color: white; padding: 10px; text-align: left; }
+        .report-table td { padding: 9px 10px; border-bottom: 1px solid #ddd; }
+        .report-table tr:nth-child(even) { background-color: #f9f9f9; }
+        .badge-due { background: #ffebee; color: var(--danger); padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="no-print">
+        <h2>BARSOI PUBLIC SCHOOL</h2>
+        <h3 style="text-align:center; color:#555; margin-top:-10px;">Fee Defaulters / Due List</h3>
+        
+        <div class="filter-section">
+            <label><b>Select Class:</b></label>
+            <select id="classFilter" onchange="filterDueList()">
+                <option value="ALL">All Classes</option>
+                <option value="NURSERY">Nursery</option>
+                <option value="LKG">LKG</option>
+                <option value="UKG">UKG</option>
+                <option value="CLASS 1">Class 1</option>
+                <option value="CLASS 2">Class 2</option>
+                <option value="CLASS 3">Class 3</option>
+                <option value="CLASS 4">Class 4</option>
+                <option value="CLASS 5">Class 5</option>
+                <option value="CLASS 6">Class 6</option>
+                <option value="CLASS 7">Class 7</option>
+                <option value="CLASS 8">Class 8</option>
+                <option value="CLASS 9">Class 9</option>
+                <option value="CLASS 10">Class 10</option>
+            </select>
+            
+            <input type="text" id="searchInput" onkeyup="filterDueList()" placeholder="Search Student Name / ID...">
+
+            <button class="btn-btn" onclick="fetchDueData()">REFRESH LIST 🔄</button>
+            <button class="btn-btn btn-print" onclick="window.print()">PRINT DUE LIST 🖨️</button>
+        </div>
+    </div>
+
+    <div id="printHeader" style="text-align:center; margin-bottom:15px;">
+        <h2 style="margin:0;">BARSOI PUBLIC SCHOOL</h2>
+        <p style="margin:2px; font-size:12px;">QUAZITOLA, BARSOI (KATIHAR)</p>
+        <h4 style="margin:5px 0; color:var(--danger);">FEE DEFAULTERS / PENDING DUES REPORT</h4>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+        <div class="card">
+            <h4>TOTAL DEFAULTER RECORDS</h4>
+            <p id="totalDefaulters">0</p>
+        </div>
+        <div class="card">
+            <h4>TOTAL PENDING DUES (₹)</h4>
+            <p id="totalDueAmount">₹0</p>
+        </div>
+    </div>
+
+    <!-- Defaulters Table -->
+    <div style="overflow-x:auto;">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Receipt No</th>
+                    <th>Date</th>
+                    <th>Student Name (ID)</th>
+                    <th>Class</th>
+                    <th>Fee Month</th>
+                    <th>Sub Total</th>
+                    <th>Paid</th>
+                    <th>Pending Due</th>
+                </tr>
+            </thead>
+            <tbody id="dueTableBody">
+                <tr><td colspan="9" style="text-align:center; color:#666;">Loading Defaulters List...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
+    let rawDefaulterData = [];
+
+    window.onload = () => {
+        fetchDueData();
+    };
+
+    async function fetchDueData() {
+        Swal.fire({ title: 'Loading Due Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Unable to fetch fee records.", "error");
+                return;
+            }
+
+            // केवल उन रिकॉर्ड्स को फ़िल्टर करना जिनका Remaining Dues > 0 है
+            rawDefaulterData = allData.filter(r => {
+                let rem = parseFloat(r["Remaining"]) || 0;
+                return rem > 0;
+            });
+
+            filterDueList();
+
+        } catch (e) {
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
+    }
+
+    function filterDueList() {
+        let selectedClass = document.getElementById('classFilter').value.toUpperCase();
+        let searchVal = document.getElementById('searchInput').value.toLowerCase().trim();
+
+        let filtered = rawDefaulterData.filter(r => {
+            let matchesClass = (selectedClass === 'ALL') || 
+                               ((r["Class"] || "").toString().toUpperCase() === selectedClass);
+            
+            let sName = (r["Student Name"] || "").toString().toLowerCase();
+            let sId = (r["Student Id"] || "").toString().toLowerCase();
+            let matchesSearch = sName.includes(searchVal) || sId.includes(searchVal);
+
+            return matchesClass && matchesSearch;
+        });
+
+        renderDueTable(filtered);
+    }
+
+    function renderDueTable(records) {
+        let tbody = document.getElementById('dueTableBody');
+        
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; color:green; font-weight:bold;">🎉 No Pending Dues Found!</td></tr>';
+            document.getElementById('totalDefaulters').innerText = "0";
+            document.getElementById('totalDueAmount').innerText = "₹0";
+            return;
+        }
+
+        let totDueSum = 0;
+        let html = "";
+
+        records.forEach((r, idx) => {
+            let subTotal = parseFloat(r["Sub Total"]) || 0;
+            let paid = parseFloat(r["Total Paid"]) || 0;
+            let remaining = parseFloat(r["Remaining"]) || 0;
+
+            totDueSum += remaining;
+
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td><b>${r["Receipt No"] || "N/A"}</b></td>
+                <td>${r["Paid Date"] || "-"}</td>
+                <td><b>${r["Student Name"] || ""}</b> <br><small style="color:#666;">ID: ${r["Student Id"] || "N/A"}</small></td>
+                <td>${r["Class"] || ""}</td>
+                <td>${r["Month"] || ""}</td>
+                <td>₹${subTotal}</td>
+                <td style="color:#2e7d32;">₹${paid}</td>
+                <td><span class="badge-due">₹${remaining}</span></td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('totalDefaulters').innerText = records.length;
+        document.getElementById('totalDueAmount').innerText = `₹${totDueSum}`;
+    }
+</script>
+</body>
+</html>
