@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics Dashboard - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; --success: #2e7d32; --warning: #fbc02d; --danger: #c62828; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .header h2 { margin: 0; color: var(--p); font-size: 20px; }
+        .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+
+        /* Summary Cards */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--p); }
+        .card h4 { margin: 0; font-size: 12px; color: #666; text-transform: uppercase; }
+        .card p { margin: 8px 0 0; font-size: 22px; font-weight: 700; color: #333; }
+
+        /* Charts Layout */
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
+        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .chart-card h3 { margin-top: 0; font-size: 15px; color: var(--p); text-align: center; margin-bottom: 15px; }
+        .chart-container { position: relative; height: 280px; width: 100%; }
+
+        @media (max-width: 600px) {
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Top Header -->
+    <div class="header">
+        <div>
+            <h2>BARSOI PUBLIC SCHOOL</h2>
+            <small style="color:#666;">Fees Collection Analytics Dashboard</small>
+        </div>
+        <button class="btn-refresh" onclick="loadDashboardData()">REFRESH DATA 🔄</button>
+    </div>
+
+    <!-- Summary Statistics -->
+    <div class="metrics-grid">
+        <div class="card" style="border-left-color: var(--p);">
+            <h4>Total Collection</h4>
+            <p id="totalPaid" style="color: var(--p);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--danger);">
+            <h4>Total Outstanding Dues</h4>
+            <p id="totalDues" style="color: var(--danger);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--warning);">
+            <h4>Total Discount Given</h4>
+            <p id="totalDiscount" style="color: var(--warning);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--success);">
+            <h4>Total Receipts</h4>
+            <p id="totalCount" style="color: var(--success);">0</p>
+        </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+        <!-- Monthly Collection Trend -->
+        <div class="chart-card">
+            <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Class-wise Revenue Share -->
+        <div class="chart-card">
+            <h3>CLASS-WISE COLLECTION BREAKDOWN</h3>
+            <div class="chart-container">
+                <canvas id="classChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
+    
+    let monthlyChartInstance = null;
+    let classChartInstance = null;
+
+    window.onload = () => {
+        loadDashboardData();
+    };
+
+    async function loadDashboardData() {
+        Swal.fire({ title: 'Loading Analytics...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Failed to fetch collection data.", "error");
+                return;
+            }
+
+            processAndRenderMetrics(allData);
+
+        } catch (e) {
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
+    }
+
+    function processAndRenderMetrics(data) {
+        let grandPaid = 0, grandDues = 0, grandDisc = 0;
+        
+        let monthMap = {};
+        let classMap = {};
+
+        // Months Order List for sorting
+        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        data.forEach(r => {
+            let paid = parseFloat(r["Total Paid"]) || 0;
+            let due = parseFloat(r["Remaining"]) || 0;
+            let disc = parseFloat(r["Discount"]) || 0;
+            let month = (r["Month"] || "Other").toString().trim();
+            let className = (r["Class"] || "Unassigned").toString().trim().toUpperCase();
+
+            // Totals
+            grandPaid += paid;
+            grandDues += due;
+            grandDisc += disc;
+
+            // Month-wise Aggr
+            if (!monthMap[month]) monthMap[month] = 0;
+            monthMap[month] += paid;
+
+            // Class-wise Aggr
+            if (!classMap[className]) classMap[className] = 0;
+            classMap[className] += paid;
+        });
+
+        // Update Cards
+        document.getElementById('totalPaid').innerText = `₹${grandPaid.toLocaleString('en-IN')}`;
+        document.getElementById('totalDues').innerText = `₹${grandDues.toLocaleString('en-IN')}`;
+        document.getElementById('totalDiscount').innerText = `₹${grandDisc.toLocaleString('en-IN')}`;
+        document.getElementById('totalCount').innerText = data.length;
+
+        // Sort Monthly Data
+        let sortedMonths = Object.keys(monthMap).sort((a, b) => {
+            return monthOrder.indexOf(a) - monthOrder.indexOf(b);
+        });
+        let monthlyValues = sortedMonths.map(m => monthMap[m]);
+
+        // Class Data
+        let classLabels = Object.keys(classMap);
+        let classValues = Object.values(classMap);
+
+        // Render Charts
+        renderMonthlyChart(sortedMonths, monthlyValues);
+        renderClassChart(classLabels, classValues);
+    }
+
+    function renderMonthlyChart(labels, values) {
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        if (monthlyChartInstance) monthlyChartInstance.destroy();
+
+        monthlyChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Collection (₹)',
+                    data: values,
+                    backgroundColor: '#1a237e',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    }
+
+    function renderClassChart(labels, values) {
+        const ctx = document.getElementById('classChart').getContext('2d');
+        if (classChartInstance) classChartInstance.destroy();
+
+        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1', '#c2185b', '#512da8'];
+
+        classChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors.slice(0, labels.length)
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
