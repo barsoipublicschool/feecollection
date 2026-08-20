@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Complete Fee Management System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen p-4">
+
+  <div class="max-w-7xl mx-auto space-y-6">
+    
+    <!-- Top Bar -->
+    <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700">
+      <h1 class="text-xl font-bold text-blue-400"><i class="fa-solid fa-school mr-2"></i>School Fee Management</h1>
+      <button onclick="loadData()" class="bg-slate-700 hover:bg-slate-600 px-3 py-1.5 rounded text-sm"><i class="fa-solid fa-rotate-right mr-1"></i> Refresh</button>
+    </div>
+
+    <!-- Analytics Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <p class="text-slate-400 text-xs">Total Receipts Generated</p>
+        <p id="totalStudents" class="text-2xl font-bold text-white">0</p>
+      </div>
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <p class="text-slate-400 text-xs">Total Amount Paid</p>
+        <p id="totalCollected" class="text-2xl font-bold text-emerald-400">₹0</p>
+      </div>
+      <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
+        <p class="text-slate-400 text-xs">Total Remaining Dues</p>
+        <p id="totalDue" class="text-2xl font-bold text-rose-400">₹0</p>
+      </div>
+    </div>
+
+    <!-- Form Section -->
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+      <h2 class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-file-invoice-dollar mr-2"></i>New Fee Receipt Entry</h2>
+      
+      <form id="feeForm" class="space-y-6">
+        
+        <!-- Basic Information -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <div><label class="text-xs text-slate-400">Student ID</label><input type="text" id="studentId" required class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+          <div><label class="text-xs text-slate-400">Student Name</label><input type="text" id="studentName" required class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+          <div><label class="text-xs text-slate-400">Father Name</label><input type="text" id="fatherName" required class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+          <div><label class="text-xs text-slate-400">Class</label><input type="text" id="className" required class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+          <div><label class="text-xs text-slate-400">Month</label><input type="text" id="month" placeholder="e.g. April 2026" required class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+          <div class="col-span-2 md:col-span-3"><label class="text-xs text-slate-400">Address</label><input type="text" id="address" class="w-full bg-slate-900 border border-slate-700 p-2 rounded text-sm"></div>
+        </div>
+
+        <hr class="border-slate-700">
+
+        <!-- Fee Items Breakdown -->
+        <p class="text-xs font-bold text-blue-400 uppercase tracking-wider">Fee Heads & Items</p>
+        <div class="grid grid-cols-2 md:grid-cols-6 gap-3">
+          <div><label class="text-[11px] text-slate-400">Prev Dues</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="prevDues"></div>
+          <div><label class="text-[11px] text-slate-400">Admission Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="admissionFee"></div>
+          <div><label class="text-[11px] text-slate-400">School Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="schoolFee"></div>
+          <div><label class="text-[11px] text-slate-400">Van Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="schoolVanFee"></div>
+          <div><label class="text-[11px] text-slate-400">Hostel Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="hostelFee"></div>
+          <div><label class="text-[11px] text-slate-400">Exam Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="examFee"></div>
+          <div><label class="text-[11px] text-slate-400">Shirts</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="shirts"></div>
+          <div><label class="text-[11px] text-slate-400">Pants</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="pants"></div>
+          <div><label class="text-[11px] text-slate-400">T-Shirts</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="tShirts"></div>
+          <div><label class="text-[11px] text-slate-400">ID Card</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="idCard"></div>
+          <div><label class="text-[11px] text-slate-400">Leggings</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="leggings"></div>
+          <div><label class="text-[11px] text-slate-400">Sweater</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="sweater"></div>
+          <div><label class="text-[11px] text-slate-400">Blazer</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="blazer"></div>
+          <div><label class="text-[11px] text-slate-400">Tie</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="tie"></div>
+          <div><label class="text-[11px] text-slate-400">Belt</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="belt"></div>
+          <div><label class="text-[11px] text-slate-400">Logo</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="logo"></div>
+          <div><label class="text-[11px] text-slate-400">Books Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="booksFee"></div>
+          <div><label class="text-[11px] text-slate-400">Copies</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="copies"></div>
+          <div><label class="text-[11px] text-slate-400">Cover</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="cover"></div>
+          <div><label class="text-[11px] text-slate-400">Stationary</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="stationary"></div>
+          <div><label class="text-[11px] text-slate-400">Geo-Box</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="geoBox"></div>
+          <div><label class="text-[11px] text-slate-400">School Bag</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="schoolBag"></div>
+          <div><label class="text-[11px] text-slate-400">Development Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="developmentFee"></div>
+          <div><label class="text-[11px] text-slate-400">Other Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="otherFee"></div>
+          <div><label class="text-[11px] text-slate-400">Republic Day</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="republicDayFee"></div>
+          <div><label class="text-[11px] text-slate-400">Independence Day</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="independenceDayFee"></div>
+          <div><label class="text-[11px] text-slate-400">UDISE Fee</label><input type="number" class="fee-input w-full bg-slate-900 border border-slate-700 p-1.5 rounded text-sm" id="udiseFee"></div>
+        </div>
+
+        <hr class="border-slate-700">
+
+        <!-- Calculation Summary Footer -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 bg-slate-900 p-4 rounded-xl border border-slate-700">
+          <div><label class="text-xs text-slate-400">Sub Total</label><input type="number" id="subTotal" readonly class="w-full bg-slate-800 font-bold text-blue-400 p-2 rounded text-sm" value="0"></div>
+          <div><label class="text-xs text-slate-400">Discount</label><input type="number" id="discount" value="0" class="fee-calc w-full bg-slate-800 p-2 rounded text-sm"></div>
+          <div><label class="text-xs text-slate-400">Total Paid</label><input type="number" id="totalPaid" value="0" required class="fee-calc w-full bg-slate-800 p-2 rounded text-sm font-bold text-emerald-400"></div>
+          <div><label class="text-xs text-slate-400">Remaining Balance</label><input type="number" id="remaining" readonly class="w-full bg-slate-800 font-bold text-rose-400 p-2 rounded text-sm" value="0"></div>
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg">Save Record & Print Receipt</button>
+      </form>
+    </div>
+
+    <!-- Data Table -->
+    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 space-y-4">
+      <h2 class="text-lg font-bold text-white">Recent Transactions</h2>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-xs text-slate-300">
+          <thead class="bg-slate-900 text-slate-400 uppercase">
+            <tr>
+              <th class="p-3">Receipt No</th>
+              <th class="p-3">ID</th>
+              <th class="p-3">Name</th>
+              <th class="p-3">Class</th>
+              <th class="p-3">Paid Date</th>
+              <th class="p-3">Total Paid</th>
+              <th class="p-3">Remaining</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-700"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzhvp9RyAqvjRrLXana_BX8nqfTSPDownOxNJHkTbLBeGi4IkCm6aohdvw83jcj2EIG/exec";
+
+    // Auto Calculation Logic
+    const inputs = document.querySelectorAll('.fee-input');
+    inputs.forEach(input => input.addEventListener('input', calculateTotals));
+    document.querySelectorAll('.fee-calc').forEach(input => input.addEventListener('input', calculateTotals));
+
+    function calculateTotals() {
+      let sub = 0;
+      inputs.forEach(i => sub += Number(i.value) || 0);
+      document.getElementById('subTotal').value = sub;
+      
+      const disc = Number(document.getElementById('discount').value) || 0;
+      const paid = Number(document.getElementById('totalPaid').value) || 0;
+      document.getElementById('remaining').value = sub - disc - paid;
+    }
+
+    async function loadData() {
+      const res = await fetch(SCRIPT_URL);
+      const data = await res.json();
+      document.getElementById('totalStudents').innerText = data.totalStudents;
+      document.getElementById('totalCollected').innerText = '₹' + data.totalCollected.toLocaleString('en-IN');
+      document.getElementById('totalDue').innerText = '₹' + data.totalDue.toLocaleString('en-IN');
+      
+      const tbody = document.getElementById('tableBody');
+      tbody.innerHTML = '';
+      data.transactions.forEach(i => {
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-700/50">
+            <td class="p-3 font-mono text-blue-400">${i.receiptNo}</td>
+            <td class="p-3">${i.studentId}</td>
+            <td class="p-3 font-semibold text-white">${i.studentName}</td>
+            <td class="p-3">${i.className}</td>
+            <td class="p-3">${i.paidDate}</td>
+            <td class="p-3 font-bold text-emerald-400">₹${i.totalPaid}</td>
+            <td class="p-3 font-bold text-rose-400">₹${i.remaining}</td>
+          </tr>`;
+      });
+    }
+
+    document.getElementById('feeForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('submitBtn');
+      btn.innerText = "Saving to Google Sheet...";
+      btn.disabled = true;
+
+      const fields = [
+        "studentId", "month", "studentName", "fatherName", "className", "address",
+        "prevDues", "admissionFee", "schoolFee", "schoolVanFee", "hostelFee", "examFee",
+        "shirts", "pants", "tShirts", "idCard", "leggings", "sweater", "blazer", "tie",
+        "belt", "logo", "booksFee", "copies", "cover", "stationary", "geoBox", "schoolBag",
+        "developmentFee", "otherFee", "republicDayFee", "independenceDayFee", "udiseFee",
+        "discount", "totalPaid"
+      ];
+
+      const payload = {};
+      fields.forEach(f => payload[f] = document.getElementById(f).value);
+
+      await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(payload) });
+      
+      alert("Receipt Saved Successfully!");
+      document.getElementById('feeForm').reset();
+      calculateTotals();
+      btn.innerText = "Save Record & Print Receipt";
+      btn.disabled = false;
+      loadData();
+    });
+
+    loadData();
+  </script>
+</body>
+</html>
