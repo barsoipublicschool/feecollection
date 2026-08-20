@@ -178,7 +178,13 @@
 <div id="report-view" class="container no-print" style="max-width:95%;">
     <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
         <h3 style="margin:0; color:var(--p);">Pending Fee Reminders</h3>
-        <div style="display:flex; gap:10px; align-items:center;">
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <!-- PORTAL / DASHBOARD URL OPTION -->
+            <div style="display:flex; align-items:center; gap:4px;">
+                <label style="margin:0; font-size:11px;">Portal URL:</label>
+                <input type="text" id="portalUrlInput" value="barsoipublicschool.github.io/feecollection" placeholder="e.g. myschool.com" onchange="renderFilteredReminders()" style="padding:4px 8px; width:210px; font-size:12px;">
+            </div>
+
             <select id="classFilterSelect" onchange="renderFilteredReminders()" style="padding:6px 10px; width:auto; font-weight:bold;">
                 <option value="ALL">ALL CLASSES</option>
             </select>
@@ -234,6 +240,16 @@
         } catch(e) { console.log("Init load failed"); }
     };
 
+    // Helper: Formats Date object or string to DD/MM/YYYY
+    function formatDateDDMMYYYY(dateObj) {
+        let d = dateObj ? new Date(dateObj) : new Date();
+        if (isNaN(d.getTime())) d = new Date();
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
+
     function showView(view) {
         document.getElementById('entry-view').style.display = view === 'entry' ? 'block' : 'none';
         document.getElementById('search-view').style.display = view === 'search' ? 'block' : 'none';
@@ -262,7 +278,6 @@
                 return;
             }
 
-            // Populate Class Filter Dropdown Dynamically
             let classSet = new Set();
             for (let i = 1; i < reminderRawData.length; i++) {
                 let cls = reminderRawData[i][0];
@@ -285,6 +300,7 @@
 
     function renderFilteredReminders() {
         const selectedClass = document.getElementById('classFilterSelect').value;
+        const portalUrl = document.getElementById('portalUrlInput').value.trim();
         const tbody = document.getElementById('reminder-table-body');
         
         if (!reminderRawData || reminderRawData.length <= 1) return;
@@ -295,16 +311,6 @@
         for (let i = 1; i < reminderRawData.length; i++) {
             let r = reminderRawData[i];
             
-            // EXACT INDEX MAPPING ACCORDING TO YOUR GOOGLE SHEET:
-            // 0: Class (A)
-            // 1: Roll No (B)
-            // 2: Name (C)
-            // 3: Father Name (D)
-            // 4: Address (E)
-            // 5: Empty (F - Previous Due if present, otherwise 0)
-            // 6: Monthly Fee (G)
-            // 7: Whatsapp No (H)
-            
             let sClass = (r[0] || "").toString().trim();
             let rollNo = r[1] || "";
             let name = r[2] || "";
@@ -314,17 +320,21 @@
             let monthlyFee = parseFloat(r[6]) || 0;
             let phone = (r[7] || "").toString().trim();
             
-            // Total Due calculation (Monthly Fee + Previous Due)
             let totalDue = monthlyFee + prevDue;
 
             if (selectedClass === "ALL" || sClass.toLowerCase() === selectedClass.toLowerCase()) {
                 count++;
                 
-                // Ensure Phone formatting (e.g. 91 prefix if 10 digits)
                 let cleanPhone = phone.replace(/[^0-9]/g, '');
                 if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
 
-                let waMsg = `आदरणीय अभिभावक,\nआपके बच्चे ${name} (Class: ${sClass}) की कुल बकाया फीस ₹${totalDue} है।\n(मासिक फीस: ₹${monthlyFee} + पिछला बकाया: ₹${prevDue})\n\nकृपया नीचे दिए गए UPI ID पर भुगतान करें:\nUPI ID: riyazahmad5@okaxis\nName: BARSOI PUBLIC SCHOOL\n\nधन्यवाद!`;
+                let waMsg = `आदरणीय अभिभावक,\nआपके बच्चे ${name} (Class: ${sClass}) की कुल बकाया फीस ₹${totalDue} है।\n(मासिक फीस: ₹${monthlyFee} + पिछला बकाया: ₹${prevDue})\n\n`;
+                if(portalUrl) {
+                    let formattedUrl = portalUrl.startsWith("http") ? portalUrl : "https://" + portalUrl;
+                    waMsg += `फीस देखने या ऑनलाइन पोर्टल के लिए यहाँ क्लिक करें:\n${formattedUrl}\n\n`;
+                }
+                waMsg += `कृपया नीचे दिए गए UPI ID पर भुगतान करें:\nUPI ID: riyazahmad5@okaxis\nName: BARSOI PUBLIC SCHOOL\n\nधन्यवाद!`;
+                
                 let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
 
                 html += `<tr>
@@ -435,6 +445,8 @@
         let nextSerial = (allRecords && allRecords.length > 0) ? allRecords.length + 1 : 1;
         let rNo = "SPS_" + currentYear + "/" + nextSerial.toString().padStart(2, '0');
         
+        let formattedDate = formatDateDDMMYYYY(now);
+        
         let data = {
             "Receipt No": rNo,
             "Month": document.getElementById('Month').value,
@@ -456,7 +468,7 @@
             "Total Paid": document.getElementById('Total Paid').value || 0,
             "Sub Total": document.getElementById('sub_t').value, 
             "Remaining": document.getElementById('ui_due').innerText,
-            "Paid Date": now.toLocaleDateString('en-GB')
+            "Paid Date": formattedDate
         };
 
         document.querySelectorAll('tr[data-h]').forEach(row => { 
@@ -513,11 +525,13 @@
         if(!currentActiveReceipt) return;
         let d = currentActiveReceipt;
         
+        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+
         let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
                   `📍 Quazitola, Barsoi (Katihar)\n` +
                   `-----------------------------------\n` +
                   `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
-                  `📅 *Date:* ${d["Paid Date"] || "N/A"}\n` +
+                  `📅 *Date:* ${displayDate}\n` +
                   `👤 *Student Name:* ${d["Student Name"]}\n` +
                   `🆔 *Student ID:* ${d["Student Id"]}\n` +
                   `🏫 *Class:* ${d["Class"]}\n` +
@@ -555,6 +569,8 @@
         ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
 
         let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
+        
+        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
         return `
             <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
@@ -570,7 +586,7 @@
                     <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
                     <p style="font-size:7px">email - sagarpublicschool2023@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${d["Paid Date"] || ""}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
                     <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
