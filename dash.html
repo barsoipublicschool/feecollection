@@ -4,49 +4,172 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analytics Dashboard - Barsoi Public School</title>
+    <title>Dashboard & Fees Management - Barsoi Public School</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --p: #1a237e; --bg: #f4f7f6; --success: #2e7d32; --warning: #fbc02d; --danger: #c62828; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
-        .container { max-width: 1100px; margin: 0 auto; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
-        .header h2 { margin: 0; color: var(--p); font-size: 20px; }
-        .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        :root { 
+            --p: #1a237e; 
+            --p-light: #3f51b5;
+            --bg: #f4f7f6; 
+            --card-bg: #ffffff;
+            --text: #333;
+            --danger: #c62828;
+            --success: #2e7d32;
+            --warning: #fbc02d;
+        }
 
-        /* Summary Cards */
-        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--p); }
-        .card h4 { margin: 0; font-size: 12px; color: #666; text-transform: uppercase; }
-        .card p { margin: 8px 0 0; font-size: 22px; font-weight: 700; color: #333; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; min-height: 100vh; }
+
+        /* Sidebar Styling */
+        .sidebar { width: 260px; background: var(--p); color: white; display: flex; flex-direction: column; transition: all 0.3s; flex-shrink: 0; }
+        .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-header p { margin: 3px 0 0; font-size: 11px; opacity: 0.8; }
+
+        .nav-menu { list-style: none; padding: 15px 10px; margin: 0; flex-grow: 1; }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: var(--p-light); color: white; font-weight: 600; }
+        .nav-link span { font-size: 16px; }
+
+        .sidebar-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; text-align: center; opacity: 0.7; }
+
+        /* Main Content Styling */
+        .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
+        
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .top-bar h2 { margin: 0; color: var(--p); font-size: 20px; }
+
+        .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-refresh:hover { background: var(--p-light); }
+
+        /* Quick Action Grid */
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; transition: 0.2s; }
+        .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--p-light); }
+        .action-card .icon { font-size: 22px; margin-bottom: 4px; display: block; }
+        .action-card .title { font-size: 11px; font-weight: 600; color: var(--p); }
+
+        /* Summary Cards Grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 5px solid var(--p); }
+        .card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
+        .card p { margin: 6px 0 0; font-size: 20px; font-weight: 700; color: #333; }
 
         /* Charts Layout */
-        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 20px; }
-        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .chart-card h3 { margin-top: 0; font-size: 15px; color: var(--p); text-align: center; margin-bottom: 15px; }
-        .chart-container { position: relative; height: 280px; width: 100%; }
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
+        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .chart-card h3 { margin-top: 0; font-size: 14px; color: var(--p); text-align: center; margin-bottom: 15px; }
+        .chart-container { position: relative; height: 260px; width: 100%; }
 
-        @media (max-width: 600px) {
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; }
             .charts-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Top Header -->
-    <div class="header">
+<!-- Left Navigation Sidebar -->
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <h3>BARSOI PUBLIC SCHOOL</h3>
+        <p>Quazitola, Barsoi (Katihar)</p>
+    </div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="dashboard.html" class="nav-link active">
+                <span>📊</span> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="index.html" class="nav-link">
+                <span>➕</span> Add / Deposit Fee
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="search.html" class="nav-link">
+                <span>🔍</span> Search Fee Receipt
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="daily.html" class="nav-link">
+                <span>📅</span> Daily Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="monthly.html" class="nav-link">
+                <span>🗓️</span> Monthly Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="duelist.html" class="nav-link">
+                <span>⚠️</span> Defaulters List
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="reminder.html" class="nav-link">
+                <span>🔔</span> Fee Reminders
+            </a>
+        </li>
+        <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+            <a href="#" onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
+                <span>🚪</span> Logout
+            </a>
+        </li>
+    </ul>
+
+    <div class="sidebar-footer">
+        Fees Portal v2.0
+    </div>
+</aside>
+
+<!-- Main Dashboard Content -->
+<main class="main-content">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
         <div>
-            <h2>BARSOI PUBLIC SCHOOL</h2>
-            <small style="color:#666;">Fees Collection Analytics Dashboard</small>
+            <h2>Admin Analytics Dashboard</h2>
+            <small style="color:#666;">Real-time overview of fee collections and dues</small>
         </div>
-        <button class="btn-refresh" onclick="loadDashboardData()">REFRESH DATA 🔄</button>
+        <button class="btn-refresh" onclick="loadDashboardData()">🔄 REFRESH DATA</button>
     </div>
 
-    <!-- Summary Statistics -->
+    <!-- Quick Action Shortcut Buttons -->
+    <div class="quick-actions">
+        <a href="index.html" class="action-card">
+            <span class="icon">➕</span>
+            <span class="title">Add Fee</span>
+        </a>
+        <a href="search.html" class="action-card">
+            <span class="icon">🔍</span>
+            <span class="title">Search Fee</span>
+        </a>
+        <a href="daily.html" class="action-card">
+            <span class="icon">📅</span>
+            <span class="title">Daily Report</span>
+        </a>
+        <a href="monthly.html" class="action-card">
+            <span class="icon">🗓️</span>
+            <span class="title">Monthly Report</span>
+        </a>
+        <a href="duelist.html" class="action-card">
+            <span class="icon">⚠️</span>
+            <span class="title">Due List</span>
+        </a>
+        <a href="reminder.html" class="action-card">
+            <span class="icon">🔔</span>
+            <span class="title">Send Reminder</span>
+        </a>
+    </div>
+
+    <!-- Summary Metrics -->
     <div class="metrics-grid">
         <div class="card" style="border-left-color: var(--p);">
             <h4>Total Collection</h4>
@@ -57,7 +180,7 @@
             <p id="totalDues" style="color: var(--danger);">₹0</p>
         </div>
         <div class="card" style="border-left-color: var(--warning);">
-            <h4>Total Discount Given</h4>
+            <h4>Total Discount</h4>
             <p id="totalDiscount" style="color: var(--warning);">₹0</p>
         </div>
         <div class="card" style="border-left-color: var(--success);">
@@ -66,9 +189,8 @@
         </div>
     </div>
 
-    <!-- Charts Section -->
+    <!-- Visual Charts -->
     <div class="charts-grid">
-        <!-- Monthly Collection Trend -->
         <div class="chart-card">
             <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
             <div class="chart-container">
@@ -76,15 +198,15 @@
             </div>
         </div>
 
-        <!-- Class-wise Revenue Share -->
         <div class="chart-card">
-            <h3>CLASS-WISE COLLECTION BREAKDOWN</h3>
+            <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
             <div class="chart-container">
                 <canvas id="classChart"></canvas>
             </div>
         </div>
     </div>
-</div>
+
+</main>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
@@ -118,11 +240,8 @@
 
     function processAndRenderMetrics(data) {
         let grandPaid = 0, grandDues = 0, grandDisc = 0;
-        
         let monthMap = {};
         let classMap = {};
-
-        // Months Order List for sorting
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         data.forEach(r => {
@@ -132,39 +251,27 @@
             let month = (r["Month"] || "Other").toString().trim();
             let className = (r["Class"] || "Unassigned").toString().trim().toUpperCase();
 
-            // Totals
             grandPaid += paid;
             grandDues += due;
             grandDisc += disc;
 
-            // Month-wise Aggr
             if (!monthMap[month]) monthMap[month] = 0;
             monthMap[month] += paid;
 
-            // Class-wise Aggr
             if (!classMap[className]) classMap[className] = 0;
             classMap[className] += paid;
         });
 
-        // Update Cards
         document.getElementById('totalPaid').innerText = `₹${grandPaid.toLocaleString('en-IN')}`;
         document.getElementById('totalDues').innerText = `₹${grandDues.toLocaleString('en-IN')}`;
         document.getElementById('totalDiscount').innerText = `₹${grandDisc.toLocaleString('en-IN')}`;
         document.getElementById('totalCount').innerText = data.length;
 
-        // Sort Monthly Data
-        let sortedMonths = Object.keys(monthMap).sort((a, b) => {
-            return monthOrder.indexOf(a) - monthOrder.indexOf(b);
-        });
+        let sortedMonths = Object.keys(monthMap).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
         let monthlyValues = sortedMonths.map(m => monthMap[m]);
 
-        // Class Data
-        let classLabels = Object.keys(classMap);
-        let classValues = Object.values(classMap);
-
-        // Render Charts
         renderMonthlyChart(sortedMonths, monthlyValues);
-        renderClassChart(classLabels, classValues);
+        renderClassChart(Object.keys(classMap), Object.values(classMap));
     }
 
     function renderMonthlyChart(labels, values) {
@@ -175,20 +282,13 @@
             type: 'bar',
             data: {
                 labels: labels,
-                datasets: [{
-                    label: 'Collection (₹)',
-                    data: values,
-                    backgroundColor: '#1a237e',
-                    borderRadius: 4
-                }]
+                datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e', borderRadius: 4 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
-                scales: {
-                    y: { beginAtZero: true }
-                }
+                scales: { y: { beginAtZero: true } }
             }
         });
     }
@@ -197,25 +297,25 @@
         const ctx = document.getElementById('classChart').getContext('2d');
         if (classChartInstance) classChartInstance.destroy();
 
-        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1', '#c2185b', '#512da8'];
+        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1'];
 
         classChartInstance = new Chart(ctx, {
             type: 'doughnut',
             data: {
                 labels: labels,
-                datasets: [{
-                    data: values,
-                    backgroundColor: colors.slice(0, labels.length)
-                }]
+                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: { position: 'right' }
-                }
+                plugins: { legend: { position: 'right' } }
             }
         });
+    }
+
+    function logoutUser() {
+        sessionStorage.clear();
+        window.location.href = 'loginsystem.html';
     }
 </script>
 
