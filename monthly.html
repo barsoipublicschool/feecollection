@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monthly Collection Report - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 950px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: var(--p); text-align: center; margin-top: 0; }
+        .filter-section { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        select, input[type="number"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-print { background: #2e7d32; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: #f8f9fa; border-left: 4px solid var(--p); padding: 12px 15px; border-radius: 4px; }
+        .card h4 { margin: 0; font-size: 12px; color: #666; }
+        .card p { margin: 5px 0 0; font-size: 18px; font-weight: bold; color: var(--p); }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .report-table th { background: var(--p); color: white; padding: 10px; text-align: left; }
+        .report-table td { padding: 9px 10px; border-bottom: 1px solid #ddd; }
+        .report-table tr:nth-child(even) { background-color: #f9f9f9; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="no-print">
+        <h2>BARSOI PUBLIC SCHOOL</h2>
+        <h3 style="text-align:center; color:#555; margin-top:-10px;">Monthly Collection Summary</h3>
+        
+        <div class="filter-section">
+            <label><b>Select Month:</b></label>
+            <select id="reportMonth">
+                <option>January</option><option>February</option><option>March</option>
+                <option>April</option><option>May</option><option>June</option>
+                <option>July</option><option>August</option><option>September</option>
+                <option>October</option><option>November</option><option>December</option>
+            </select>
+            
+            <label><b>Year:</b></label>
+            <input type="number" id="reportYear" value="2026" style="width: 80px;">
+
+            <button class="btn-btn" onclick="generateMonthlyReport()">GENERATE REPORT</button>
+            <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
+        </div>
+    </div>
+
+    <div id="printHeader" style="text-align:center; margin-bottom:15px;">
+        <h2 style="margin:0;">BARSOI PUBLIC SCHOOL</h2>
+        <p style="margin:2px; font-size:12px;">QUAZITOLA, BARSOI (KATIHAR)</p>
+        <h4 style="margin:5px 0; color:var(--p);">MONTHLY COLLECTION REPORT - <span id="displaySelectedMonth">January 2026</span></h4>
+    </div>
+
+    <!-- Summary Statistics Cards -->
+    <div class="summary-grid">
+        <div class="card">
+            <h4>TOTAL RECEIPTS</h4>
+            <p id="totalTx">0</p>
+        </div>
+        <div class="card" style="border-left-color: #2e7d32;">
+            <h4>MONTHLY COLLECTION (₹)</h4>
+            <p id="totalCollected" style="color:#2e7d32;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #fbc02d;">
+            <h4>DISCOUNT GIVEN (₹)</h4>
+            <p id="totalDiscount" style="color:#fbc02d;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #c62828;">
+            <h4>TOTAL REMAINING DUES (₹)</h4>
+            <p id="totalDues" style="color:#c62828;">₹0</p>
+        </div>
+    </div>
+
+    <!-- Monthly Transactions Table -->
+    <div style="overflow-x:auto;">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Date</th>
+                    <th>Receipt No</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Fee Month</th>
+                    <th>Sub Total</th>
+                    <th>Discount</th>
+                    <th>Paid Amount</th>
+                    <th>Due Amount</th>
+                </tr>
+            </thead>
+            <tbody id="monthlyTableBody">
+                <tr><td colspan="10" style="text-align:center; color:#666;">Select Month and click Generate Report.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
+
+    window.onload = () => {
+        const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let now = new Date();
+        document.getElementById('reportMonth').value = monthNames[now.getMonth()];
+        document.getElementById('reportYear').value = now.getFullYear();
+        generateMonthlyReport();
+    };
+
+    async function generateMonthlyReport() {
+        let month = document.getElementById('reportMonth').value;
+        let year = document.getElementById('reportYear').value;
+
+        document.getElementById('displaySelectedMonth').innerText = `${month} ${year}`;
+
+        Swal.fire({ title: 'Fetching Monthly Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Unable to fetch fee records.", "error");
+                return;
+            }
+
+            // Filter matching Month & Year in Paid Date / Month
+            let filtered = allData.filter(r => {
+                let recordMonth = (r["Month"] || "").toString().trim().toLowerCase();
+                let selectedMonth = month.toLowerCase();
+                
+                // Paid date check for Year filter
+                let pDate = r["Paid Date"] || "";
+                let matchesYear = true;
+                if (pDate.includes('/')) {
+                    let parts = pDate.split('/');
+                    if (parts.length === 3 && parts[2] != year) {
+                        matchesYear = false;
+                    }
+                }
+
+                return recordMonth === selectedMonth && matchesYear;
+            });
+
+            renderMonthlyTable(filtered);
+
+        } catch (e) {
+            Swal.fire("Error", "Server Connection Error", "error");
+        }
+    }
+
+    function renderMonthlyTable(records) {
+        let tbody = document.getElementById('monthlyTableBody');
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red;">No collection entries found for this month/year.</td></tr>';
+            document.getElementById('totalTx').innerText = "0";
+            document.getElementById('totalCollected').innerText = "₹0";
+            document.getElementById('totalDiscount').innerText = "₹0";
+            document.getElementById('totalDues').innerText = "₹0";
+            return;
+        }
+
+        let totPaid = 0, totDisc = 0, totDue = 0, html = "";
+
+        records.forEach((r, idx) => {
+            let subTotal = parseFloat(r["Sub Total"]) || 0;
+            let discount = parseFloat(r["Discount"]) || 0;
+            let paid = parseFloat(r["Total Paid"]) || 0;
+            let remaining = parseFloat(r["Remaining"]) || 0;
+
+            totPaid += paid;
+            totDisc += discount;
+            totDue += remaining;
+
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td>${r["Paid Date"] || "-"}</td>
+                <td><b>${r["Receipt No"] || "N/A"}</b></td>
+                <td>${r["Student Name"] || ""} (${r["Student Id"] || ""})</td>
+                <td>${r["Class"] || ""}</td>
+                <td>${r["Month"] || ""}</td>
+                <td>₹${subTotal}</td>
+                <td>₹${discount}</td>
+                <td style="color:#2e7d32; font-weight:bold;">₹${paid}</td>
+                <td style="color:${remaining > 0 ? 'red' : 'green'};">₹${remaining}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('totalTx').innerText = records.length;
+        document.getElementById('totalCollected').innerText = `₹${totPaid}`;
+        document.getElementById('totalDiscount').innerText = `₹${totDisc}`;
+        document.getElementById('totalDues').innerText = `₹${totDue}`;
+    }
+</script>
+</body>
+</html>
