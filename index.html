@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barsoi Public School | Pro Dashboard</title>
-    <!-- Tailwind CSS for Advanced UI -->
+    <title>Barsoi Public School | Fee Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         .loader { border-top-color: #2563eb; animation: spinner 1.5s linear infinite; }
@@ -16,61 +15,48 @@
     <!-- Navbar -->
     <nav class="bg-blue-700 text-white p-4 shadow-lg">
         <div class="max-w-6xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-tight">🏫 Barsoi Public School</h1>
-            <span id="date-time" class="text-xs opacity-80">Dashboard v2.0</span>
+            <h1 class="text-lg font-bold">🏫 Barsoi Public School</h1>
+            <span id="date-time" class="text-xs opacity-80">Fee Portal</span>
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto p-4 md:p-6">
+    <main class="max-w-6xl mx-auto p-4">
         <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Total Students</h3>
-                <p id="stat-count" class="text-3xl font-bold text-gray-900 mt-2">--</p>
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-[10px] uppercase font-bold">Total Students</h3>
+                <p id="stat-count" class="text-xl font-bold text-gray-900 mt-1">--</p>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Outstanding Dues</h3>
-                <p id="stat-due" class="text-3xl font-bold text-red-600 mt-2">₹0</p>
-            </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                <h3 class="text-gray-500 text-sm font-medium">Status</h3>
-                <p class="text-sm text-green-600 font-semibold mt-4 bg-green-50 px-3 py-1 rounded-full inline-block">System Active</p>
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100">
+                <h3 class="text-gray-500 text-[10px] uppercase font-bold">Outstanding Dues</h3>
+                <p id="stat-due" class="text-xl font-bold text-red-600 mt-1">₹0</p>
             </div>
         </div>
 
         <!-- Controls -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 flex flex-wrap gap-4 mb-6">
-            <select id="classFilter" onchange="updateView()" class="bg-gray-50 border border-gray-300 rounded-lg p-2.5 w-full md:w-64 focus:ring-blue-500">
-                <option value="ALL">All Classes</option>
-                <option value="Nursery">Nursery</option>
-                <option value="1">Class 1</option>
-                <option value="5">Class 5</option>
-                <option value="10">Class 10</option>
-            </select>
-            <input type="text" id="searchBox" onkeyup="updateView()" placeholder="Search Student..." class="bg-gray-50 border border-gray-300 rounded-lg p-2.5 flex-1">
+        <div class="bg-white p-3 rounded-xl shadow-sm border border-gray-100 mb-6">
+            <input type="text" id="searchBox" onkeyup="updateView()" placeholder="🔍 Search name or father..." class="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 outline-none focus:ring-2 focus:ring-blue-500">
         </div>
 
         <!-- Table -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="bg-gray-50 text-gray-600 text-xs uppercase font-semibold">
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50 text-gray-500 border-b">
                     <tr>
-                        <th class="px-6 py-4">Student</th>
-                        <th class="px-6 py-4">Class</th>
-                        <th class="px-6 py-4">Dues</th>
-                        <th class="px-6 py-4">Action</th>
+                        <th class="px-4 py-3">Student</th>
+                        <th class="px-4 py-3">Due Details</th>
+                        <th class="px-4 py-3">Action</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody" class="divide-y divide-gray-100">
-                    <!-- Loading State -->
-                    <tr><td colspan="4" class="text-center py-10"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-10 w-10 mx-auto"></div></td></tr>
+                    <tr><td colspan="3" class="text-center py-10"><div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-8 w-8 mx-auto"></div></td></tr>
                 </tbody>
             </table>
         </div>
     </main>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzXYJniBjWot1TumdljG32CalPFyclMzZlKCScPj5B3MNJ8Zzjza54v7Rqr2M5irtcJ/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxyg0A_nZiHKZUXUxWBGp4VgfKk9VqP25ASUpeDBqJLyJHANVvQg_edwKo-el9JvvI4/exec";
         let reminderRawData = [];
 
         window.onload = () => {
@@ -80,54 +66,72 @@
         };
 
         function updateView() {
-    const selectedClass = document.getElementById('classFilter').value.toLowerCase();
-    const searchWord = document.getElementById('searchBox').value.toLowerCase();
-    const tbody = document.getElementById('tableBody');
-    
-    let html = "";
-    let count = 0;
-    let grandTotalDue = 0;
+            const searchWord = document.getElementById('searchBox').value.toLowerCase();
+            const tbody = document.getElementById('tableBody');
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN');
+            const monthStr = now.toLocaleString('default', { month: 'long' });
 
-    for (let i = 0; i < reminderRawData.length; i++) {
-        let r = reminderRawData[i];
-        
-        let sClass = (r[0] || "").toString().trim();
-        let rollNo = r[1] || "";
-        let name = r[2] || "";
-        let father = r[3] || "";
-        let monthlyFee = parseFloat(r[4]) || 0;
-        let phone = (r[5] || "").toString().replace(/[^0-9]/g, '').trim();
-        let prevDue = parseFloat(r[6]) || 0;
-        let totalDue = parseFloat(r[7]) || (monthlyFee + prevDue);
+            let html = "";
+            let count = 0;
+            let grandTotalDue = 0;
 
-        // Class matching logic: Dono ko lowercase kiya aur space hataya
-        let matchClass = (selectedClass === "all" || sClass.toLowerCase().includes(selectedClass.replace("class", "").trim()));
-        let matchSearch = name.toLowerCase().includes(searchWord) || father.toLowerCase().includes(searchWord);
+            for (let i = 0; i < reminderRawData.length; i++) {
+                let r = reminderRawData[i];
+                let sClass = (r[0] || "").toString().trim();
+                let rollNo = r[1] || "";
+                let name = r[2] || "";
+                let father = r[3] || "";
+                let monthlyFee = parseFloat(r[4]) || 0;
+                let phone = (r[5] || "").toString().replace(/[^0-9]/g, '').trim();
+                let prevDue = parseFloat(r[6]) || 0;
+                let totalDue = parseFloat(r[7]) || (monthlyFee + prevDue);
 
-        if (matchClass && matchSearch) {
-            count++;
-            grandTotalDue += totalDue;
+                if (name.toLowerCase().includes(searchWord) || father.toLowerCase().includes(searchWord)) {
+                    count++;
+                    grandTotalDue += totalDue;
 
-            html += `
-            <tr class="hover:bg-blue-50 border-b">
-                <td class="px-4 py-3">
-                    <div class="font-bold text-gray-900">${name}</div>
-                    <div class="text-xs text-gray-500">Father: ${father}</div>
-                </td>
-                <td class="px-4 py-3 text-blue-700 font-semibold">${sClass}</td>
-                <td class="px-4 py-3 font-bold text-red-600">₹${totalDue}</td>
-                <td class="px-4 py-3">
-                    <a href="https://wa.me/91${phone}?text=नमस्ते, आपके बच्चे ${name} की कुल बकाया फीस ${totalDue} है।" target="_blank" 
-                       class="bg-green-600 text-white px-3 py-1 rounded text-xs font-bold">WhatsApp</a>
-                </td>
-            </tr>`;
+                    // WhatsApp Message Construction
+                    const msg = encodeURIComponent(`*BARSOI PUBLIC SCHOOL - FEE REMINDER*
+📍 Nehar Nagar, Barsoi (Katihar)
+-----------------------------------
+📅 *Date:* ${dateStr}
+👤 *Student Name:* ${name}
+🆔 *Roll No:* ${rollNo}
+🏫 *Class:* ${sClass}
+🗓️ *Month:* ${monthStr}
+-----------------------------------
+💵 *Previous Due:* ₹${prevDue}
+✅ *Monthly:* ₹${monthlyFee}
+🔻 *Total Due Balance:* ₹${totalDue}
+-----------------------------------
+Please pay the amount asap!
+ Barsoi Public School Management`);
+
+                    html += `
+                    <tr class="hover:bg-blue-50">
+                        <td class="px-4 py-3">
+                            <div class="font-bold text-gray-900">${name}</div>
+                            <div class="text-[10px] text-gray-500 uppercase">${father} • Class ${sClass}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-[10px] text-gray-400">P.Due: ₹${prevDue}</div>
+                            <div class="text-[10px] text-gray-400">Monthly: ₹${monthlyFee}</div>
+                            <div class="font-bold text-red-600 text-sm">Total: ₹${totalDue}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <a href="https://wa.me/91${phone}?text=${msg}" target="_blank" 
+                               class="bg-green-600 text-white px-3 py-2 rounded-lg text-[10px] font-bold shadow-md">WHATSAPP</a>
+                        </td>
+                    </tr>`;
+                }
+            }
+
+            document.getElementById('stat-count').innerText = count;
+            document.getElementById('stat-due').innerText = "₹" + grandTotalDue.toLocaleString('en-IN');
+            tbody.innerHTML = html || '<tr><td colspan="3" class="text-center py-6 text-gray-400">No records found.</td></tr>';
         }
-    }
-
-    document.getElementById('stat-count').innerText = count;
-    document.getElementById('stat-due').innerText = "₹" + grandTotalDue.toLocaleString('en-IN');
-    tbody.innerHTML = html || '<tr><td colspan="4" class="text-center py-6">No records found.</td></tr>';
-}
     </script>
 </body>
 </html>
