@@ -38,7 +38,6 @@
         .sidebar-header h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
         .sidebar-header p { margin: 3px 0 0; font-size: 11px; opacity: 0.8; }
 
-        /* User Identity Badge */
         .user-badge { background: rgba(255,255,255,0.15); margin: 10px 15px 0; padding: 8px 10px; border-radius: 6px; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
 
         .nav-menu { list-style: none; padding: 15px 10px; margin: 0; flex-grow: 1; }
@@ -58,31 +57,6 @@
         .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
         .btn-refresh:hover { background: var(--p-light); }
 
-        /* Tab Panels Management */
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-
-        /* Search Section Styling */
-        .search-card-wrapper { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .search-title { text-align: center; color: var(--p); font-size: 18px; margin-top: 0; margin-bottom: 15px; font-weight: 700; }
-        .search-form-row { display: flex; gap: 8px; margin-bottom: 20px; }
-        .search-form-row input { flex-grow: 1; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
-        .search-form-row button { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
-        .search-form-row button:hover { background: var(--p-light); }
-
-        /* Search Results Card Styling */
-        .search-results-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .receipt-item-card { background: white; border-radius: 6px; padding: 12px 15px; border: 1px solid #eee; border-left: 4px solid var(--p); box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .receipt-info h4 { margin: 0; font-size: 14px; color: #333; }
-        .receipt-info p { margin: 2px 0 0; font-size: 11px; color: #666; }
-
-        /* Action Buttons */
-        .receipt-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-view-receipt { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-        .btn-view-receipt:hover { opacity: 0.9; }
-        .btn-edit-receipt { background: var(--p); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-        .btn-edit-receipt:hover { background: var(--p-light); }
-
         /* Quick Action Grid & Metrics */
         .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; cursor: pointer; transition: 0.2s; }
@@ -100,6 +74,22 @@
         .chart-card h3 { margin-top: 0; font-size: 14px; color: var(--p); text-align: center; margin-bottom: 15px; }
         .chart-container { position: relative; height: 260px; width: 100%; }
 
+        /* Search Section Styling */
+        .search-card-wrapper { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .search-title { text-align: center; color: var(--p); font-size: 18px; margin-top: 0; margin-bottom: 15px; font-weight: 700; }
+        .search-form-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-form-row input { flex-grow: 1; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .search-form-row button { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        
+        .search-results-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .receipt-item-card { background: white; border-radius: 6px; padding: 12px 15px; border: 1px solid #eee; border-left: 4px solid var(--p); box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .receipt-info h4 { margin: 0; font-size: 14px; color: #333; }
+        .receipt-info p { margin: 2px 0 0; font-size: 11px; color: #666; }
+
+        .receipt-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-view-receipt { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .btn-edit-receipt { background: var(--p); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+
         /* Modal Overlay for Edit Record */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
         .modal-card { background: white; width: 90%; max-width: 450px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
@@ -111,6 +101,9 @@
         .btn-cancel { background: #888; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; }
         .btn-save { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
 
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
         @media (max-width: 850px) {
             body { flex-direction: column; }
             .sidebar { width: 100%; }
@@ -120,58 +113,27 @@
 </head>
 <body>
 
-<!-- Left Navigation Sidebar -->
+<!-- Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
         <h3>BARSOI PUBLIC SCHOOL</h3>
         <p>Quazitola, Barsoi (Katihar)</p>
     </div>
 
-    <!-- Logged in User Badge -->
     <div class="user-badge">
-        👤 Logged in: <b id="displayUserName">User</b>
+        👤 Logged in: <b id="displayUserName">Admin</b>
     </div>
     
     <ul class="nav-menu">
-        <li class="nav-item">
-            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active">
-                <span>📊</span> Dashboard
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('addfee')" id="nav-addfee" class="nav-link">
-                <span>➕</span> Add / Deposit Fee
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('search')" id="nav-search" class="nav-link">
-                <span>🔍</span> Search Fee Receipt
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('daily')" id="nav-daily" class="nav-link">
-                <span>📅</span> Daily Collection
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('monthly')" id="nav-monthly" class="nav-link">
-                <span>🗓️</span> Monthly Collection
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('duelist')" id="nav-duelist" class="nav-link">
-                <span>⚠️</span> Defaulters List
-            </a>
-        </li>
-        <li class="nav-item">
-            <a onclick="switchTab('reminder')" id="nav-reminder" class="nav-link">
-                <span>🔔</span> Fee Reminders
-            </a>
-        </li>
+        <li class="nav-item"><a onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active"><span>📊</span> Dashboard</a></li>
+        <li class="nav-item"><a onclick="switchTab('addfee')" id="nav-addfee" class="nav-link"><span>➕</span> Add / Deposit Fee</a></li>
+        <li class="nav-item"><a onclick="switchTab('search')" id="nav-search" class="nav-link"><span>🔍</span> Search Fee Receipt</a></li>
+        <li class="nav-item"><a onclick="switchTab('daily')" id="nav-daily" class="nav-link"><span>📅</span> Daily Collection</a></li>
+        <li class="nav-item"><a onclick="switchTab('monthly')" id="nav-monthly" class="nav-link"><span>🗓️</span> Monthly Collection</a></li>
+        <li class="nav-item"><a onclick="switchTab('duelist')" id="nav-duelist" class="nav-link"><span>⚠️</span> Defaulters List</a></li>
+        <li class="nav-item"><a onclick="switchTab('reminder')" id="nav-reminder" class="nav-link"><span>🔔</span> Fee Reminders</a></li>
         <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-            <a onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
-                <span>🚪</span> Logout
-            </a>
+            <a onclick="logoutUser()" class="nav-link" style="color: #ff8a80;"><span>🚪</span> Logout</a>
         </li>
     </ul>
 
@@ -182,8 +144,6 @@
 
 <!-- Main Area Content -->
 <main class="main-content">
-    
-    <!-- Top Bar -->
     <div class="top-bar">
         <div>
             <h2 id="pageTitle">Admin Analytics Dashboard</h2>
@@ -192,37 +152,17 @@
         <button class="btn-refresh" onclick="refreshCurrentTab()">🔄 REFRESH DATA</button>
     </div>
 
-    <!-- TAB 1: DASHBOARD PANEL -->
+    <!-- TAB 1: DASHBOARD -->
     <div id="tab-dashboard" class="tab-panel active">
-        <!-- Quick Action Shortcut Buttons -->
         <div class="quick-actions">
-            <div onclick="switchTab('addfee')" class="action-card">
-                <span class="icon">➕</span>
-                <span class="title">Add Fee</span>
-            </div>
-            <div onclick="switchTab('search')" class="action-card">
-                <span class="icon">🔍</span>
-                <span class="title">Search Fee</span>
-            </div>
-            <div onclick="switchTab('daily')" class="action-card">
-                <span class="icon">📅</span>
-                <span class="title">Daily Report</span>
-            </div>
-            <div onclick="switchTab('monthly')" class="action-card">
-                <span class="icon">🗓️</span>
-                <span class="title">Monthly Report</span>
-            </div>
-            <div onclick="switchTab('duelist')" class="action-card">
-                <span class="icon">⚠️</span>
-                <span class="title">Due List</span>
-            </div>
-            <div onclick="switchTab('reminder')" class="action-card">
-                <span class="icon">🔔</span>
-                <span class="title">Send Reminder</span>
-            </div>
+            <div onclick="switchTab('addfee')" class="action-card"><span class="icon">➕</span><span class="title">Add Fee</span></div>
+            <div onclick="switchTab('search')" class="action-card"><span class="icon">🔍</span><span class="title">Search Fee</span></div>
+            <div onclick="switchTab('daily')" class="action-card"><span class="icon">📅</span><span class="title">Daily Report</span></div>
+            <div onclick="switchTab('monthly')" class="action-card"><span class="icon">🗓️</span><span class="title">Monthly Report</span></div>
+            <div onclick="switchTab('duelist')" class="action-card"><span class="icon">⚠️</span><span class="title">Due List</span></div>
+            <div onclick="switchTab('reminder')" class="action-card"><span class="icon">🔔</span><span class="title">Send Reminder</span></div>
         </div>
 
-        <!-- Summary Metrics -->
         <div class="metrics-grid">
             <div class="card" style="border-left-color: var(--p);">
                 <h4>Total Collection</h4>
@@ -242,25 +182,19 @@
             </div>
         </div>
 
-        <!-- Visual Charts -->
         <div class="charts-grid">
             <div class="chart-card">
                 <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
-                <div class="chart-container">
-                    <canvas id="monthlyChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
             </div>
-
             <div class="chart-card">
                 <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
-                <div class="chart-container">
-                    <canvas id="classChart"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="classChart"></canvas></div>
             </div>
         </div>
     </div>
 
-    <!-- TAB 2: SEARCH FEE RECEIPT PANEL (With View & Edit Receipts) -->
+    <!-- TAB 2: SEARCH FEE RECEIPT -->
     <div id="tab-search" class="tab-panel">
         <div class="search-card-wrapper">
             <h3 class="search-title">Search Fee Records</h3>
@@ -268,55 +202,19 @@
                 <input type="text" id="searchInput" placeholder="Enter Student ID, Reg No, or Receipt No...">
                 <button onclick="executeStudentSearch()">SEARCH</button>
             </div>
-            
-            <!-- Search Results Display Area -->
             <div id="searchResultsArea" class="search-results-list"></div>
         </div>
     </div>
 
-    <!-- TAB 3: ADD FEE PANEL -->
-    <div id="tab-addfee" class="tab-panel">
-        <div style="background: white; padding: 20px; border-radius: 8px;">
-            <h3>Deposit New Fee</h3>
-            <p style="color:#666;">New fee entry form goes here...</p>
-        </div>
-    </div>
-
-    <!-- TAB 4: DAILY COLLECTION -->
-    <div id="tab-daily" class="tab-panel">
-        <div style="background: white; padding: 20px; border-radius: 8px;">
-            <h3>Daily Collection Report</h3>
-            <p style="color:#666;">Daily collection data goes here...</p>
-        </div>
-    </div>
-
-    <!-- TAB 5: MONTHLY COLLECTION -->
-    <div id="tab-monthly" class="tab-panel">
-        <div style="background: white; padding: 20px; border-radius: 8px;">
-            <h3>Monthly Collection Overview</h3>
-            <p style="color:#666;">Monthly report details...</p>
-        </div>
-    </div>
-
-    <!-- TAB 6: DUE LIST -->
-    <div id="tab-duelist" class="tab-panel">
-        <div style="background: white; padding: 20px; border-radius: 8px;">
-            <h3>Defaulters / Due List</h3>
-            <p style="color:#666;">Student dues list...</p>
-        </div>
-    </div>
-
-    <!-- TAB 7: REMINDER -->
-    <div id="tab-reminder" class="tab-panel">
-        <div style="background: white; padding: 20px; border-radius: 8px;">
-            <h3>Fee Reminders</h3>
-            <p style="color:#666;">Send SMS/WhatsApp notifications...</p>
-        </div>
-    </div>
-
+    <!-- OTHER TAB PLACEHOLDERS -->
+    <div id="tab-addfee" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Add / Deposit Fee</h3></div></div>
+    <div id="tab-daily" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Daily Collection</h3></div></div>
+    <div id="tab-monthly" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Monthly Collection</h3></div></div>
+    <div id="tab-duelist" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Defaulters List</h3></div></div>
+    <div id="tab-reminder" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Fee Reminders</h3></div></div>
 </main>
 
-<!-- EDIT RECEIPT MODAL (POPUP) FOR ADMIN -->
+<!-- EDIT RECEIPT MODAL WITH DISCOUNT FIELD -->
 <div id="editReceiptModal" class="modal-overlay">
     <div class="modal-card">
         <div class="modal-header">✏️ Edit Fee Record</div>
@@ -359,73 +257,47 @@
         loadDashboardData();
     };
 
-    // 1. Role Setup
     function setupUserRoleAndPermissions() {
-        const activeUserName = sessionStorage.getItem('userName') || 'User';
-        const userRole = sessionStorage.getItem('userRole') || 'operator';
+        const activeUserName = sessionStorage.getItem('userName') || 'Admin';
+        const userRole = sessionStorage.getItem('userRole') || 'admin';
         document.getElementById('displayUserName').innerText = `${activeUserName} (${userRole.toUpperCase()})`;
     }
 
-    // 2. Tab Switching Logic
     function switchTab(tabId) {
         currentActiveTab = tabId;
-
-        // Hide all tab panels
         document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
         document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
 
-        // Show active panel
         const activePanel = document.getElementById(`tab-${tabId}`);
         if (activePanel) activePanel.classList.add('active');
 
         const activeNav = document.getElementById(`nav-${tabId}`);
         if (activeNav) activeNav.classList.add('active');
-
-        // Update titles
-        const titles = {
-            'dashboard': ['Admin Analytics Dashboard', 'Real-time overview of fee collections and dues'],
-            'search': ['Search Fee Records', 'Find and view or edit fee receipts'],
-            'addfee': ['Deposit Fee', 'Record student fee payments'],
-            'daily': ['Daily Report', 'Day-wise fee collection details'],
-            'monthly': ['Monthly Report', 'Month-wise revenue summary'],
-            'duelist': ['Defaulters List', 'View pending student dues'],
-            'reminder': ['Fee Reminders', 'Send payment notifications']
-        };
-
-        if (titles[tabId]) {
-            document.getElementById('pageTitle').innerText = titles[tabId][0];
-            document.getElementById('pageSubtitle').innerText = titles[tabId][1];
-        }
     }
 
     function refreshCurrentTab() {
-        if (currentActiveTab === 'dashboard') {
-            loadDashboardData();
-        } else if (currentActiveTab === 'search') {
-            executeStudentSearch();
-        } else {
-            Swal.fire("Refreshed", "Tab data refreshed", "info");
-        }
+        if (currentActiveTab === 'dashboard') loadDashboardData();
+        else if (currentActiveTab === 'search') executeStudentSearch();
     }
 
-    // 3. Dashboard Analytics Data Loading
+    // CORS Handling and Data Fetching
     async function loadDashboardData() {
         Swal.fire({ title: 'Loading Analytics...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`, { method: 'GET', redirect: 'follow' });
             const allData = await res.json();
             Swal.close();
 
             if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Failed to fetch collection data.", "error");
+                Swal.fire("Error", "Invalid data received from server.", "error");
                 return;
             }
 
             processAndRenderMetrics(allData);
 
         } catch (e) {
-            Swal.fire("Error", "Server/Network Connection Error", "error");
+            Swal.fire("Server Error", "Could not connect to Google Apps Script Backend.", "error");
         }
     }
 
@@ -433,7 +305,6 @@
         let grandPaid = 0, grandDues = 0, grandDisc = 0;
         let monthMap = {};
         let classMap = {};
-        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         data.forEach(r => {
             let paid = parseFloat(r["Total Paid"]) || 0;
@@ -458,53 +329,31 @@
         document.getElementById('totalDiscount').innerText = `₹${grandDisc.toLocaleString('en-IN')}`;
         document.getElementById('totalCount').innerText = data.length;
 
-        let sortedMonths = Object.keys(monthMap).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
-        let monthlyValues = sortedMonths.map(m => monthMap[m]);
-
-        renderMonthlyChart(sortedMonths, monthlyValues);
+        renderMonthlyChart(Object.keys(monthMap), Object.values(monthMap));
         renderClassChart(Object.keys(classMap), Object.values(classMap));
     }
 
     function renderMonthlyChart(labels, values) {
         const ctx = document.getElementById('monthlyChart').getContext('2d');
         if (monthlyChartInstance) monthlyChartInstance.destroy();
-
         monthlyChartInstance = new Chart(ctx, {
             type: 'bar',
-            data: {
-                labels: labels,
-                datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e', borderRadius: 4 }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: { y: { beginAtZero: true } }
-            }
+            data: { labels: labels, datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e' }] },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
     function renderClassChart(labels, values) {
         const ctx = document.getElementById('classChart').getContext('2d');
         if (classChartInstance) classChartInstance.destroy();
-
-        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1'];
-
         classChartInstance = new Chart(ctx, {
             type: 'doughnut',
-            data: {
-                labels: labels,
-                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { position: 'right' } }
-            }
+            data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
-    // 4. SEARCH FUNCTIONALITY (Search Student ID & Render VIEW / EDIT Buttons)
+    // Search Records
     async function executeStudentSearch() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) {
@@ -512,18 +361,17 @@
             return;
         }
 
-        Swal.fire({ title: 'Searching Fee Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Searching Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(query)}`);
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(query)}`, { method: 'GET', redirect: 'follow' });
             const data = await res.json();
             Swal.close();
 
             searchCacheData = data;
             renderSearchResultsCards(data);
-
         } catch (e) {
-            Swal.fire("Error", "Server/Network Connection Error", "error");
+            Swal.fire("Error", "Server Connection Failed", "error");
         }
     }
 
@@ -532,66 +380,28 @@
         resultsContainer.innerHTML = '';
 
         if (!data || !Array.isArray(data) || data.length === 0) {
-            resultsContainer.innerHTML = '<div style="text-align:center; color:#666; background:#f9f9f9; padding:15px; border-radius:6px;">No fee records found for this query.</div>';
+            resultsContainer.innerHTML = '<div style="text-align:center; padding:15px; color:#666;">No record found.</div>';
             return;
         }
 
-        const userRole = sessionStorage.getItem('userRole') || 'operator';
-
         data.forEach(r => {
             const receiptNo = r["Receipt No"] || r.id || 'N/A';
-            const month = r["Month"] || 'Receipt';
-            const paid = r["Total Paid"] || 0;
-
-            // Admin Role के लिए Edit Button जोड़ें
-            let editButtonHTML = '';
-            if (userRole === 'admin') {
-                editButtonHTML = `<button onclick="openEditReceiptModal('${receiptNo}')" class="btn-edit-receipt">✏️ EDIT</button>`;
-            }
-
             const card = document.createElement('div');
             card.className = 'receipt-item-card';
             card.innerHTML = `
                 <div class="receipt-info">
-                    <h4>${month}</h4>
-                    <p>Receipt: ${receiptNo} | Paid: ₹${paid}</p>
+                    <h4>${r["Month"] || 'Receipt'}</h4>
+                    <p>Receipt: ${receiptNo} | Paid: ₹${r["Total Paid"] || 0}</p>
                 </div>
                 <div class="receipt-actions">
-                    <button onclick="viewReceiptDetails('${receiptNo}')" class="btn-view-receipt">VIEW RECEIPT</button>
-                    ${editButtonHTML}
+                    <button onclick="openEditReceiptModal('${receiptNo}')" class="btn-edit-receipt">✏️ EDIT</button>
                 </div>
             `;
             resultsContainer.appendChild(card);
         });
     }
 
-    // View Receipt Details Action
-    function viewReceiptDetails(receiptNo) {
-        const record = searchCacheData.find(r => (r["Receipt No"] || r.id) === receiptNo);
-        
-        Swal.fire({
-            title: `Receipt: ${receiptNo}`,
-            html: `
-                <div style="text-align:left; font-size:13px; line-height:1.6;">
-                    <b>Month:</b> ${record ? record.Month : 'N/A'}<br>
-                    <b>Paid Amount:</b> ₹${record ? record["Total Paid"] : 0}<br>
-                    <b>Remaining Dues:</b> ₹${record ? record.Remaining : 0}<br>
-                    <b>Discount:</b> ₹${record ? record.Discount : 0}
-                </div>
-            `,
-            icon: 'info',
-            confirmButtonColor: '#1a237e'
-        });
-    }
-
-    // Open Edit Modal Dialog (Only for Admin)
     function openEditReceiptModal(receiptNo) {
-        const userRole = sessionStorage.getItem('userRole');
-        if (userRole !== 'admin') {
-            Swal.fire("Access Denied", "केवल Administrator के पास फ़ीस रसीद एडिट करने का अधिकार है!", "error");
-            return;
-        }
-
         const record = searchCacheData.find(r => (r["Receipt No"] || r.id) === receiptNo);
         if (!record) return;
 
@@ -618,35 +428,19 @@
         Swal.fire({ title: 'Updating Record...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}&discount=${updatedDiscount}`);
-            
+            await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}&discount=${updatedDiscount}`, { method: 'GET', redirect: 'follow' });
             Swal.close();
             closeEditModal();
-            Swal.fire("Success", "Receipt updated successfully!", "success");
-
-            // Refresh Search View
+            Swal.fire("Success", "Record updated successfully!", "success");
             executeStudentSearch();
-
         } catch (e) {
-            Swal.fire("Error", "Failed to update receipt on server", "error");
+            Swal.fire("Error", "Failed to update record on server", "error");
         }
     }
 
     function logoutUser() {
-        Swal.fire({
-            title: 'Logout?',
-            text: "Are you sure you want to log out?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#1a237e',
-            cancelButtonColor: '#d33',
-            confirmButtonText: 'Yes, Logout'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                sessionStorage.clear();
-                window.location.href = 'loginsystem.html';
-            }
-        });
+        sessionStorage.clear();
+        window.location.href = 'loginsystem.html';
     }
 </script>
 
