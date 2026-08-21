@@ -4,12 +4,12 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard & Fees Management - Barsoi Public School</title>
+    <title>Fees Portal - Barsoi Public School</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     
-    <!-- 🔒 LOGIN SECURITY GUARD (बिना लॉगिन सीधे एक्सेस रोकने का कोड) -->
+    <!-- 🔒 LOGIN SECURITY GUARD -->
     <script>
         if (sessionStorage.getItem('isLoggedIn') !== 'true') {
             window.location.href = 'loginsystem.html';
@@ -26,6 +26,7 @@
             --danger: #c62828;
             --success: #2e7d32;
             --warning: #fbc02d;
+            --accent: #e91e63;
         }
 
         * { box-sizing: border-box; }
@@ -42,7 +43,7 @@
 
         .nav-menu { list-style: none; padding: 15px 10px; margin: 0; flex-grow: 1; }
         .nav-item { margin-bottom: 5px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; }
         .nav-link:hover, .nav-link.active { background: var(--p-light); color: white; font-weight: 600; }
         .nav-link span { font-size: 16px; }
 
@@ -57,24 +58,58 @@
         .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
         .btn-refresh:hover { background: var(--p-light); }
 
-        /* Quick Action Grid */
+        /* Tab Panels Management */
+        .tab-panel { display: none; }
+        .tab-panel.active { display: block; }
+
+        /* Search Section Styling */
+        .search-card-wrapper { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .search-title { text-align: center; color: var(--p); font-size: 18px; margin-top: 0; margin-bottom: 15px; font-weight: 700; }
+        .search-form-row { display: flex; gap: 8px; margin-bottom: 20px; }
+        .search-form-row input { flex-grow: 1; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .search-form-row button { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .search-form-row button:hover { background: var(--p-light); }
+
+        /* Search Results Card Styling */
+        .search-results-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
+        .receipt-item-card { background: white; border-radius: 6px; padding: 12px 15px; border: 1px solid #eee; border-left: 4px solid var(--p); box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .receipt-info h4 { margin: 0; font-size: 14px; color: #333; }
+        .receipt-info p { margin: 2px 0 0; font-size: 11px; color: #666; }
+
+        /* Action Buttons */
+        .receipt-actions { display: flex; gap: 8px; align-items: center; }
+        .btn-view-receipt { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .btn-view-receipt:hover { opacity: 0.9; }
+        .btn-edit-receipt { background: var(--p); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
+        .btn-edit-receipt:hover { background: var(--p-light); }
+
+        /* Quick Action Grid & Metrics */
         .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; transition: 0.2s; }
+        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; cursor: pointer; transition: 0.2s; }
         .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--p-light); }
         .action-card .icon { font-size: 22px; margin-bottom: 4px; display: block; }
         .action-card .title { font-size: 11px; font-weight: 600; color: var(--p); }
 
-        /* Summary Cards Grid */
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 5px solid var(--p); }
         .card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
         .card p { margin: 6px 0 0; font-size: 20px; font-weight: 700; color: #333; }
 
-        /* Charts Layout */
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .chart-card h3 { margin-top: 0; font-size: 14px; color: var(--p); text-align: center; margin-bottom: 15px; }
         .chart-container { position: relative; height: 260px; width: 100%; }
+
+        /* Modal Overlay for Edit Record */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
+        .modal-card { background: white; width: 90%; max-width: 450px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+        .modal-header { font-size: 16px; font-weight: 700; color: var(--p); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
+        .modal-body { display: flex; flex-direction: column; gap: 10px; }
+        .modal-body label { font-size: 12px; font-weight: 600; color: #555; }
+        .modal-body input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 100%; }
+        .modal-footer { margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; }
+        .btn-cancel { background: #888; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; }
+        .btn-save { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
 
         @media (max-width: 850px) {
             body { flex-direction: column; }
@@ -99,42 +134,42 @@
     
     <ul class="nav-menu">
         <li class="nav-item">
-            <a href="dashboard.html" class="nav-link active">
+            <a onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active">
                 <span>📊</span> Dashboard
             </a>
         </li>
         <li class="nav-item">
-            <a href="index.html" class="nav-link">
+            <a onclick="switchTab('addfee')" id="nav-addfee" class="nav-link">
                 <span>➕</span> Add / Deposit Fee
             </a>
         </li>
         <li class="nav-item">
-            <a href="search.html" class="nav-link">
+            <a onclick="switchTab('search')" id="nav-search" class="nav-link">
                 <span>🔍</span> Search Fee Receipt
             </a>
         </li>
         <li class="nav-item">
-            <a href="daily.html" class="nav-link">
+            <a onclick="switchTab('daily')" id="nav-daily" class="nav-link">
                 <span>📅</span> Daily Collection
             </a>
         </li>
         <li class="nav-item">
-            <a href="monthly.html" class="nav-link">
+            <a onclick="switchTab('monthly')" id="nav-monthly" class="nav-link">
                 <span>🗓️</span> Monthly Collection
             </a>
         </li>
         <li class="nav-item">
-            <a href="duelist.html" class="nav-link">
+            <a onclick="switchTab('duelist')" id="nav-duelist" class="nav-link">
                 <span>⚠️</span> Defaulters List
             </a>
         </li>
         <li class="nav-item">
-            <a href="reminder.html" class="nav-link">
+            <a onclick="switchTab('reminder')" id="nav-reminder" class="nav-link">
                 <span>🔔</span> Fee Reminders
             </a>
         </li>
         <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-            <a href="#" onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
+            <a onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
                 <span>🚪</span> Logout
             </a>
         </li>
@@ -145,133 +180,231 @@
     </div>
 </aside>
 
-<!-- Main Dashboard Content -->
+<!-- Main Area Content -->
 <main class="main-content">
     
     <!-- Top Bar -->
     <div class="top-bar">
         <div>
-            <h2>Admin Analytics Dashboard</h2>
-            <small style="color:#666;">Real-time overview of fee collections and dues</small>
+            <h2 id="pageTitle">Admin Analytics Dashboard</h2>
+            <small style="color:#666;" id="pageSubtitle">Real-time overview of fee collections and dues</small>
         </div>
-        <button class="btn-refresh" onclick="loadDashboardData()">🔄 REFRESH DATA</button>
+        <button class="btn-refresh" onclick="refreshCurrentTab()">🔄 REFRESH DATA</button>
     </div>
 
-    <!-- Quick Action Shortcut Buttons -->
-    <div class="quick-actions">
-        <a href="index.html" class="action-card">
-            <span class="icon">➕</span>
-            <span class="title">Add Fee</span>
-        </a>
-        <a href="search.html" class="action-card">
-            <span class="icon">🔍</span>
-            <span class="title">Search Fee</span>
-        </a>
-        <a href="daily.html" class="action-card">
-            <span class="icon">📅</span>
-            <span class="title">Daily Report</span>
-        </a>
-        <a href="monthly.html" class="action-card">
-            <span class="icon">🗓️</span>
-            <span class="title">Monthly Report</span>
-        </a>
-        <a href="duelist.html" class="action-card">
-            <span class="icon">⚠️</span>
-            <span class="title">Due List</span>
-        </a>
-        <a href="reminder.html" class="action-card">
-            <span class="icon">🔔</span>
-            <span class="title">Send Reminder</span>
-        </a>
-    </div>
-
-    <!-- Summary Metrics -->
-    <div class="metrics-grid">
-        <div class="card" style="border-left-color: var(--p);">
-            <h4>Total Collection</h4>
-            <p id="totalPaid" style="color: var(--p);">₹0</p>
-        </div>
-        <div class="card" style="border-left-color: var(--danger);">
-            <h4>Total Outstanding Dues</h4>
-            <p id="totalDues" style="color: var(--danger);">₹0</p>
-        </div>
-        <div class="card" style="border-left-color: var(--warning);">
-            <h4>Total Discount</h4>
-            <p id="totalDiscount" style="color: var(--warning);">₹0</p>
-        </div>
-        <div class="card" style="border-left-color: var(--success);">
-            <h4>Total Receipts</h4>
-            <p id="totalCount" style="color: var(--success);">0</p>
-        </div>
-    </div>
-
-    <!-- Visual Charts -->
-    <div class="charts-grid">
-        <div class="chart-card">
-            <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
-            <div class="chart-container">
-                <canvas id="monthlyChart"></canvas>
+    <!-- TAB 1: DASHBOARD PANEL -->
+    <div id="tab-dashboard" class="tab-panel active">
+        <!-- Quick Action Shortcut Buttons -->
+        <div class="quick-actions">
+            <div onclick="switchTab('addfee')" class="action-card">
+                <span class="icon">➕</span>
+                <span class="title">Add Fee</span>
+            </div>
+            <div onclick="switchTab('search')" class="action-card">
+                <span class="icon">🔍</span>
+                <span class="title">Search Fee</span>
+            </div>
+            <div onclick="switchTab('daily')" class="action-card">
+                <span class="icon">📅</span>
+                <span class="title">Daily Report</span>
+            </div>
+            <div onclick="switchTab('monthly')" class="action-card">
+                <span class="icon">🗓️</span>
+                <span class="title">Monthly Report</span>
+            </div>
+            <div onclick="switchTab('duelist')" class="action-card">
+                <span class="icon">⚠️</span>
+                <span class="title">Due List</span>
+            </div>
+            <div onclick="switchTab('reminder')" class="action-card">
+                <span class="icon">🔔</span>
+                <span class="title">Send Reminder</span>
             </div>
         </div>
 
-        <div class="chart-card">
-            <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
-            <div class="chart-container">
-                <canvas id="classChart"></canvas>
+        <!-- Summary Metrics -->
+        <div class="metrics-grid">
+            <div class="card" style="border-left-color: var(--p);">
+                <h4>Total Collection</h4>
+                <p id="totalPaid" style="color: var(--p);">₹0</p>
             </div>
+            <div class="card" style="border-left-color: var(--danger);">
+                <h4>Total Outstanding Dues</h4>
+                <p id="totalDues" style="color: var(--danger);">₹0</p>
+            </div>
+            <div class="card" style="border-left-color: var(--warning);">
+                <h4>Total Discount</h4>
+                <p id="totalDiscount" style="color: var(--warning);">₹0</p>
+            </div>
+            <div class="card" style="border-left-color: var(--success);">
+                <h4>Total Receipts</h4>
+                <p id="totalCount" style="color: var(--success);">0</p>
+            </div>
+        </div>
+
+        <!-- Visual Charts -->
+        <div class="charts-grid">
+            <div class="chart-card">
+                <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <div class="chart-card">
+                <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
+                <div class="chart-container">
+                    <canvas id="classChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: SEARCH FEE RECEIPT PANEL (With View & Edit Receipts) -->
+    <div id="tab-search" class="tab-panel">
+        <div class="search-card-wrapper">
+            <h3 class="search-title">Search Fee Records</h3>
+            <div class="search-form-row">
+                <input type="text" id="searchInput" placeholder="Enter Student ID, Reg No, or Receipt No...">
+                <button onclick="executeStudentSearch()">SEARCH</button>
+            </div>
+            
+            <!-- Search Results Display Area -->
+            <div id="searchResultsArea" class="search-results-list"></div>
+        </div>
+    </div>
+
+    <!-- TAB 3: ADD FEE PANEL -->
+    <div id="tab-addfee" class="tab-panel">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Deposit New Fee</h3>
+            <p style="color:#666;">New fee entry form goes here...</p>
+        </div>
+    </div>
+
+    <!-- TAB 4: DAILY COLLECTION -->
+    <div id="tab-daily" class="tab-panel">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Daily Collection Report</h3>
+            <p style="color:#666;">Daily collection data goes here...</p>
+        </div>
+    </div>
+
+    <!-- TAB 5: MONTHLY COLLECTION -->
+    <div id="tab-monthly" class="tab-panel">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Monthly Collection Overview</h3>
+            <p style="color:#666;">Monthly report details...</p>
+        </div>
+    </div>
+
+    <!-- TAB 6: DUE LIST -->
+    <div id="tab-duelist" class="tab-panel">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Defaulters / Due List</h3>
+            <p style="color:#666;">Student dues list...</p>
+        </div>
+    </div>
+
+    <!-- TAB 7: REMINDER -->
+    <div id="tab-reminder" class="tab-panel">
+        <div style="background: white; padding: 20px; border-radius: 8px;">
+            <h3>Fee Reminders</h3>
+            <p style="color:#666;">Send SMS/WhatsApp notifications...</p>
         </div>
     </div>
 
 </main>
+
+<!-- EDIT RECEIPT MODAL (POPUP) FOR ADMIN -->
+<div id="editReceiptModal" class="modal-overlay">
+    <div class="modal-card">
+        <div class="modal-header">✏️ Edit Fee Record</div>
+        <div class="modal-body">
+            <input type="hidden" id="editReceiptNo">
+            <div>
+                <label>Month</label>
+                <input type="text" id="editMonth">
+            </div>
+            <div>
+                <label>Paid Amount (₹)</label>
+                <input type="number" id="editPaidAmount">
+            </div>
+            <div>
+                <label>Remaining Dues (₹)</label>
+                <input type="number" id="editDuesAmount">
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+            <button class="btn-save" onclick="saveReceiptChanges()">Save Changes</button>
+        </div>
+    </div>
+</div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
     
     let monthlyChartInstance = null;
     let classChartInstance = null;
+    let searchCacheData = [];
+    let currentActiveTab = 'dashboard';
 
     window.onload = () => {
-        // 1. यूजर Identity और Permissions चेक करें
         setupUserRoleAndPermissions();
-
-        // 2. डैशबोर्ड डेटा लोड करें
         loadDashboardData();
     };
 
-    // रोल और अनुमतियाँ (Role & Permissions) नियंत्रित करने का फ़ंक्शन
+    // 1. Role Setup
     function setupUserRoleAndPermissions() {
         const activeUserName = sessionStorage.getItem('userName') || 'User';
         const userRole = sessionStorage.getItem('userRole') || 'operator';
-
-        // साइडबार में एक्टिव यूजर का नाम सेट करें
         document.getElementById('displayUserName').innerText = `${activeUserName} (${userRole.toUpperCase()})`;
+    }
 
-        // अगर यूजर Staff (Operator) है, तो एडमिन-ओनली फीचर्स पर एक्सेस कंट्रोल लगाएँ
-        if (userRole !== 'admin') {
-            const adminOnlyElements = document.querySelectorAll('.admin-only');
-            adminOnlyElements.forEach(el => el.style.display = 'none');
+    // 2. Tab Switching Logic
+    function switchTab(tabId) {
+        currentActiveTab = tabId;
+
+        // Hide all tab panels
+        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+
+        // Show active panel
+        const activePanel = document.getElementById(`tab-${tabId}`);
+        if (activePanel) activePanel.classList.add('active');
+
+        const activeNav = document.getElementById(`nav-${tabId}`);
+        if (activeNav) activeNav.classList.add('active');
+
+        // Update titles
+        const titles = {
+            'dashboard': ['Admin Analytics Dashboard', 'Real-time overview of fee collections and dues'],
+            'search': ['Search Fee Records', 'Find and view or edit fee receipts'],
+            'addfee': ['Deposit Fee', 'Record student fee payments'],
+            'daily': ['Daily Report', 'Day-wise fee collection details'],
+            'monthly': ['Monthly Report', 'Month-wise revenue summary'],
+            'duelist': ['Defaulters List', 'View pending student dues'],
+            'reminder': ['Fee Reminders', 'Send payment notifications']
+        };
+
+        if (titles[tabId]) {
+            document.getElementById('pageTitle').innerText = titles[tabId][0];
+            document.getElementById('pageSubtitle').innerText = titles[tabId][1];
         }
     }
 
-    // 🔒 Admin-Only Edit Action Guard (बिना Code.gs बदले क्लाइंट-साइड सिक्योरिटी)
-    function executeEditAction(receiptId, updateDataCallback) {
-        const userRole = sessionStorage.getItem('userRole');
-
-        if (userRole !== 'admin') {
-            Swal.fire({
-                icon: 'error',
-                title: 'Access Denied',
-                text: 'केवल Administrator के पास फ़ीस रसीद एडिट करने का अधिकार है!'
-            });
-            return false;
+    function refreshCurrentTab() {
+        if (currentActiveTab === 'dashboard') {
+            loadDashboardData();
+        } else if (currentActiveTab === 'search') {
+            executeStudentSearch();
+        } else {
+            Swal.fire("Refreshed", "Tab data refreshed", "info");
         }
-
-        if (typeof updateDataCallback === 'function') {
-            updateDataCallback(receiptId);
-        }
-        return true;
     }
 
+    // 3. Dashboard Analytics Data Loading
     async function loadDashboardData() {
         Swal.fire({ title: 'Loading Analytics...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
@@ -365,6 +498,132 @@
                 plugins: { legend: { position: 'right' } }
             }
         });
+    }
+
+    // 4. SEARCH FUNCTIONALITY (Search Student ID & Render VIEW / EDIT Buttons)
+    async function executeStudentSearch() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) {
+            Swal.fire("Warning", "Please enter Student ID, Reg No, or Receipt No", "warning");
+            return;
+        }
+
+        Swal.fire({ title: 'Searching Fee Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(query)}`);
+            const data = await res.json();
+            Swal.close();
+
+            searchCacheData = data;
+            renderSearchResultsCards(data);
+
+        } catch (e) {
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
+    }
+
+    function renderSearchResultsCards(data) {
+        const resultsContainer = document.getElementById('searchResultsArea');
+        resultsContainer.innerHTML = '';
+
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            resultsContainer.innerHTML = '<div style="text-align:center; color:#666; background:#f9f9f9; padding:15px; border-radius:6px;">No fee records found for this query.</div>';
+            return;
+        }
+
+        const userRole = sessionStorage.getItem('userRole') || 'operator';
+
+        data.forEach(r => {
+            const receiptNo = r["Receipt No"] || r.id || 'N/A';
+            const month = r["Month"] || 'Receipt';
+            const paid = r["Total Paid"] || 0;
+
+            // Admin Role के लिए Edit Button जोड़ें
+            let editButtonHTML = '';
+            if (userRole === 'admin') {
+                editButtonHTML = `<button onclick="openEditReceiptModal('${receiptNo}')" class="btn-edit-receipt">✏️ EDIT</button>`;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'receipt-item-card';
+            card.innerHTML = `
+                <div class="receipt-info">
+                    <h4>${month}</h4>
+                    <p>Receipt: ${receiptNo} | Paid: ₹${paid}</p>
+                </div>
+                <div class="receipt-actions">
+                    <button onclick="viewReceiptDetails('${receiptNo}')" class="btn-view-receipt">VIEW RECEIPT</button>
+                    ${editButtonHTML}
+                </div>
+            `;
+            resultsContainer.appendChild(card);
+        });
+    }
+
+    // View Receipt Details Action
+    function viewReceiptDetails(receiptNo) {
+        const record = searchCacheData.find(r => (r["Receipt No"] || r.id) === receiptNo);
+        
+        Swal.fire({
+            title: `Receipt: ${receiptNo}`,
+            html: `
+                <div style="text-align:left; font-size:13px; line-height:1.6;">
+                    <b>Month:</b> ${record ? record.Month : 'N/A'}<br>
+                    <b>Paid Amount:</b> ₹${record ? record["Total Paid"] : 0}<br>
+                    <b>Remaining Dues:</b> ₹${record ? record.Remaining : 0}<br>
+                    <b>Discount:</b> ₹${record ? record.Discount : 0}
+                </div>
+            `,
+            icon: 'info',
+            confirmButtonColor: '#1a237e'
+        });
+    }
+
+    // Open Edit Modal Dialog (Only for Admin)
+    function openEditReceiptModal(receiptNo) {
+        const userRole = sessionStorage.getItem('userRole');
+        if (userRole !== 'admin') {
+            Swal.fire("Access Denied", "केवल Administrator के पास फ़ीस रसीद एडिट करने का अधिकार है!", "error");
+            return;
+        }
+
+        const record = searchCacheData.find(r => (r["Receipt No"] || r.id) === receiptNo);
+        if (!record) return;
+
+        document.getElementById('editReceiptNo').value = receiptNo;
+        document.getElementById('editMonth').value = record["Month"] || '';
+        document.getElementById('editPaidAmount').value = record["Total Paid"] || 0;
+        document.getElementById('editDuesAmount').value = record["Remaining"] || 0;
+
+        document.getElementById('editReceiptModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+        document.getElementById('editReceiptModal').style.display = 'none';
+    }
+
+    async function saveReceiptChanges() {
+        const receiptNo = document.getElementById('editReceiptNo').value;
+        const updatedMonth = document.getElementById('editMonth').value;
+        const updatedPaid = document.getElementById('editPaidAmount').value;
+        const updatedDues = document.getElementById('editDuesAmount').value;
+
+        Swal.fire({ title: 'Updating Record...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}`);
+            
+            Swal.close();
+            closeEditModal();
+            Swal.fire("Success", "Receipt updated successfully!", "success");
+
+            // Refresh Search View
+            executeStudentSearch();
+
+        } catch (e) {
+            Swal.fire("Error", "Failed to update receipt on server", "error");
+        }
     }
 
     function logoutUser() {
