@@ -355,7 +355,7 @@
         let now = new Date(); 
         let currentYear = now.getFullYear();
         let nextSerial = (allRecords && allRecords.length > 0) ? allRecords.length + 1 : 1;
-        let rNo = "SPS_" + currentYear + "/" + nextSerial.toString().padStart(2, '0');
+        let rNo = "BPS/" + currentYear + "/" + nextSerial.toString().padStart(2, '0');
         let formattedDate = formatDateDDMMYYYY(now);
         
         let data = {
