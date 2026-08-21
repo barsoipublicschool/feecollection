@@ -334,6 +334,10 @@
                 <label>Remaining Dues (₹)</label>
                 <input type="number" id="editDuesAmount">
             </div>
+            <div>
+                <label>Discount Amount (₹)</label>
+                <input type="number" id="editDiscountAmount">
+            </div>
         </div>
         <div class="modal-footer">
             <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
@@ -595,6 +599,7 @@
         document.getElementById('editMonth').value = record["Month"] || '';
         document.getElementById('editPaidAmount').value = record["Total Paid"] || 0;
         document.getElementById('editDuesAmount').value = record["Remaining"] || 0;
+        document.getElementById('editDiscountAmount').value = record["Discount"] || 0;
 
         document.getElementById('editReceiptModal').style.display = 'flex';
     }
@@ -608,11 +613,12 @@
         const updatedMonth = document.getElementById('editMonth').value;
         const updatedPaid = document.getElementById('editPaidAmount').value;
         const updatedDues = document.getElementById('editDuesAmount').value;
+        const updatedDiscount = document.getElementById('editDiscountAmount').value;
 
         Swal.fire({ title: 'Updating Record...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}`);
+            const res = await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}&discount=${updatedDiscount}`);
             
             Swal.close();
             closeEditModal();
