@@ -27,18 +27,12 @@
 
     .btn-save { width: 100%; padding: 15px; background: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; margin-top: 15px; cursor: pointer; font-size: 16px; }
 
-    #search-view, #report-view { display: none; }
+    #search-view { display: none; }
     .month-card { background: #fff; border-left: 5px solid var(--p); border-radius: 8px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #ddd; }
     .month-info h4 { margin: 0; color: #333; font-size: 14px; }
     .month-info p { margin: 2px 0 0; font-size: 12px; color: #666; }
     .btn-view { background: #e91e63; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
     .btn-edit { background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
-
-    .reminder-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 10px; }
-    .reminder-table th { background: var(--p); color: white; padding: 10px; text-align: left; }
-    .reminder-table td { padding: 10px; border-bottom: 1px solid #ddd; }
-    .btn-wa-direct { background: #25D366; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px; display: inline-flex; align-items: center; gap: 5px; text-decoration: none; }
-    .btn-wa-direct:hover { background: #128C7E; }
 
     #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
     
@@ -73,7 +67,7 @@
 <div class="nav no-print">
     <button id="btn-nav-entry" class="active" onclick="showView('entry')">NEW ENTRY</button>
     <button id="btn-nav-search" onclick="showView('search')">SEARCH RECORD</button>
-    <button id="btn-nav-report" onclick="showView('report')">REMINDERS</button>
+    <button id="btn-nav-report" onclick="window.location.href='https://barsoipublicschool.github.io/feecollection/reminder.html'">REMINDERS</button>
 </div>
 
 <!-- ENTRY VIEW -->
@@ -190,44 +184,6 @@
     <div id="resultsList"></div>
 </div>
 
-<!-- REMINDERS VIEW -->
-<div id="report-view" class="container no-print" style="max-width:95%;">
-    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
-        <h3 style="margin:0; color:var(--p);">Pending Fee Reminders</h3>
-        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
-            <div style="display:flex; align-items:center; gap:4px;">
-                <label style="margin:0; font-size:11px;">Portal URL:</label>
-                <input type="text" id="portalUrlInput" value="barsoipublicschool.github.io/feecollection/reminder.html" placeholder="e.g. myschool.com" onchange="renderFilteredReminders()" style="padding:4px 8px; width:210px; font-size:12px;">
-            </div>
-
-            <select id="classFilterSelect" onchange="renderFilteredReminders()" style="padding:6px 10px; width:auto; font-weight:bold;">
-                <option value="ALL">ALL CLASSES</option>
-            </select>
-            <span id="totalStudentCount" style="font-weight:bold; color:var(--p); font-size:13px;">Total Students: 0</span>
-            <button onclick="fetchReminders()" style="background:var(--p); color:white; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">🔄 Refresh List</button>
-        </div>
-    </div>
-    <div style="overflow-x:auto;">
-        <table class="reminder-table">
-            <thead>
-                <tr>
-                    <th>Class</th>
-                    <th>Roll No</th>
-                    <th>Student Name</th>
-                    <th>Father Name</th>
-                    <th>Monthly Fee</th>
-                    <th>Previous Due</th>
-                    <th>Total Due</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="reminder-table-body">
-                <tr><td colspan="8" style="text-align:center; color:#666;">Click Refresh to load reminders...</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
-
 <!-- RECEIPT MODAL -->
 <div id="receipt-modal">
     <div class="print-wrapper">
@@ -245,7 +201,6 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbysD9HfKVY2B15QQm7pUYaHBkhM2aLH0NZ3dhsb_H3yY6Kkz4KJ0vXW8bgwJl2mnBPM/exec";
     let allRecords = [];
     let currentActiveReceipt = null;
-    let reminderRawData = [];
 
     window.onload = async () => {
         try {
@@ -267,109 +222,9 @@
     function showView(view) {
         document.getElementById('entry-view').style.display = view === 'entry' ? 'block' : 'none';
         document.getElementById('search-view').style.display = view === 'search' ? 'block' : 'none';
-        document.getElementById('report-view').style.display = view === 'report' ? 'block' : 'none';
         
         document.getElementById('btn-nav-entry').className = view === 'entry' ? 'active' : '';
         document.getElementById('btn-nav-search').className = view === 'search' ? 'active' : '';
-        document.getElementById('btn-nav-report').className = view === 'report' ? 'active' : '';
-
-        if(view === 'report') {
-            fetchReminders();
-        }
-    }
-
-    async function fetchReminders() {
-        const tbody = document.getElementById('reminder-table-body');
-        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;">Loading reminders... ⏳</td></tr>';
-        
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=getReminderData`);
-            reminderRawData = await res.json();
-
-            if (!reminderRawData || !Array.isArray(reminderRawData) || reminderRawData.length <= 1) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">No reminder data found in sheet.</td></tr>';
-                document.getElementById('totalStudentCount').innerText = "Total Students: 0";
-                return;
-            }
-
-            let classSet = new Set();
-            for (let i = 1; i < reminderRawData.length; i++) {
-                let cls = reminderRawData[i][0];
-                if (cls) classSet.add(cls.toString().trim());
-            }
-
-            let select = document.getElementById('classFilterSelect');
-            select.innerHTML = '<option value="ALL">ALL CLASSES</option>';
-            classSet.forEach(c => {
-                select.innerHTML += `<option value="${c}">${c}</option>`;
-            });
-
-            renderFilteredReminders();
-
-        } catch (e) {
-            console.error(e);
-            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Error loading reminders.</td></tr>';
-        }
-    }
-
-    function renderFilteredReminders() {
-        const selectedClass = document.getElementById('classFilterSelect').value;
-        const portalUrl = document.getElementById('portalUrlInput').value.trim();
-        const tbody = document.getElementById('reminder-table-body');
-        
-        if (!reminderRawData || reminderRawData.length <= 1) return;
-
-        let html = "";
-        let count = 0;
-
-        for (let i = 1; i < reminderRawData.length; i++) {
-            let r = reminderRawData[i];
-            
-            let sClass = (r[0] || "").toString().trim();
-            let rollNo = r[1] || "";
-            let name = r[2] || "";
-            let father = r[3] || "";
-            let address = r[4] || "";
-            let prevDue = parseFloat(r[5]) || 0; 
-            let monthlyFee = parseFloat(r[6]) || 0;
-            let phone = (r[7] || "").toString().trim();
-            
-            let totalDue = monthlyFee + prevDue;
-
-            if (selectedClass === "ALL" || sClass.toLowerCase() === selectedClass.toLowerCase()) {
-                count++;
-                
-                let cleanPhone = phone.replace(/[^0-9]/g, '');
-                if (cleanPhone.length === 10) cleanPhone = '91' + cleanPhone;
-
-                let waMsg = `आदरणीय अभिभावक,\nआपके बच्चे ${name} (Class: ${sClass}) की कुल बकाया फीस ₹${totalDue} है।\n(मासिक फीस: ₹${monthlyFee} + पिछला बकाया: ₹${prevDue})\n\n`;
-                if(portalUrl) {
-                    let formattedUrl = portalUrl.startsWith("http") ? portalUrl : "https://" + portalUrl;
-                    waMsg += `फीस देखने या ऑनलाइन पोर्टल के लिए यहाँ क्लिक करें:\n${formattedUrl}\n\n`;
-                }
-                waMsg += `कृपया नीचे दिए गए UPI ID पर भुगतान करें:\nUPI ID: riyazahmad5@okaxis\nName: BARSOI PUBLIC SCHOOL\n\nधन्यवाद!`;
-                
-                let waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMsg)}`;
-
-                html += `<tr>
-                    <td><b>${sClass}</b></td>
-                    <td>${rollNo}</td>
-                    <td><b>${name}</b></td>
-                    <td>${father}</td>
-                    <td>₹${monthlyFee}</td>
-                    <td>₹${prevDue}</td>
-                    <td style="color:red; font-weight:bold;">₹${totalDue}</td>
-                    <td>
-                        <a href="${waUrl}" target="_blank" class="btn-wa-direct">
-                            SEND WHATSAPP 📱
-                        </a>
-                    </td>
-                </tr>`;
-            }
-        }
-
-        document.getElementById('totalStudentCount').innerText = `Total Students: ${count}`;
-        tbody.innerHTML = html || '<tr><td colspan="8" style="text-align:center;">No students found for this class.</td></tr>';
     }
 
     async function autoFetchByClassRoll() {
