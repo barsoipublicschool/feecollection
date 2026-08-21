@@ -185,33 +185,6 @@
                 <label style="margin:0; font-size:11px;">Portal URL:</label>
                 <input type="text" id="portalUrlInput" value="barsoipublicschool.github.io/feecollection" placeholder="e.g. myschool.com" onchange="renderFilteredReminders()" style="padding:4px 8px; width:210px; font-size:12px;">
             </div>
-
-            <select id="classFilterSelect" onchange="renderFilteredReminders()" style="padding:6px 10px; width:auto; font-weight:bold;">
-                <option value="ALL">ALL CLASSES</option>
-            </select>
-            <span id="totalStudentCount" style="font-weight:bold; color:var(--p); font-size:13px;">Total Students: 0</span>
-            <button onclick="fetchReminders()" style="background:var(--p); color:white; border:none; padding:6px 15px; border-radius:4px; cursor:pointer; font-weight:bold;">🔄 Refresh List</button>
-        </div>
-    </div>
-    <div style="overflow-x:auto;">
-        <table class="reminder-table">
-            <thead>
-                <tr>
-                    <th>Class</th>
-                    <th>Roll No</th>
-                    <th>Student Name</th>
-                    <th>Father Name</th>
-                    <th>Monthly Fee</th>
-                    <th>Previous Due</th>
-                    <th>Total Due</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="reminder-table-body">
-                <tr><td colspan="8" style="text-align:center; color:#666;">Click Refresh or open tab to load reminders...</td></tr>
-            </tbody>
-        </table>
-    </div>
 </div>
 
 <!-- RECEIPT MODAL -->
@@ -243,7 +216,7 @@
 
     // REMINDERS tab redirect function
     function openRemindersUrl() {
-        window.location.href = "https://barsoipublicschool.github.io/feecollection";
+        window.location.href = "https://barsoipublicschool.github.io/feecollection/reminder.html";
     }
 
     // Helper: Formats Date object or string to DD/MM/YYYY
