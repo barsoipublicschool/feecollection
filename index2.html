@@ -55,27 +55,34 @@
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #64748b; }
         .info-grid div span { color: #1e293b; font-weight: 600; }
 
-        /* TABLE */
+        /* DASHBOARD TABLE */
         .table-responsive { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; text-align: center; }
-        th { background: #0f172a; color: white; padding: 8px 4px; font-weight: 500; font-size: 10px; }
-        td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
+        .dash-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; text-align: center; }
+        .dash-table th { background: #0f172a; color: white; padding: 8px 4px; font-weight: 500; font-size: 10px; }
+        .dash-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
         .btn-view-rec { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
 
-        /* RECEIPT MODAL */
+        /* RECEIPT MODAL (CLEAN & NO BLACK SHADE) */
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
         .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
         .receipt-box { width: 48%; background: #ffdae9; border: 1.5px solid #000; padding: 10px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; min-height: 100%; }
+        
         .r-header { position: relative; }
-        .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; text-align: center; }
-        .r-header p { margin: 1px; font-size: 8px; font-weight: bold; text-align: center; }
+        .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; text-align: center; color: #000; }
+        .r-header p { margin: 1px; font-size: 8px; font-weight: bold; text-align: center; color: #000; }
         .school-logo { width: 45px; height: 45px; position: absolute; left: 5px; top: 15px; }
+        
         .top-info { display: flex; justify-content: space-between; font-size: 9.5px; margin-top: 4px; border-bottom: 1px solid #000; padding-bottom: 2px; }
         .copy-tag { background: #000; color: #fff; padding: 1px 6px; font-size: 8px; font-weight: bold; text-transform: uppercase; border-radius: 2px; }
         .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
-        .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; }
-        .r-table th, .r-table td { border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
+        
+        /* RECEIPT TABLE FIXED (NO BLACK SHADE) */
+        .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; background: transparent; }
+        .r-table th { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; font-weight: bold; line-height: 1.1; }
+        .r-table td { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
+        .r-table tfoot th, .r-table tfoot td { background: transparent !important; color: #000 !important; }
+        
         .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
         .footer-sigs { display: flex; justify-content: space-between; margin-top: auto; padding-top: 15px; font-size: 9.5px; font-weight: bold; }
 
@@ -168,7 +175,7 @@
             <div class="card-title">💳 Fee Payment History & Receipts</div>
         </div>
         <div class="table-responsive">
-            <table>
+            <table class="dash-table">
                 <thead>
                     <tr>
                         <th>Month</th>
@@ -196,17 +203,15 @@
         <div class="receipt-box" id="guardian-copy"></div>
         <div class="receipt-box" id="office-copy"></div>
     </div>
-    <div class="no-print" style="text-align:center; margin-top:15px; padding-bottom:30px; display:flex; justify-content:center; gap:8px;">
-        <button onclick="window.print()" style="padding:8px 16px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">PRINT / SAVE PDF 🖨️</button>
-        <button onclick="shareWhatsapp()" style="padding:8px 16px; background:#25d366; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">SHARE ON WHATSAPP 📲</button>
-        <button onclick="closeReceipt()" style="padding:8px 16px; background:#475569; color:white; border:none; border-radius:5px; cursor:pointer; font-size:11px;">CLOSE ✖</button>
+    <div class="no-print" style="text-align:center; margin-top:15px; padding-bottom:30px; display:flex; justify-content:center; gap:10px;">
+        <button onclick="window.print()" style="padding:8px 20px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">PRINT / SAVE PDF 🖨️</button>
+        <button onclick="closeReceipt()" style="padding:8px 20px; background:#475569; color:white; border:none; border-radius:5px; cursor:pointer; font-size:11px;">CLOSE ✖</button>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     let studentRecords = [];
-    let currentReceiptData = null;
 
     function getProp(obj, fieldName) {
         if(!obj) return "";
@@ -217,7 +222,7 @@
         return "";
     }
 
-    // Google Drive URL Convertor for Direct Image
+    // Direct Image URL Converter
     function getDirectImageUrl(url) {
         if (!url) return "https://via.placeholder.com/75?text=No+Img";
         let match = url.match(/[-\w]{25,}/);
@@ -296,11 +301,11 @@
         document.getElementById('st-address').innerText = getProp(first, "Address") || "N/A";
         document.getElementById('st-mobile').innerText = inputMobile || "N/A";
 
-        // Photo Fix
+        // Photo Load
         let photoRaw = getProp(first, "Photo") || getProp(first, "Student Photo") || getProp(first, "Image");
         document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-        // Latest Remaining Dues Banner
+        // Total Remaining Dues
         let latestRecord = records[records.length - 1];
         let totalRemainingDues = getProp(latestRecord, "Remaining") || 0;
         document.getElementById('total-due-val').innerText = "₹" + totalRemainingDues;
@@ -331,7 +336,6 @@
 
     function showDualReceipt(d) {
         if(!d) return;
-        currentReceiptData = d;
         document.getElementById('guardian-copy').innerHTML = generateReceiptHTML(d, "Guardian's Copy");
         document.getElementById('office-copy').innerHTML = generateReceiptHTML(d, "Office Copy");
         document.getElementById('receipt-modal').style.display = 'block';
@@ -341,16 +345,6 @@
     function closeReceipt() {
         document.getElementById('receipt-modal').style.display = 'none';
         document.getElementById('dashboard-screen').style.display = 'block';
-    }
-
-    function shareWhatsapp() {
-        if(!currentReceiptData) return;
-        let name = getProp(currentReceiptData, "Student Name");
-        let recNo = getProp(currentReceiptData, "Receipt No");
-        let paid = getProp(currentReceiptData, "Total Paid");
-        let rem = getProp(currentReceiptData, "Remaining");
-        let text = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n\nStudent: ${name}\nReceipt No: ${recNo}\nAmount Paid: ₹${paid}\nRemaining Dues: ₹${rem}\n\nThank you!`;
-        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     function logout() {
