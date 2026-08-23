@@ -1,256 +1,389 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BARSOI PUBLIC SCHOOL - PARENT PORTAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --p: #1a237e; --bg: #f4f7f6; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--p); font-size: 18px; margin-bottom: 5px; }
-        p.sub-text { text-align: center; font-size: 12px; color: #666; margin-top: 0; margin-bottom: 20px; }
-        label { font-size: 12px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; margin-bottom: 12px; }
-        .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
-        
-        /* DASHBOARD SECTION */
-        #portal-dashboard { display: none; }
-        .student-profile { background: #e8eaf6; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--p); }
-        .student-profile h4 { margin: 0 0 5px 0; color: var(--p); font-size: 15px; }
-        .student-profile p { margin: 2px 0; font-size: 12px; color: #333; }
-        
-        .history-card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .history-info h5 { margin: 0; font-size: 14px; color: #333; }
-        .history-info p { margin: 3px 0 0; font-size: 11px; color: #666; }
-        .btn-view { background: #e91e63; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        :root {
+            --primary: #3f51b5;
+            --primary-dark: #303f9f;
+            --bg: #f0f2f5;
+            --card-bg: #ffffff;
+            --text-dark: #2c3e50;
+            --text-muted: #7f8c8d;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+        }
 
-        /* RECEIPT MODAL */
-        #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 10px; }
-        .receipt-box { width: 100%; max-width: 450px; margin: 0 auto; background: #fff0f5; border: 1.5px solid #000; padding: 10px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
-        .r-header { position: relative; text-align: center; padding-left: 50px; min-height: 50px; }
-        .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; }
-        .r-header p { margin: 1px; font-size: 8px; font-weight: bold; }
-        .school-logo { width: 45px; height: 45px; position: absolute; left: 0; top: 0; object-fit: contain; }
-        .top-info { display: flex; justify-content: space-between; font-size: 9.5px; margin-top: 6px; border-bottom: 1px solid #000; padding-bottom: 2px; }
-        .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
-        .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; }
-        .r-table th, .r-table td { border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
-        .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
-        .footer-sigs { display: flex; justify-content: space-between; margin-top: 20px; font-size: 9.5px; font-weight: bold; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .portal-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .header-banner {
+            background: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 20px 15px;
+        }
+
+        .header-banner h2 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        .header-banner p {
+            margin: 3px 0 0;
+            font-size: 11px;
+            opacity: 0.85;
+            text-transform: uppercase;
+        }
+
+        .content-area {
+            padding: 20px;
+        }
+
+        /* LOGIN FORM */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 6px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid #dcdfe6;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.15);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-dark);
+        }
+
+        /* DASHBOARD VIEW */
+        #dashboard-section {
+            display: none;
+        }
+
+        .profile-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+            border: 1px solid #edf2f7;
+        }
+
+        .avatar-box {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info h4 {
+            margin: 0 0 3px 0;
+            font-size: 15px;
+            color: var(--text-dark);
+        }
+
+        .profile-info p {
+            margin: 1px 0;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .sec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .sec-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .logout-link {
+            color: var(--danger);
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .history-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid var(--primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-main h5 {
+            margin: 0;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .history-main p {
+            margin: 3px 0 0 0;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .history-side {
+            text-align: right;
+        }
+
+        .paid-amount {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        .due-amount {
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--danger);
+            margin-top: 2px;
+        }
+
+        .footer-note {
+            text-align: center;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 15px;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 10px;
+        }
     </style>
 </head>
 <body>
 
-<div class="container" id="login-container">
-    <h2>BARSOI PUBLIC SCHOOL</h2>
-    <p class="sub-text">Parent Fee Portal - Check Records & Receipts</p>
-    
-    <label>Student ID / Roll No</label>
-    <input type="text" id="login-sid" placeholder="e.g. 1">
-    
-    <label>Registered Mobile Number</label>
-    <input type="text" id="login-mob" placeholder="Enter mobile number">
-    
-    <button class="btn-login" onclick="parentLogin()">LOGIN TO VIEW FEES</button>
-</div>
+<div class="portal-card">
+    <div class="header-banner">
+        <h2>BARSOI PUBLIC SCHOOL</h2>
+        <p>Student Fee & Profile Portal</p>
+    </div>
 
-<!-- DASHBOARD VIEW -->
-<div class="container" id="portal-dashboard">
-    <h2>Student Fee Dashboard</h2>
-    <div class="student-profile" id="profile-box"></div>
-    
-    <h4 style="color: var(--p); font-size: 14px; margin-bottom: 8px;">Payment History & Receipts</h4>
-    <div id="history-list"></div>
+    <div class="content-area">
+        <!-- LOGIN SECTION -->
+        <div id="login-section">
+            <div class="form-group">
+                <label>Student ID / Roll No</label>
+                <input type="text" id="sid" placeholder="e.g. 77">
+            </div>
+            <div class="form-group">
+                <label>Registered Mobile No.</label>
+                <input type="text" id="mobile" placeholder="e.g. 9471685668">
+            </div>
+            <button class="btn-submit" onclick="loginParent()">VIEW FEE DETAILS</button>
+        </div>
 
-    <button onclick="logout()" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:4px; margin-top:15px; cursor:pointer; font-weight:bold;">LOGOUT</button>
-</div>
+        <!-- DASHBOARD SECTION -->
+        <div id="dashboard-section">
+            <div class="profile-card" id="student-profile">
+                <!-- Profile loaded dynamically -->
+            </div>
 
-<!-- RECEIPT MODAL FOR PARENT -->
-<div id="receipt-modal">
-    <div id="single-receipt-view"></div>
-    <div style="text-align:center; margin-top:20px; padding-bottom:20px;">
-        <button onclick="window.print()" style="padding:10px 20px; background:#2e7d32; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:4px;">PRINT / SAVE PDF</button>
-        <button onclick="closeReceipt()" style="padding:10px 20px; background:#666; color:white; border:none; border-radius:4px; margin-left:10px; cursor:pointer;">CLOSE</button>
+            <div class="sec-header">
+                <span class="sec-title">📊 Fee Details & History</span>
+                <span class="logout-link" onclick="logout()">⏻ Logout</span>
+            </div>
+
+            <div id="fee-history-container">
+                <!-- Records loaded dynamically -->
+            </div>
+
+            <div class="footer-note">
+                Barsoi Public School • Managed via Google Sheet API
+            </div>
+        </div>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4Jrpt7eVk1erYOH41kJt6tfMTzbZO9vZGy_Iq2mH90whJWK2n8PiMQN4F1L-_x2T7Gw/exec";
-    let studentRecords = [];
 
-    async function parentLogin() {
-        let sid = document.getElementById('login-sid').value.trim();
-        let inputMob = document.getElementById('login-mob').value.trim().replace(/[^0-9]/g, '');
+    async function loginParent() {
+        const idVal = document.getElementById('sid').value.trim();
+        const mobVal = document.getElementById('mobile').value.trim().replace(/[^0-9]/g, '');
 
-        if(!sid || !inputMob) {
-            Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein.", "warning");
+        if (!idVal || !mobVal) {
+            Swal.fire("Incomplete Data", "Kripya Roll/ID aur Mobile Number dono daalein.", "warning");
             return;
         }
 
-        if(inputMob.length < 8) {
-            Swal.fire("Warning", "Kripya sahi Mobile Number daalein.", "warning");
-            return;
-        }
-
-        Swal.fire({title:'Checking details...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
+        Swal.fire({
+            title: 'Fetching Data...',
+            text: 'Please wait',
+            didOpen: () => Swal.showLoading(),
+            allowOutsideClick: false
+        });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(sid)}`);
-            let data = await res.json();
+            // Fetching data using searchData action
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(idVal)}`);
+            const data = await res.json();
             Swal.close();
 
-            if(!data || !data.length) {
-                Swal.fire("Not Found", "Is Student ID ka koi record nahi mila.", "error");
+            if (!data || data.length === 0) {
+                Swal.fire("Not Found", "Is Student ID / Roll No ka koi record nahi mila.", "error");
                 return;
             }
 
-            // Universal Flexible Mobile Checking Logic
-            let isValidUser = false;
+            // Mobile Match Logic Across 'All Students' Data Row
+            let matchedStudent = null;
+            let studentHistory = [];
 
-            for(let row of data) {
-                let allRowText = Object.values(row).map(v => String(v).replace(/[^0-9]/g, '')).join(" ");
-                if(allRowText.includes(inputMob)) {
-                    isValidUser = true;
-                    break;
+            data.forEach(row => {
+                let rowStr = Object.values(row).map(v => String(v).replace(/[^0-9]/g, '')).join(" ");
+                if (rowStr.includes(mobVal)) {
+                    matchedStudent = row;
+                    studentHistory.push(row);
                 }
-            }
+            });
 
-            if(!isValidUser) {
-                Swal.fire("Access Denied", "Galat Mobile Number! Ye Mobile Number is Student ID se match nahi karta.", "error");
+            if (!matchedStudent) {
+                Swal.fire("Access Denied", "Mobile Number match nahi hua!", "error");
                 return;
             }
 
-            studentRecords = data;
-            renderDashboard(data[0]);
+            renderDashboard(matchedStudent, studentHistory);
 
-        } catch(e) {
+        } catch (e) {
             Swal.close();
-            Swal.fire("Error", "Server se connect karne mein samasya aayi.", "error");
+            Swal.fire("Error", "Server se connect karne me samasya aayi.", "error");
         }
     }
 
-    function renderDashboard(info) {
-        document.getElementById('login-container').style.display = 'none';
-        document.getElementById('portal-dashboard').style.display = 'block';
+    function renderDashboard(profile, history) {
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'block';
 
-        let profileHtml = `
-            <h4>${info["Student Name"] || info["Name"] || "Student Profile"}</h4>
-            <p><b>Student ID:</b> ${info["Student Id"] || info["ID"] || info["Roll No"]} | <b>Class:</b> ${info["Class"] || "N/A"}</p>
-            <p><b>Father's Name:</b> ${info["Father Name"] || info["Father's Name"] || "N/A"}</p>
-            <p style="color:red; margin-top:5px;"><b>Current Due Balance: ₹${info["Remaining"] || info["Due"] || 0}</b></p>
+        // Render Student Profile Box
+        const name = profile["Student Name"] || profile["Name"] || "Student";
+        const roll = profile["Roll No"] || profile["Roll"] || profile["ID"] || profile["Student Id"] || "N/A";
+        const cls = profile["Class"] || "N/A";
+        const sec = profile["Section"] ? ` (${profile["Section"]})` : '';
+        const father = profile["Father Name"] || profile["Father's Name"] || "N/A";
+        const mob = profile["Mobile"] || profile["Contact"] || document.getElementById('mobile').value;
+
+        document.getElementById('student-profile').innerHTML = `
+            <div class="avatar-box">
+                <span style="font-size:24px; color:#a0aec0;">👤</span>
+            </div>
+            <div class="profile-info">
+                <h4>${name}</h4>
+                <p>Class: <b>${cls}${sec}</b> | Roll: <b>${roll}</b></p>
+                <p>Father: <b>${father}</b></p>
+                <p>Mobile: <b>${mob}</b></p>
+            </div>
         `;
-        document.getElementById('profile-box').innerHTML = profileHtml;
 
+        // Render History Items
         let listHtml = "";
-        studentRecords.forEach((r, index) => {
+        history.forEach(item => {
+            const month = item["Month"] || "N/A";
+            const date = item["Paid Date"] || item["Date"] || "N/A";
+            const receipt = item["Receipt No"] || item["Receipt"] || "N/A";
+            const paid = item["Total Paid"] || item["Paid"] || 0;
+            const due = item["Remaining"] || item["Due"] || 0;
+
             listHtml += `
                 <div class="history-card">
-                    <div class="history-info">
-                        <h5>Month: ${r.Month || "N/A"}</h5>
-                        <p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"] || r["Paid"] || 0} | Date: ${r["Paid Date"] || "N/A"}</p>
+                    <div class="history-main">
+                        <h5>${month} <span style="font-size:10px; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-left:4px;">${date}</span></h5>
+                        <p>Receipt: #${receipt}</p>
                     </div>
-                    <button class="btn-view" onclick="viewReceipt(${index})">VIEW RECEIPT</button>
+                    <div class="history-side">
+                        <div class="paid-amount">₹${paid}</div>
+                        <div class="due-amount">Due: ₹${due}</div>
+                    </div>
                 </div>
             `;
         });
-        document.getElementById('history-list').innerHTML = listHtml;
+
+        document.getElementById('fee-history-container').innerHTML = listHtml;
     }
 
     function logout() {
-        document.getElementById('portal-dashboard').style.display = 'none';
-        document.getElementById('login-container').style.display = 'block';
-        document.getElementById('login-sid').value = '';
-        document.getElementById('login-mob').value = '';
-        studentRecords = [];
-    }
-
-    function viewReceipt(index) {
-        let d = studentRecords[index];
-        if(!d) return;
-        document.getElementById('single-receipt-view').innerHTML = generateReceiptHTML(d);
-        document.getElementById('receipt-modal').style.display = 'block';
-    }
-
-    function closeReceipt() {
-        document.getElementById('receipt-modal').style.display = 'none';
-    }
-
-    function formatDateDDMMYYYY(dateObj) {
-        let d = dateObj ? new Date(dateObj) : new Date();
-        if (isNaN(d.getTime())) d = new Date();
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
-
-    function roman(n) { const r = ["i","ii","iii","iv","v","vi","vii","viii","ix","x"]; return r[n-1] || n; }
-
-    function numberToWords(num) {
-        var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
-        var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
-        if (num == 0) return 'Zero';
-        var n = ('000000000' + num).substr(-9).match(/^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/);
-        if (!n) return ''; var str = '';
-        str += (n[1] != 0) ? (a[Number(n[1])] || b[n[1][0]] + ' ' + a[n[1][1]]) + 'Crore ' : '';
-        str += (n[2] != 0) ? (a[Number(n[2])] || b[n[2][0]] + ' ' + a[n[2][1]]) + 'Lakh ' : '';
-        str += (n[3] != 0) ? (a[Number(n[3])] || b[n[3][0]] + ' ' + a[n[3][1]]) + 'Thousand ' : '';
-        str += (n[4] != 0) ? (a[Number(n[4])] || b[n[4][0]] + ' ' + a[n[4][1]]) + 'Hundred ' : '';
-        str += (n[5] != 0) ? ((str != '') ? 'and ' : '') + (a[Number(n[5])] || b[n[5][0]] + ' ' + a[n[5][1]]) : '';
-        return str.trim();
-    }
-
-    function generateReceiptHTML(d) {
-        let sl = 1; let rows = "";
-        const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
-        main.forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
-        
-        const lists = {
-            "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
-            "School Books & Other": ["Books Fee", "Copies", "Cover", "Geo-Box", "Diary", "Stationary"],
-            "Miscellaneous Fees": ["Republic Day Fee", "Independence Day Fee", "UDISE Fee"]
-        };
-
-        for (let category in lists) {
-            let tempRows = ""; let cSub = 1;
-            lists[category].forEach(k => { if(d[k]>0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
-            if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
-        }
-
-        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
-
-        let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
-
-        return `
-            <div class="receipt-box">
-                <div class="r-header">
-                    <img src="${logo}" class="school-logo">
-                    <h2>BARSOI PUBLIC SCHOOL</h2>
-                    <p>QUAZITOLA, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
-                </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
-                <div class="student-details">
-                    <div><b>Name:</b> ${d["Student Name"] || d["Name"]}</div><div><b>ID:</b> ${d["Student Id"] || d["ID"]}</div>
-                    <div><b>Father:</b> ${d["Father Name"] || d["Father's Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"] || ""}</div><div><b>Month:</b> ${d["Month"]}</div>
-                </div>
-                <table class="r-table">
-                    <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
-                    <tbody>${rows}</tbody>
-                    <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"] || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${d["Discount"] || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${d["Total Paid"] || 0}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"] || 0}</b></td></tr>
-                    </tfoot>
-                </table>
-                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"] || 0)} Only.</div>
-                <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
-            </div>`;
+        document.getElementById('dashboard-section').style.display = 'none';
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('sid').value = '';
+        document.getElementById('mobile').value = '';
     }
 </script>
 </body>
