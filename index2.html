@@ -82,10 +82,18 @@
 
     async function parentLogin() {
         let sid = document.getElementById('login-sid').value.trim();
-        let mob = document.getElementById('login-mob').value.trim();
+        let inputMob = document.getElementById('login-mob').value.trim();
 
-        if(!sid || !mob) {
-            Swal.fire("Error", "Kripya Student ID aur Mobile Number dono bharein.", "warning");
+        if(!sid || !inputMob) {
+            Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein.", "warning");
+            return;
+        }
+
+        // Clean mobile number format
+        inputMob = inputMob.replace(/[^0-9]/g, '');
+
+        if(inputMob.length < 10) {
+            Swal.fire("Warning", "Kripya sahi 10-digit Mobile Number daalein.", "warning");
             return;
         }
 
@@ -101,8 +109,25 @@
                 return;
             }
 
-            // Note: Agar aapne Google Sheet mein mobile number ka column rakha hai toh aap yahan mobile number match bhi kara sakte hain. 
-            // Abhi yeh ID ke basis par saare records fetch karke dashboard dikha dega.
+            // Mobile number verification across common column headers
+            let isVerified = data.some(r => {
+                let sheetMob = String(
+                    r["Contact No"] || 
+                    r["Contact"] || 
+                    r["Mobile No"] || 
+                    r["Mobile"] || 
+                    r["Phone"] || 
+                    ""
+                ).replace(/[^0-9]/g, '').trim();
+
+                return sheetMob.includes(inputMob) || inputMob.includes(sheetMob);
+            });
+
+            if(!isVerified) {
+                Swal.fire("Access Denied", "Galat Mobile Number! Ye Mobile Number is Student ID se match nahi karta.", "error");
+                return;
+            }
+
             studentRecords = data;
             renderDashboard(data[0]);
 
