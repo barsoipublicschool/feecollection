@@ -10,10 +10,8 @@
         :root { --p: #4c46e5; --p-dark: #3730a3; --bg: #f3f4f6; }
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 0; }
         
-        /* HEADER */
         .top-bar { background: #1e293b; color: white; padding: 10px; text-align: center; font-weight: 600; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
-        /* LOGIN SCREEN */
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 90vh; padding: 15px; box-sizing: border-box; }
         .login-card { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 100%; max-width: 360px; overflow: hidden; text-align: center; }
         .login-header { background: linear-gradient(135deg, #5145cd, #4338ca); color: white; padding: 25px 15px; }
@@ -35,10 +33,8 @@
         .btn-portal:hover { background: #4338ca; }
         .login-footer { font-size: 9px; color: #94a3b8; margin-top: 15px; margin-bottom: 5px; }
 
-        /* DASHBOARD */
         #dashboard-screen { display: none; max-width: 650px; margin: 15px auto; padding: 0 10px; }
         
-        /* BOLD TOTAL DUE BANNER */
         .due-banner { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 12px 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(239, 68, 68, 0.08); }
         .due-banner-text { color: #991b1b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
         .due-banner-amount { color: #dc2626; font-size: 20px; font-weight: 900; }
@@ -48,21 +44,18 @@
         .card-title { color: #2563eb; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .btn-logout { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; }
 
-        /* STUDENT PROFILE WITH RECTANGLE PHOTO */
         .profile-grid { display: grid; grid-template-columns: 85px 1fr; gap: 15px; align-items: center; }
         .avatar { width: 75px; height: 90px; border-radius: 8px; background: #f1f5f9; border: 2px solid #cbd5e1; object-fit: cover; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 6px; display: inline-block; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #64748b; }
         .info-grid div span { color: #1e293b; font-weight: 600; }
 
-        /* DASHBOARD TABLE */
         .table-responsive { overflow-x: auto; }
         .dash-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; text-align: center; }
         .dash-table th { background: #0f172a; color: white; padding: 8px 4px; font-weight: 500; font-size: 10px; }
         .dash-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
         .btn-view-rec { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
 
-        /* RECEIPT MODAL (CLEAN & NO BLACK SHADE) */
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
         .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
@@ -77,7 +70,6 @@
         .copy-tag { background: #000; color: #fff; padding: 1px 6px; font-size: 8px; font-weight: bold; text-transform: uppercase; border-radius: 2px; }
         .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
         
-        /* RECEIPT TABLE CLEAN STYLES */
         .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; background: transparent; }
         .r-table th { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; font-weight: bold; line-height: 1.1; }
         .r-table td { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
@@ -102,7 +94,6 @@
     🎓 BARSOI PUBLIC SCHOOL - PARENT PORTAL
 </div>
 
-<!-- 1. LOGIN SCREEN -->
 <div id="login-screen" class="no-print">
     <div class="login-card">
         <div class="login-header">
@@ -136,16 +127,13 @@
     </div>
 </div>
 
-<!-- 2. DASHBOARD SCREEN -->
 <div id="dashboard-screen" class="no-print">
     
-    <!-- TOTAL DUE BANNER -->
     <div class="due-banner">
         <div class="due-banner-text">⚠️ Total Remaining Dues:</div>
         <div class="due-banner-amount" id="total-due-val">₹0</div>
     </div>
 
-    <!-- STUDENT PROFILE CARD -->
     <div class="card">
         <div class="card-header">
             <div class="card-title">👤 Student Details</div>
@@ -169,7 +157,6 @@
         </div>
     </div>
 
-    <!-- FEE HISTORY CARD -->
     <div class="card">
         <div class="card-header">
             <div class="card-title">💳 Fee Payment History & Receipts</div>
@@ -197,7 +184,6 @@
 
 </div>
 
-<!-- 3. DUAL RECEIPT MODAL -->
 <div id="receipt-modal">
     <div class="print-wrapper">
         <div class="receipt-box" id="guardian-copy"></div>
@@ -213,17 +199,24 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     let studentRecords = [];
 
-    function getProp(obj, fieldName) {
+    function fetchAnyProp(obj, possibleKeys) {
         if(!obj) return "";
-        let searchKey = fieldName.toString().toLowerCase().replace(/[\s_:'"()\-]/g, '');
-        for(let key in obj) {
-            let cleanKey = key.toString().toLowerCase().replace(/[\s_:'"()\-]/g, '');
-            if(cleanKey === searchKey) return obj[key];
+        for (let key of possibleKeys) {
+            let targetKey = key.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
+            for (let objKey in obj) {
+                let cleanObjKey = objKey.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
+                if (cleanObjKey === targetKey && obj[objKey] !== "" && obj[objKey] !== null) {
+                    return obj[objKey];
+                }
+            }
         }
         return "";
     }
 
-    // Direct Image URL Converter for Drive Links
+    function getProp(obj, fieldName) {
+        return fetchAnyProp(obj, [fieldName]);
+    }
+
     function getDirectImageUrl(url) {
         if (!url || url === "" || url === "N/A") {
             return "https://lh3.googleusercontent.com/d/1hFBKLJM7GfIGvBrsiMxKmQpu3dVGWZvh=s300";
@@ -235,10 +228,19 @@
         return url;
     }
 
-    function formatDateDDMMYYYY(dateObj) {
-        if (!dateObj || dateObj === "N/A") return "N/A";
-        let d = new Date(dateObj);
-        if (isNaN(d.getTime())) return dateObj; // Agar pehle se string format (DD/MM/YYYY) me ho
+    function formatDateDDMMYYYY(val) {
+        if (!val || val === "" || val === "N/A") return "N/A";
+        
+        if (typeof val === 'string' && (val.includes('/') || val.includes('-'))) {
+            let parts = val.split(/[/\-]/);
+            if(parts.length === 3) {
+                if(parts[0].length === 4) return `${parts[2]}/${parts[1]}/${parts[0]}`;
+                return val;
+            }
+        }
+
+        let d = new Date(val);
+        if (isNaN(d.getTime())) return val;
         let day = String(d.getDate()).padStart(2, '0');
         let month = String(d.getMonth() + 1).padStart(2, '0');
         let year = d.getFullYear();
@@ -262,96 +264,76 @@
     }
 
     async function loginStudent() {
-    let sid = document.getElementById('login-sid').value.trim();
-    let mobile = document.getElementById('login-mobile').value.trim();
+        let sid = document.getElementById('login-sid').value.trim();
+        let mobile = document.getElementById('login-mobile').value.trim();
 
-    if(!sid || !mobile) {
-        Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein", "warning");
-        return;
-    }
-
-    Swal.fire({title: 'Authenticating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
-
-    try {
-        // verifyLogin API se All Students aur Fees dono ka data ek sath aayega
-        const res = await fetch(`${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(sid)}&mobile=${encodeURIComponent(mobile)}`);
-        const result = await res.json();
-        Swal.close();
-
-        if(result.status === "error") {
-            Swal.fire("Error", result.message, "error");
+        if(!sid || !mobile) {
+            Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein", "warning");
             return;
         }
 
-        let st = result.student;
-        studentRecords = result.fees || [];
+        Swal.fire({title: 'Authenticating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
 
-        // Profile Details Update (All Students Sheet Se)
-        document.getElementById('st-name').innerText = st["Student Name"] || "Student";
-        document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Roll No"] || sid);
-        document.getElementById('st-class').innerText = st["Class"] || "-";
-        document.getElementById('st-roll').innerText = st["Roll No"] || "-";
-        document.getElementById('st-father').innerText = st["Father Name"] || "N/A";
-        document.getElementById('st-mother').innerText = st["Mother Name"] || "N/A";
-        document.getElementById('st-dob').innerText = st["DOB"] || "N/A";
-        document.getElementById('st-address').innerText = st["Address"] || "N/A";
-        document.getElementById('st-mobile').innerText = st["Mobile No"] || mobile;
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(sid)}&mobile=${encodeURIComponent(mobile)}`);
+            const result = await res.json();
+            Swal.close();
 
-        // Photo Update
-        let photoRaw = st["Photo url"] || st["Photo"] || "";
-        document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
+            if(result.status === "error") {
+                Swal.fire("Error", result.message, "error");
+                return;
+            }
 
-        // Dashboard Tables Render
-        renderFeeHistory(studentRecords);
+            let st = result.student || {};
+            studentRecords = result.fees || [];
 
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('dashboard-screen').style.display = 'block';
+            // Profile Details Set From "All Students"
+            document.getElementById('st-name').innerText = st["Student Name"] || "Student";
+            document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Student ID"] || sid);
+            document.getElementById('st-class').innerText = st["Class"] || "-";
+            document.getElementById('st-roll').innerText = st["Roll No"] || "-";
+            document.getElementById('st-father').innerText = st["Father Name"] || "N/A";
+            document.getElementById('st-mother').innerText = st["Mother Name"] || "N/A";
+            document.getElementById('st-dob').innerText = formatDateDDMMYYYY(st["DOB"]);
+            document.getElementById('st-address').innerText = st["Address"] || "N/A";
+            document.getElementById('st-mobile').innerText = st["Mobile No"] || mobile;
 
-    } catch(e) {
-        Swal.fire("Error", "Server connect nahi ho saka: " + e.message, "error");
+            let photoRaw = st["Photo url"] || st["Photo"] || "";
+            document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
+
+            renderDashboard(studentRecords);
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+
+        } catch(e) {
+            Swal.fire("Error", "Server connect nahi ho saka: " + e.message, "error");
+        }
     }
-}
 
-    function renderDashboard(records, inputMobile) {
-        let first = records[0];
+    function renderDashboard(records) {
+        if(!records || records.length === 0) {
+            document.getElementById('total-due-val').innerText = "₹0";
+            document.getElementById('history-rows').innerHTML = "<tr><td colspan='8'>Koi fee record nahi mila.</td></tr>";
+            return;
+        }
 
-        // Advanced Mother Name and DOB Fetching
-        let motherVal = getProp(first, "Mother Name") || getProp(first, "Mothers Name") || getProp(first, "Mother's Name") || getProp(first, "Mother") || "N/A";
-        let dobVal = getProp(first, "Date of Birth") || getProp(first, "DOB") || getProp(first, "DateOfBirth") || getProp(first, "Birth Date") || "N/A";
-
-        // Profile Updates
-        document.getElementById('st-name').innerText = getProp(first, "Student Name") || "Student";
-        document.getElementById('st-badge').innerText = "ID: " + (getProp(first, "Student Id") || "-");
-        document.getElementById('st-class').innerText = getProp(first, "Class") || "-";
-        document.getElementById('st-roll').innerText = getProp(first, "Student Id") || "-";
-        document.getElementById('st-father').innerText = getProp(first, "Father Name") || getProp(first, "Father's Name") || "N/A";
-        document.getElementById('st-mother').innerText = motherVal;
-        document.getElementById('st-dob').innerText = formatDateDDMMYYYY(dobVal);
-        document.getElementById('st-address').innerText = getProp(first, "Address") || "N/A";
-        document.getElementById('st-mobile').innerText = inputMobile || "N/A";
-
-        // Photo Mapping with Drive Link Fallback
-        let photoRaw = getProp(first, "Photo") || getProp(first, "Student Photo") || getProp(first, "Image") || getProp(first, "Photo URL");
-        document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
-
-        // Total Remaining Dues
         let latestRecord = records[records.length - 1];
-        let totalRemainingDues = getProp(latestRecord, "Remaining") || 0;
+        let totalRemainingDues = fetchAnyProp(latestRecord, ["Remaining", "Due Balance", "Dues"]) || 0;
         document.getElementById('total-due-val').innerText = "₹" + totalRemainingDues;
 
-        // History Table
         let rowsHtml = "";
         records.forEach((r, idx) => {
-            let mFee = getProp(r, "School Fee") || 0;
-            let pDues = getProp(r, "Prev Dues") || 0;
-            let pAmt = getProp(r, "Total Paid") || 0;
-            let rem = getProp(r, "Remaining") || 0;
+            let mFee = fetchAnyProp(r, ["School Fee", "Fee"]) || 0;
+            let pDues = fetchAnyProp(r, ["Prev Dues", "Previous Dues"]) || 0;
+            let pAmt = fetchAnyProp(r, ["Total Paid", "Paid Amount", "Paid"]) || 0;
+            let rem = fetchAnyProp(r, ["Remaining", "Due Balance"]) || 0;
 
             rowsHtml += `
                 <tr>
-                    <td><b>${getProp(r, "Month")}</b></td>
-                    <td>${getProp(r, "Receipt No")}</td>
-                    <td>${formatDateDDMMYYYY(getProp(r, "Paid Date"))}</td>
+                    <td><b>${fetchAnyProp(r, ["Month"]) || "-"}</b></td>
+                    <td>${fetchAnyProp(r, ["Receipt No", "Receipt"]) || "-"}</td>
+                    <td>${formatDateDDMMYYYY(fetchAnyProp(r, ["Paid Date", "Date"]))}</td>
                     <td>₹${mFee}</td>
                     <td>₹${pDues}</td>
                     <td style="color:#16a34a; font-weight:bold;">₹${pAmt}</td>
@@ -413,9 +395,9 @@
         });
 
         let logo = "https://lh3.googleusercontent.com/d/1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe=s300";
-        let pDate = getProp(d, "Paid Date");
+        let pDate = fetchAnyProp(d, ["Paid Date", "Date"]);
         let displayDate = pDate ? formatDateDDMMYYYY(pDate) : formatDateDDMMYYYY(new Date());
-        let totalPaidNum = parseFloat(getProp(d, "Total Paid")) || 0;
+        let totalPaidNum = parseFloat(fetchAnyProp(d, ["Total Paid", "Paid Amount"])) || 0;
 
         return `
             <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
@@ -431,20 +413,20 @@
                     <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
                     <p style="font-size:7px">email - sagarpublicschool2023@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${getProp(d, "Receipt No") || "________"}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${fetchAnyProp(d, ["Receipt No", "Receipt"]) || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${getProp(d, "Student Name")}</div><div><b>ID:</b> ${getProp(d, "Student Id")}</div>
-                    <div><b>Father:</b> ${getProp(d, "Father Name")}</div><div><b>Class:</b> ${getProp(d, "Class")}</div>
-                    <div><b>Address:</b> ${getProp(d, "Address")}</div><div><b>Month:</b> ${getProp(d, "Month")}</div>
+                    <div><b>Name:</b> ${fetchAnyProp(d, ["Student Name", "Name"])}</div><div><b>ID:</b> ${fetchAnyProp(d, ["Student Id", "ID"])}</div>
+                    <div><b>Father:</b> ${fetchAnyProp(d, ["Father Name", "Father"])}</div><div><b>Class:</b> ${fetchAnyProp(d, ["Class"])}</div>
+                    <div><b>Address:</b> ${fetchAnyProp(d, ["Address"])}</div><div><b>Month:</b> ${fetchAnyProp(d, ["Month"])}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${getProp(d, "Sub Total") || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${getProp(d, "Discount") || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${fetchAnyProp(d, ["Sub Total"]) || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${fetchAnyProp(d, ["Discount"]) || 0}</td></tr>
                         <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${totalPaidNum}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${getProp(d, "Remaining") || 0}</b></td></tr>
+                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${fetchAnyProp(d, ["Remaining", "Due Balance"]) || 0}</b></td></tr>
                     </tfoot>
                 </table>
                 <div class="words-section"><b>Words:</b> ${numberToWords(totalPaidNum)} Only.</div>
