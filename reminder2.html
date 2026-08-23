@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barsoi Public School | Pro Fee Dashboard</title>
+    <!-- Tailwind CSS & FontAwesome Icons -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .loader { border-top-color: #3b82f6; animation: spinner 1s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .gradient-header { background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
+
+    <!-- Navbar -->
+    <nav class="gradient-header text-white p-4 shadow-xl border-b border-blue-400/30">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <span class="text-2xl">🏫</span>
+                <div>
+                    <h1 class="text-lg md:text-xl font-extrabold tracking-wide">BARSOI PUBLIC SCHOOL</h1>
+                    <p class="text-[10px] text-blue-200 uppercase tracking-widest font-medium">Fee Management Dashboard</p>
+                </div>
+            </div>
+            <div class="hidden sm:block text-right">
+                <span class="bg-blue-500/30 border border-blue-300/30 text-xs px-3 py-1 rounded-full font-semibold">
+                    <i class="fa-solid fa-signal text-green-400 mr-1"></i> System Active
+                </span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto p-4 md:p-6 space-y-6">
+
+        <!-- Stat Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            <!-- Total Students -->
+            <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between border-l-4 border-l-blue-600">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Total Students</p>
+                    <h3 id="stat-count" class="text-3xl font-black text-slate-800 mt-1">--</h3>
+                </div>
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-600 text-xl font-bold">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+            </div>
+
+            <!-- Outstanding Dues -->
+            <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between border-l-4 border-l-rose-500">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Outstanding Dues</p>
+                    <h3 id="stat-due" class="text-3xl font-black text-rose-600 mt-1">₹0</h3>
+                </div>
+                <div class="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 text-xl font-bold">
+                    <i class="fa-solid fa-indian-rupee-sign"></i>
+                </div>
+            </div>
+
+            <!-- Dashboard Status -->
+            <div class="glass-card p-5 rounded-2xl shadow-sm border border-slate-200/80 flex items-center justify-between border-l-4 border-l-emerald-500">
+                <div>
+                    <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Reminder System</p>
+                    <span class="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+                        <span class="w-2 h-2 mr-1.5 bg-emerald-500 rounded-full animate-pulse"></span> Ready to Send
+                    </span>
+                </div>
+                <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 text-xl font-bold">
+                    <i class="fa-brands fa-whatsapp"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters & Search Controls -->
+        <div class="glass-card p-4 rounded-2xl shadow-sm border border-slate-200/80 flex flex-col md:flex-row gap-4 items-center">
+            <!-- Class Filter Dropdown -->
+            <div class="w-full md:w-64 relative">
+                <i class="fa-solid fa-filter absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                <select id="classFilter" onchange="updateView()" class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+                    <option value="ALL">All Classes</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="LKG">LKG</option>
+                    <option value="UKG">UKG</option>
+                    <option value="1">Class 1</option>
+                    <option value="2">Class 2</option>
+                    <option value="3">Class 3</option>
+                    <option value="4">Class 4</option>
+                    <option value="5">Class 5</option>
+                    <option value="6">Class 6</option>
+                    <option value="7">Class 7</option>
+                    <option value="8">Class 8</option>
+                    <option value="9">Class 9</option>
+                    <option value="10">Class 10</option>
+                </select>
+            </div>
+
+            <!-- Search Input -->
+            <div class="w-full flex-1 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
+                <input type="text" id="searchBox" onkeyup="updateView()" placeholder="Search Student or Father Name..." class="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+        </div>
+
+        <!-- Student Data Table -->
+        <div class="glass-card rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-50 border-b border-slate-200 text-slate-500 text-[11px] uppercase font-extrabold tracking-wider">
+                        <tr>
+                            <th class="px-6 py-4">Student Info</th>
+                            <th class="px-6 py-4">Class</th>
+                            <th class="px-6 py-4">Fee Breakdown</th>
+                            <th class="px-6 py-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody" class="divide-y divide-slate-100 text-sm font-medium">
+                        <tr>
+                            <td colspan="4" class="text-center py-12">
+                                <div class="loader ease-linear rounded-full border-4 border-t-4 border-slate-200 h-10 w-10 mx-auto"></div>
+                                <p class="text-xs font-bold text-slate-400 mt-3">Fetching Live Student Dues...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytnZ8V5RwKx_F3cqqJ7iaBdvu8c0sKFtFIQK4GS8XAoZDVYjll7mZZ751qWYYWk7Q8/exec";
+        let reminderRawData = [];
+
+        window.onload = () => {
+            fetch(`${SCRIPT_URL}?action=getReminderData`)
+            .then(res => res.json())
+            .then(data => { 
+                reminderRawData = data; 
+                updateView(); 
+            })
+            .catch(err => {
+                document.getElementById('tableBody').innerHTML = `<tr><td colspan="4" class="text-center py-8 text-rose-500 font-bold">Error loading data. Please refresh.</td></tr>`;
+            });
+        };
+
+        function updateView() {
+            const selectedClass = document.getElementById('classFilter').value.toLowerCase().trim();
+            const searchWord = document.getElementById('searchBox').value.toLowerCase().trim();
+            const tbody = document.getElementById('tableBody');
+            
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-IN');
+            const monthStr = now.toLocaleString('default', { month: 'long' });
+
+            let html = "";
+            let count = 0;
+            let grandTotalDue = 0;
+
+            for (let i = 0; i < reminderRawData.length; i++) {
+                let r = reminderRawData[i];
+                
+                let sClass = (r[0] || "").toString().trim();
+                let rollNo = r[1] || "";
+                let name = r[2] || "";
+                let father = r[3] || "";
+                let monthlyFee = parseFloat(r[4]) || 0;
+                let phone = (r[5] || "").toString().replace(/[^0-9]/g, '').trim();
+                let prevDue = parseFloat(r[6]) || 0;
+                let totalDue = parseFloat(r[7]) || (monthlyFee + prevDue);
+
+                // Exact & Flexible Class Filter Matching
+                let cleanClass = sClass.toLowerCase().replace("class", "").trim();
+                let matchClass = (selectedClass === "all" || cleanClass === selectedClass);
+                let matchSearch = name.toLowerCase().includes(searchWord) || father.toLowerCase().includes(searchWord);
+
+                if (matchClass && matchSearch) {
+                    count++;
+                    grandTotalDue += totalDue;
+
+                    // UPI payment link generation based on total due amount
+                    const upiLink = `upi://pay?pa=riyazahmad5@okaxis&pn=Barsoi%20Public%20School&am=${totalDue}&cu=INR`;
+
+                    // Customized WhatsApp Message Template with UPI Payment Link
+                    const whatsappMsg = encodeURIComponent(`*BARSOI PUBLIC SCHOOL - FEE REMINDER*
+📍 Nehar Nagar, Barsoi (Katihar)
+-----------------------------------
+📅 *Date:* ${dateStr}
+👤 *Student Name:* ${name}
+🆔 *Roll No:* ${rollNo}
+🏫 *Class:* ${sClass}
+🗓️ *Month:* ${monthStr}
+-----------------------------------
+💵 *Previous Due:* ₹${prevDue}
+✅ *Monthly:* ₹${monthlyFee}
+🔻 *Total Due Balance:* ₹${totalDue}
+-----------------------------------
+🔗 *Pay Online Instantly:*
+${upiLink}
+
+Please pay the amount asap!
+_Barsoi Public School Management_`);
+
+                    html += `
+                    <tr class="hover:bg-blue-50/60 transition">
+                        <td class="px-6 py-4">
+                            <div class="font-bold text-slate-900 text-base">${name}</div>
+                            <div class="text-xs text-slate-500 mt-0.5"><i class="fa-solid fa-user-tie text-slate-400 mr-1"></i> Father: <span class="font-semibold text-slate-700">${father}</span></div>
+                        </td>
+                        <td class="px-6 py-4">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-xs font-bold bg-blue-100/70 text-blue-700 border border-blue-200">
+                                Class ${sClass.replace("Class", "").trim()}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="text-xs text-slate-500">Prev. Due: <span class="font-semibold text-slate-700">₹${prevDue}</span></div>
+                            <div class="text-xs text-slate-500">Monthly: <span class="font-semibold text-slate-700">₹${monthlyFee}</span></div>
+                            <div class="text-sm font-black text-rose-600 mt-0.5">Total Due: ₹${totalDue}</div>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <a href="https://wa.me/91${phone}?text=${whatsappMsg}" target="_blank" 
+                               class="inline-flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md hover:shadow-lg transition gap-2">
+                                <i class="fa-brands fa-whatsapp text-sm"></i> Send WhatsApp
+                            </a>
+                        </td>
+                    </tr>`;
+                }
+            }
+
+            document.getElementById('stat-count').innerText = count;
+            document.getElementById('stat-due').innerText = "₹" + grandTotalDue.toLocaleString('en-IN');
+            tbody.innerHTML = html || `<tr><td colspan="4" class="text-center py-10 text-slate-400 font-bold">No student records found matching your filters.</td></tr>`;
+        }
+    </script>
+</body>
+</html>
