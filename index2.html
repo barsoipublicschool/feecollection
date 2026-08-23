@@ -82,15 +82,12 @@
 
     async function parentLogin() {
         let sid = document.getElementById('login-sid').value.trim();
-        let inputMob = document.getElementById('login-mob').value.trim();
+        let inputMob = document.getElementById('login-mob').value.trim().replace(/[^0-9]/g, '');
 
         if(!sid || !inputMob) {
             Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein.", "warning");
             return;
         }
-
-        // Clean mobile number format
-        inputMob = inputMob.replace(/[^0-9]/g, '');
 
         if(inputMob.length < 10) {
             Swal.fire("Warning", "Kripya sahi 10-digit Mobile Number daalein.", "warning");
@@ -100,30 +97,44 @@
         Swal.fire({title:'Checking details...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
 
         try {
+            // Step 1: Fetch Fee Records
             const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${sid}`);
             let data = await res.json();
-            Swal.close();
 
             if(!data || !data.length) {
+                Swal.close();
                 Swal.fire("Not Found", "Is Student ID ka koi record nahi mila.", "error");
                 return;
             }
 
-            // Mobile number verification across common column headers
-            let isVerified = data.some(r => {
-                let sheetMob = String(
-                    r["Contact No"] || 
-                    r["Contact"] || 
-                    r["Mobile No"] || 
-                    r["Mobile"] || 
-                    r["Phone"] || 
-                    ""
-                ).replace(/[^0-9]/g, '').trim();
+            // Step 2: Strict Mobile Check against Sheet Row Data
+            let isValidUser = false;
 
-                return sheetMob.includes(inputMob) || inputMob.includes(sheetMob);
-            });
+            for(let row of data) {
+                // Object ke sabhi values me search karenge ki kahin 10-digit mobile number match hota hai ya nahi
+                let rowValues = Object.values(row).map(v => String(v).replace(/[^0-9]/g, ''));
+                if(rowValues.some(val => val.includes(inputMob) && inputMob.length >= 10)) {
+                    isValidUser = true;
+                    break;
+                }
+            }
 
-            if(!isVerified) {
+            // Agar pehle check me match nahi hua, toh Student ID ke sath Father Name / Mobile strictly check hoga
+            if(!isValidUser) {
+                // Check if any field key contains Mobile/Contact/Phone
+                data.forEach(r => {
+                    for(let k in r) {
+                        if(k.toLowerCase().includes("mobile") || k.toLowerCase().includes("contact") || k.toLowerCase().includes("phone")) {
+                            let mVal = String(r[k]).replace(/[^0-9]/g, '');
+                            if(mVal.includes(inputMob)) isValidUser = true;
+                        }
+                    }
+                });
+            }
+
+            Swal.close();
+
+            if(!isValidUser) {
                 Swal.fire("Access Denied", "Galat Mobile Number! Ye Mobile Number is Student ID se match nahi karta.", "error");
                 return;
             }
@@ -132,6 +143,7 @@
             renderDashboard(data[0]);
 
         } catch(e) {
+            Swal.close();
             Swal.fire("Error", "Server se connect karne mein samasya aayi.", "error");
         }
     }
