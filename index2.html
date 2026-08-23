@@ -48,10 +48,10 @@
         .card-title { color: #2563eb; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .btn-logout { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; }
 
-        /* STUDENT PROFILE */
+        /* STUDENT PROFILE WITH RECTANGLE PHOTO */
         .profile-grid { display: grid; grid-template-columns: 85px 1fr; gap: 15px; align-items: center; }
-        .avatar { width: 75px; height: 75px; border-radius: 50%; background: #f1f5f9; border: 2px solid #cbd5e1; object-fit: cover; display: block; margin: 0 auto; }
-        .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 4px; display: inline-block; }
+        .avatar { width: 75px; height: 90px; border-radius: 8px; background: #f1f5f9; border: 2px solid #cbd5e1; object-fit: cover; display: block; margin: 0 auto; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 6px; display: inline-block; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #64748b; }
         .info-grid div span { color: #1e293b; font-weight: 600; }
 
@@ -77,7 +77,7 @@
         .copy-tag { background: #000; color: #fff; padding: 1px 6px; font-size: 8px; font-weight: bold; text-transform: uppercase; border-radius: 2px; }
         .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
         
-        /* RECEIPT TABLE FIXED (NO BLACK SHADE) */
+        /* RECEIPT TABLE CLEAN STYLES */
         .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; background: transparent; }
         .r-table th { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; font-weight: bold; line-height: 1.1; }
         .r-table td { background: transparent !important; color: #000 !important; border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
@@ -153,7 +153,7 @@
         </div>
         <div class="profile-grid">
             <div style="text-align:center;">
-                <img id="st-photo" class="avatar" src="https://via.placeholder.com/75" alt="Photo" onerror="this.src='https://via.placeholder.com/75?text=No+Img'">
+                <img id="st-photo" class="avatar" src="https://via.placeholder.com/75x90?text=Photo" alt="Photo" onerror="this.src='https://lh3.googleusercontent.com/d/1hFBKLJM7GfIGvBrsiMxKmQpu3dVGWZvh=s300'">
                 <div id="st-name" style="font-weight:bold; font-size:12px; margin-top:4px; color:#1e293b;">-</div>
                 <div class="student-id-badge" id="st-badge">ID: -</div>
             </div>
@@ -161,8 +161,8 @@
                 <div>Class: <span id="st-class">-</span></div>
                 <div>Roll No: <span id="st-roll">-</span></div>
                 <div>Father's Name: <span id="st-father">-</span></div>
-                <div>Mother's Name: <span id="st-mother">N/A</span></div>
-                <div>Date of Birth: <span id="st-dob">N/A</span></div>
+                <div>Mother's Name: <span id="st-mother">-</span></div>
+                <div>Date of Birth: <span id="st-dob">-</span></div>
                 <div>Mobile No: <span id="st-mobile">-</span></div>
                 <div style="grid-column: span 2;">Address: <span id="st-address">-</span></div>
             </div>
@@ -215,26 +215,30 @@
 
     function getProp(obj, fieldName) {
         if(!obj) return "";
-        let searchKey = fieldName.toString().toLowerCase().replace(/[\s_]/g, '');
+        let searchKey = fieldName.toString().toLowerCase().replace(/[\s_:'"()\-]/g, '');
         for(let key in obj) {
-            if(key.toString().toLowerCase().replace(/[\s_]/g, '') === searchKey) return obj[key];
+            let cleanKey = key.toString().toLowerCase().replace(/[\s_:'"()\-]/g, '');
+            if(cleanKey === searchKey) return obj[key];
         }
         return "";
     }
 
-    // Direct Image URL Converter
+    // Direct Image URL Converter for Drive Links
     function getDirectImageUrl(url) {
-        if (!url) return "https://via.placeholder.com/75?text=No+Img";
+        if (!url || url === "" || url === "N/A") {
+            return "https://lh3.googleusercontent.com/d/1hFBKLJM7GfIGvBrsiMxKmQpu3dVGWZvh=s300";
+        }
         let match = url.match(/[-\w]{25,}/);
         if (match) {
-            return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w300`;
+            return `https://lh3.googleusercontent.com/d/${match[0]}=s300`;
         }
         return url;
     }
 
     function formatDateDDMMYYYY(dateObj) {
-        let d = dateObj ? new Date(dateObj) : new Date();
-        if (isNaN(d.getTime())) d = new Date();
+        if (!dateObj || dateObj === "N/A") return "N/A";
+        let d = new Date(dateObj);
+        if (isNaN(d.getTime())) return dateObj; // Agar pehle se string format (DD/MM/YYYY) me ho
         let day = String(d.getDate()).padStart(2, '0');
         let month = String(d.getMonth() + 1).padStart(2, '0');
         let year = d.getFullYear();
@@ -292,17 +296,23 @@
     function renderDashboard(records, inputMobile) {
         let first = records[0];
 
+        // Advanced Mother Name and DOB Fetching
+        let motherVal = getProp(first, "Mother Name") || getProp(first, "Mothers Name") || getProp(first, "Mother's Name") || getProp(first, "Mother") || "N/A";
+        let dobVal = getProp(first, "Date of Birth") || getProp(first, "DOB") || getProp(first, "DateOfBirth") || getProp(first, "Birth Date") || "N/A";
+
         // Profile Updates
         document.getElementById('st-name').innerText = getProp(first, "Student Name") || "Student";
         document.getElementById('st-badge').innerText = "ID: " + (getProp(first, "Student Id") || "-");
         document.getElementById('st-class').innerText = getProp(first, "Class") || "-";
         document.getElementById('st-roll').innerText = getProp(first, "Student Id") || "-";
-        document.getElementById('st-father').innerText = getProp(first, "Father Name") || "N/A";
+        document.getElementById('st-father').innerText = getProp(first, "Father Name") || getProp(first, "Father's Name") || "N/A";
+        document.getElementById('st-mother').innerText = motherVal;
+        document.getElementById('st-dob').innerText = formatDateDDMMYYYY(dobVal);
         document.getElementById('st-address').innerText = getProp(first, "Address") || "N/A";
         document.getElementById('st-mobile').innerText = inputMobile || "N/A";
 
-        // Photo Load
-        let photoRaw = getProp(first, "Photo") || getProp(first, "Student Photo") || getProp(first, "Image");
+        // Photo Mapping with Drive Link Fallback
+        let photoRaw = getProp(first, "Photo") || getProp(first, "Student Photo") || getProp(first, "Image") || getProp(first, "Photo URL");
         document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
         // Total Remaining Dues
@@ -322,7 +332,7 @@
                 <tr>
                     <td><b>${getProp(r, "Month")}</b></td>
                     <td>${getProp(r, "Receipt No")}</td>
-                    <td>${getProp(r, "Paid Date") || "N/A"}</td>
+                    <td>${formatDateDDMMYYYY(getProp(r, "Paid Date"))}</td>
                     <td>₹${mFee}</td>
                     <td>₹${pDues}</td>
                     <td style="color:#16a34a; font-weight:bold;">₹${pAmt}</td>
@@ -383,7 +393,7 @@
             if(val > 0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
         });
 
-        let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
+        let logo = "https://lh3.googleusercontent.com/d/1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe=s300";
         let pDate = getProp(d, "Paid Date");
         let displayDate = pDate ? formatDateDDMMYYYY(pDate) : formatDateDDMMYYYY(new Date());
         let totalPaidNum = parseFloat(getProp(d, "Total Paid")) || 0;
