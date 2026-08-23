@@ -292,8 +292,8 @@
             document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Student ID"] || sid);
             document.getElementById('st-class').innerText = st["Class"] || "-";
             document.getElementById('st-roll').innerText = st["Roll No"] || "-";
-            document.getElementById('st-father').innerText = st["Father Name"] || "N/A";
-            document.getElementById('st-mother').innerText = st["Mother Name"] || "N/A";
+            document.getElementById('st-father').innerText = fetchAnyProp(st, ["Father Name", "Father's Name", "Father"]) || "N/A";
+            document.getElementById('st-mother').innerText = fetchAnyProp(st, ["Mother Name", "Mother's Name", "Mother"]) || "N/A";
             document.getElementById('st-dob').innerText = formatDateDDMMYYYY(st["DOB"]);
             document.getElementById('st-address').innerText = st["Address"] || "N/A";
             document.getElementById('st-mobile').innerText = st["Mobile No"] || mobile;
