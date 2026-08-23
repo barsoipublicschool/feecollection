@@ -3,115 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barsoi Public School - Parent Portal</title>
-    <!-- Tailwind CSS for Modern Responsive UI -->
+    <title>Barsoi Public School - Student Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SweetAlert2 for clean alerts -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-100 min-h-screen flex items-center justify-center p-3 font-sans">
 
-    <!-- Main Container -->
     <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
         
-        <!-- Header -->
-        <div class="bg-indigo-700 text-white p-6 text-center relative">
-            <div class="w-16 h-16 bg-white/10 rounded-full mx-auto flex items-center justify-center mb-2 backdrop-blur-sm">
-                <i class="fa-solid fa-graduation-cap text-3xl text-indigo-200"></i>
-            </div>
-            <h1 class="text-xl font-bold tracking-wide">BARSOI PUBLIC SCHOOL</h1>
-            <p class="text-xs text-indigo-200 mt-0.5 font-medium">Student Fee & Profile Portal</p>
+        <!-- App Header -->
+        <div class="bg-indigo-700 text-white p-5 text-center relative">
+            <h1 class="text-lg font-bold tracking-wide">BARSOI PUBLIC SCHOOL</h1>
+            <p class="text-[11px] text-indigo-200 uppercase tracking-wider">Student Fee & Profile Portal</p>
         </div>
 
-        <!-- Content Area -->
-        <div class="p-6">
-            
-            <!-- LOGIN FORM -->
-            <div id="loginForm" class="space-y-4">
-                <div class="text-center mb-4">
-                    <h2 class="text-lg font-semibold text-slate-700">Student Login</h2>
-                    <p class="text-xs text-slate-400">Login with ID/Roll No & Registered Mobile</p>
+        <div class="p-5">
+            <!-- Login Form -->
+            <div id="loginBox" class="space-y-4">
+                <div class="text-center mb-2">
+                    <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-2 text-xl">
+                        <i class="fa-solid font-bold fa-user-graduate"></i>
+                    </div>
+                    <h2 class="font-bold text-slate-800 text-base">Student Login</h2>
+                    <p class="text-xs text-slate-500">Apna Roll No / ID aur Mobile No daalein</p>
                 </div>
-
+                
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Student ID / Roll No</label>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Roll No / Student ID</label>
                     <div class="relative">
-                        <i class="fa-solid fa-id-card absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="text" id="loginId" placeholder="e.g. 7 or 26" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-slate-50">
+                        <i class="fa-solid fa-id-card absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="text" id="stuId" placeholder="e.g. 26 ya BPS-101" class="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-600 mb-1">Mobile Number</label>
+                    <label class="block text-[11px] font-semibold text-slate-600 mb-1">Registered Mobile No</label>
                     <div class="relative">
-                        <i class="fa-solid fa-phone absolute left-3.5 top-3.5 text-slate-400 text-sm"></i>
-                        <input type="tel" id="loginMobile" placeholder="Registered 10-digit mobile" class="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm bg-slate-50">
+                        <i class="fa-solid fa-phone absolute left-3 top-3 text-slate-400 text-sm"></i>
+                        <input type="tel" id="stuMob" placeholder="e.g. 6207173992" class="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 outline-none bg-slate-50">
                     </div>
                 </div>
 
-                <button onclick="loginStudent()" id="loginBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-lg shadow-indigo-200 transition-all flex items-center justify-center space-x-2 text-sm mt-2">
-                    <span>Login to Portal</span>
-                    <i class="fa-solid fa-arrow-right text-xs"></i>
+                <button onclick="doLogin()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl shadow-md text-sm mt-2 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-right-to-bracket"></i> Login Portal
                 </button>
             </div>
 
-            <!-- STUDENT DASHBOARD (Hidden initially) -->
-            <div id="dashboard" class="hidden space-y-5">
+            <!-- Dashboard Screen -->
+            <div id="dashBox" class="hidden space-y-4">
                 
-                <!-- Profile Card -->
-                <div class="bg-gradient-to-r from-indigo-600 to-indigo-800 text-white p-4 rounded-2xl shadow-md flex items-center space-x-4">
-                    <img id="studentPhoto" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-16 h-16 rounded-full border-2 border-white/50 object-cover bg-white">
-                    <div class="overflow-hidden">
-                        <h3 id="dashName" class="font-bold text-base truncate">Student Name</h3>
-                        <p class="text-xs text-indigo-200 mt-0.5">Class: <span id="dashClass" class="font-semibold"></span> (<span id="dashSec"></span>)</p>
-                        <p class="text-xs text-indigo-200">Roll No: <span id="dashRoll" class="font-semibold"></span></p>
-                        <p class="text-[11px] text-indigo-300 truncate mt-0.5"><i class="fa-solid fa-user-group mr-1"></i><span id="dashFather"></span></p>
+                <!-- Student Card -->
+                <div class="bg-gradient-to-r from-indigo-50 to-slate-50 p-4 rounded-2xl border border-indigo-100 flex items-start space-x-3">
+                    <img id="stuImg" src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-16 h-16 rounded-xl object-cover border-2 border-indigo-200 bg-white shadow-sm flex-shrink-0">
+                    <div class="flex-1 min-w-0">
+                        <h3 id="stuName" class="font-bold text-slate-800 text-sm truncate"></h3>
+                        <p class="text-[11px] text-slate-600 mt-0.5">
+                            Class: <span id="stuClass" class="font-semibold text-indigo-700"></span> 
+                            (<span id="stuSec"></span>) | Roll: <span id="stuRoll" class="font-semibold text-indigo-700"></span>
+                        </p>
+                        <p class="text-[11px] text-slate-500 truncate">Father: <span id="stuFather" class="font-medium text-slate-700"></span></p>
+                        <p class="text-[11px] text-slate-500 truncate">Mobile: <span id="stuPhone" class="font-medium text-slate-700"></span></p>
                     </div>
                 </div>
 
-                <!-- Fee Payment History Section -->
+                <!-- Dues Summary & Fee History -->
                 <div>
-                    <div class="flex items-center justify-between mb-3">
-                        <h4 class="text-xs font-bold text-slate-700 uppercase tracking-wider">Fee Payment History</h4>
-                        <button onclick="logout()" class="text-xs text-red-500 font-semibold hover:underline flex items-center">
-                            <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                            <i class="fa-solid fa-receipt text-indigo-600"></i> Fee Details & History
+                        </span>
+                        <button onclick="logout()" class="text-[11px] text-red-500 font-semibold hover:underline flex items-center gap-1">
+                            <i class="fa-solid fa-power-off"></i> Logout
                         </button>
                     </div>
 
-                    <div id="feeList" class="space-y-2.5 max-h-64 overflow-y-auto pr-1">
-                        <!-- Fee Cards dynamically injected here -->
-                    </div>
+                    <div id="feeHistory" class="space-y-2 max-h-60 overflow-y-auto pr-1"></div>
                 </div>
-
             </div>
-
         </div>
 
-        <!-- Footer -->
-        <div class="bg-slate-50 p-3 text-center border-t border-slate-100 text-[11px] text-slate-400">
-            Powered by Barsoi Public School Digital Systems
+        <div class="bg-slate-50 p-3 text-center border-t border-slate-100 text-[10px] text-slate-400 font-medium">
+            Barsoi Public School • Managed via Google Sheet API
         </div>
-
     </div>
 
-    <!-- JavaScript Section -->
     <script>
-        // AAPKA GOOGLE APPS SCRIPT WEB APP URL
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyR0YO7tRy6GTgGv4IPU32F-nTJUIsgflMPdt31SeITmJ9RQefPsZlBMXpNYQTHA-NysQ/exec";
+        // Google Apps Script Deploy Web App URL
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4Jrpt7eVk1erYOH41kJt6tfMTzbZO9vZGy_Iq2mH90whJWK2n8PiMQN4F1L-_x2T7Gw/exec";
 
-        async function loginStudent() {
-            const id = document.getElementById('loginId').value.trim();
-            const mobile = document.getElementById('loginMobile').value.trim();
+        function doLogin() {
+            const id = document.getElementById('stuId').value.trim();
+            const mob = document.getElementById('stuMob').value.trim();
 
-            if (!id || !mobile) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Incomplete Details',
-                    text: 'Kripya Student ID/Roll No aur Mobile Number dono darj karein.',
-                    confirmColor: '#4f46e5'
-                });
+            if (!id || !mob) {
+                Swal.fire({ icon: 'warning', title: 'Adhura Details', text: 'Kripya Roll No/ID aur Mobile No dono bharein.' });
                 return;
             }
 
@@ -122,88 +108,93 @@
                 didOpen: () => Swal.showLoading()
             });
 
-            try {
-                // Fetch Request with Redirect Mode Follow for Google Apps Script Web App
-                const requestUrl = `${GOOGLE_SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(id)}&mobile=${encodeURIComponent(mobile)}`;
-                const response = await fetch(requestUrl, { redirect: "follow" });
-                const data = await response.json();
+            // JSONP Mechanism to bypass GitHub CORS Restriction
+            const callbackName = 'handleResponse_' + Math.round(Math.random() * 100000);
+            const script = document.createElement('script');
 
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
                 Swal.close();
 
                 if (data.status === "success") {
-                    renderPortal(data.student, data.fees);
+                    showDashboard(data.student, data.fees);
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Login Failed',
-                        text: data.message || 'Galaat ID ya Mobile Number.',
-                        confirmColor: '#4f46e5'
-                    });
+                    Swal.fire({ icon: 'error', title: 'Login Failed', text: data.message });
                 }
-            } catch (error) {
-                Swal.close();
-                console.error("API Error:", error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Connection Error',
-                    text: 'Server se connect nahi ho paya. Kripya Apps Script Deployment check karein.',
-                    confirmColor: '#4f46e5'
-                });
-            }
+            };
+
+            script.src = `${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(id)}&mobile=${encodeURIComponent(mob)}&callback=${callbackName}`;
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                Swal.fire({ icon: 'error', title: 'Server Error', text: 'Google Sheet API connection me dikkat hai.' });
+            };
+
+            document.body.appendChild(script);
         }
 
-        function renderPortal(student, fees) {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('dashboard').classList.remove('hidden');
+        function showDashboard(stu, fees) {
+            document.getElementById('loginBox').classList.add('hidden');
+            document.getElementById('dashBox').classList.remove('hidden');
 
-            document.getElementById('dashName').innerText = student["Student Name"] || "N/A";
-            document.getElementById('dashClass').innerText = student["Class"] || "-";
-            document.getElementById('dashSec').innerText = student["Section"] || "-";
-            document.getElementById('dashRoll').innerText = student["Roll No"] || student["Reg No"] || "N/A";
-            document.getElementById('dashFather').innerText = student["Father Name"] || "N/A";
+            document.getElementById('stuName').innerText = stu["Student Name"] || "N/A";
+            document.getElementById('stuClass').innerText = stu["Class"] || "-";
+            document.getElementById('stuSec').innerText = stu["Section"] || "-";
+            document.getElementById('stuRoll').innerText = stu["Roll No"] || "-";
+            document.getElementById('stuFather').innerText = stu["Father Name"] || "N/A";
+            document.getElementById('stuPhone').innerText = stu["Mobile No"] || "N/A";
 
-            if (student["Photo url"]) {
-                document.getElementById('studentPhoto').src = student["Photo url"];
+            if (stu["Photo url"] && stu["Photo url"].toString().startsWith("http")) {
+                document.getElementById('stuImg').src = stu["Photo url"];
             }
 
-            const feeListContainer = document.getElementById('feeList');
-            feeListContainer.innerHTML = "";
+            const feeContainer = document.getElementById('feeHistory');
+            feeContainer.innerHTML = "";
 
             if (!fees || fees.length === 0) {
-                feeListContainer.innerHTML = `
+                feeContainer.innerHTML = `
                     <div class="text-center py-6 bg-slate-50 rounded-xl border border-dashed border-slate-200">
+                        <i class="fa-solid fa-folder-open text-slate-300 text-2xl mb-1"></i>
                         <p class="text-xs text-slate-400">Koi fee record nahi mila.</p>
-                    </div>`;
+                    </div>
+                `;
                 return;
             }
 
-            fees.forEach(record => {
-                const month = record.Month || "N/A";
-                const paid = record["Total Paid"] || record["Paid"] || 0;
-                const due = record["Remaining"] || record["Due"] || 0;
-                const receiptNo = record["Receipt No"] || record["Receipt Number"] || "N/A";
+            fees.forEach(f => {
+                const month = f["Month"] || "Fee Record";
+                const paid = f["Paid Amount"] || f["Total Paid"] || f["Paid"] || 0;
+                const remaining = f["Remaining"] || f["Remaining Fee"] || f["Due"] || 0;
+                const receipt = f["Receipt No"] || f["Receipt"] || "N/A";
+                const date = f["Paid Date"] || f["Date"] || "";
 
-                const card = document.createElement('div');
-                card.className = "bg-slate-50 border border-slate-200 p-3 rounded-xl flex items-center justify-between text-xs";
-                card.innerHTML = `
-                    <div>
-                        <span class="font-bold text-slate-800 block text-sm">${month}</span>
-                        <span class="text-[11px] text-slate-500">Receipt No: ${receiptNo}</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="font-bold text-emerald-600 block text-sm">₹${paid}</span>
-                        ${due > 0 ? `<span class="text-[10px] text-red-500 font-medium">Due: ₹${due}</span>` : `<span class="text-[10px] text-emerald-600 font-medium">Full Paid</span>`}
+                feeContainer.innerHTML += `
+                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex justify-between items-center text-xs hover:border-indigo-200 transition">
+                        <div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="font-bold text-indigo-700">${month}</span>
+                                ${date ? `<span class="text-[9px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded">${date}</span>` : ''}
+                            </div>
+                            <span class="text-[10px] text-slate-400 block mt-0.5">Receipt: #${receipt}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-bold text-emerald-600 block">₹${paid}</span>
+                            ${remaining > 0 
+                                ? `<span class="text-[10px] text-red-500 font-semibold">Due: ₹${remaining}</span>` 
+                                : `<span class="text-[9px] bg-emerald-100 text-emerald-700 px-1.5 py-0.5 rounded font-medium">Cleared</span>`
+                            }
+                        </div>
                     </div>
                 `;
-                feeListContainer.appendChild(card);
             });
         }
 
         function logout() {
-            document.getElementById('dashboard').classList.add('hidden');
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('loginId').value = "";
-            document.getElementById('loginMobile').value = "";
+            document.getElementById('dashBox').classList.add('hidden');
+            document.getElementById('loginBox').classList.remove('hidden');
+            document.getElementById('stuId').value = "";
+            document.getElementById('stuMob').value = "";
         }
     </script>
 </body>
