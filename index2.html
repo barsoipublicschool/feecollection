@@ -2,72 +2,86 @@
 <html>
 <head>
     <base target="_top">
-    <title>BARSOI PUBLIC SCHOOL - PARENT PORTAL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>BARSOI PUBLIC SCHOOL - Parent Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --p: #1a237e; --bg: #f4f7f6; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 500px; margin: 30px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: var(--p); font-size: 18px; margin-bottom: 5px; }
-        p.sub-text { text-align: center; font-size: 12px; color: #666; margin-top: 0; margin-bottom: 20px; }
-        label { font-size: 12px; font-weight: bold; color: #444; margin-bottom: 5px; display: block; }
-        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; font-size: 14px; margin-bottom: 12px; }
-        .btn-login { width: 100%; padding: 12px; background: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        :root { --primary: #1a237e; --secondary: #283593; --accent: #ff4081; --bg: #f4f7f6; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; color: #333; }
+        .container { max-width: 600px; margin: 20px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
         
-        /* DASHBOARD SECTION */
+        /* Login Form Styles */
+        h2 { text-align: center; color: var(--primary); font-size: 20px; margin-bottom: 5px; }
+        p.sub-text { text-align: center; font-size: 13px; color: #666; margin-top: 0; margin-bottom: 25px; }
+        label { font-size: 12px; font-weight: 600; color: #444; margin-bottom: 6px; display: block; }
+        input { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 14px; margin-bottom: 15px; background: #fafafa; }
+        input:focus { border-color: var(--primary); outline: none; background: #fff; }
+        .btn-login { width: 100%; padding: 13px; background: #2e7d32; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s; }
+        .btn-login:hover { background: #1b5e20; }
+
+        /* Dashboard Styles */
         #portal-dashboard { display: none; }
-        .student-profile { background: #e8eaf6; padding: 12px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid var(--p); }
-        .student-profile h4 { margin: 0 0 5px 0; color: var(--p); font-size: 15px; }
-        .student-profile p { margin: 2px 0; font-size: 12px; color: #333; }
+        .profile-card { background: linear-gradient(135deg, #1a237e, #3949ab); color: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(26,35,126,0.2); }
+        .profile-header { display: flex; align-items: center; gap: 15px; border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px; }
+        .student-avatar { width: 75px; height: 75px; border-radius: 50%; border: 3px solid white; object-fit: cover; background: #fff; }
+        .student-title h3 { margin: 0; font-size: 18px; font-weight: 600; }
+        .student-title p { margin: 3px 0 0; font-size: 13px; opacity: 0.9; }
         
-        .history-card { background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 12px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .history-info h5 { margin: 0; font-size: 14px; color: #333; }
+        .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px; }
+        .profile-grid div span { opacity: 0.8; display: block; font-size: 10px; text-transform: uppercase; }
+        .profile-grid div strong { font-size: 13px; }
+
+        .section-title { font-size: 15px; color: var(--primary); font-weight: 600; margin-bottom: 10px; border-left: 4px solid var(--accent); padding-left: 8px; }
+        
+        .history-card { background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 12px 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .history-info h5 { margin: 0; font-size: 14px; color: #222; }
         .history-info p { margin: 3px 0 0; font-size: 11px; color: #666; }
-        .btn-view { background: #e91e63; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
+        .btn-view { background: var(--accent); color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+        
+        .btn-logout { width: 100%; padding: 11px; background: #d32f2f; color: white; border: none; border-radius: 6px; margin-top: 20px; cursor: pointer; font-weight: 600; }
 
         /* RECEIPT MODAL */
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 10px; }
-        .receipt-box { width: 100%; max-width: 450px; margin: 0 auto; background: #ffdae9; border: 1.5px solid #000; padding: 10px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
+        .receipt-box { width: 100%; max-width: 450px; margin: 20px auto; background: #ffdae9; border: 1.5px solid #000; padding: 15px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; }
         .r-header { position: relative; text-align: center; }
         .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; }
         .r-header p { margin: 1px; font-size: 8px; font-weight: bold; }
         .school-logo { width: 40px; height: 40px; position: absolute; left: 5px; top: 5px; }
-        .top-info { display: flex; justify-content: space-between; font-size: 9.5px; margin-top: 6px; border-bottom: 1px solid #000; padding-bottom: 2px; }
-        .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
-        .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; }
-        .r-table th, .r-table td { border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
-        .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
-        .footer-sigs { display: flex; justify-content: space-between; margin-top: 20px; font-size: 9.5px; font-weight: bold; }
+        .top-info { display: flex; justify-content: space-between; font-size: 9.5px; margin-top: 8px; border-bottom: 1px solid #000; padding-bottom: 3px; }
+        .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 6px; line-height: 1.3; }
+        .r-table { width: 100%; border-collapse: collapse; margin-top: 6px; border: 1.2px solid #000; }
+        .r-table th, .r-table td { border: 1px solid #000; padding: 3px 5px; font-size: 9px; line-height: 1.2; }
+        .words-section { border-bottom: 1px dotted #000; padding: 4px 0; font-size: 9px; margin-top: 6px; font-style: italic; }
+        .footer-sigs { display: flex; justify-content: space-between; margin-top: 25px; font-size: 9.5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div class="container" id="login-container">
     <h2>BARSOI PUBLIC SCHOOL</h2>
-    <p class="sub-text">Parent Fee Portal - Check Records & Receipts</p>
+    <p class="sub-text">Parent Fee & Profile Portal</p>
     
     <label>Student ID / Roll No</label>
-    <input type="text" id="login-sid" placeholder="e.g. 1">
+    <input type="text" id="login-sid" placeholder="e.g. 101">
     
     <label>Registered Mobile Number</label>
-    <input type="text" id="login-mob" placeholder="Enter mobile number">
+    <input type="text" id="login-mob" placeholder="Enter 10-digit mobile number">
     
-    <button class="btn-login" onclick="parentLogin()">LOGIN TO VIEW FEES</button>
+    <button class="btn-login" onclick="parentLogin()">LOGIN TO PORTAL</button>
 </div>
 
 <!-- DASHBOARD VIEW -->
 <div class="container" id="portal-dashboard">
-    <h2>Student Fee Dashboard</h2>
-    <div class="student-profile" id="profile-box"></div>
+    <div id="student-profile-card"></div>
     
-    <h4 style="color: var(--p); font-size: 14px; margin-bottom: 8px;">Payment History & Receipts</h4>
+    <div class="section-title">Fee Records & Payment History</div>
     <div id="history-list"></div>
 
-    <button onclick="logout()" style="width:100%; padding:10px; background:#666; color:white; border:none; border-radius:4px; margin-top:15px; cursor:pointer; font-weight:bold;">LOGOUT</button>
+    <button class="btn-logout" onclick="logout()">LOGOUT</button>
 </div>
 
-<!-- RECEIPT MODAL FOR PARENT -->
+<!-- RECEIPT MODAL -->
 <div id="receipt-modal">
     <div id="single-receipt-view"></div>
     <div style="text-align:center; margin-top:20px; padding-bottom:20px;">
@@ -77,8 +91,9 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbytnZ8V5RwKx_F3cqqJ7iaBdvu8c0sKFtFIQK4GS8XAoZDVYjll7mZZ751qWYYWk7Q8/exec";
-    let studentRecords = [];
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxfh2dfmlc1zcvSS4NTfIw8B6YpSWrpAW7E3SsQbSrPCkzM92clwygpReMxNr-sHsMY3g/exec"; // Yahan apni deployment link dalein
+    let globalFeeRecords = [];
+    let globalStudent = {};
 
     async function parentLogin() {
         let sid = document.getElementById('login-sid').value.trim();
@@ -89,75 +104,84 @@
             return;
         }
 
-        if(inputMob.length < 8) {
-            Swal.fire("Warning", "Kripya sahi Mobile Number daalein.", "warning");
-            return;
-        }
-
-        Swal.fire({title:'Checking details...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
+        Swal.fire({title:'Verifying details...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
 
         try {
             const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(sid)}`);
             let data = await res.json();
             Swal.close();
 
-            if(!data || !data.length) {
-                Swal.fire("Not Found", "Is Student ID ka koi record nahi mila.", "error");
+            if(!data || data.status !== "success") {
+                Swal.fire("Access Denied", data.message || "Student ID galat hai.", "error");
                 return;
             }
 
-            // Universal Flexible Mobile Checking Logic
-            let isValidUser = false;
+            globalStudent = data.student;
+            let sheetMob = String(globalStudent["Mobile No"] || globalStudent["Mobile Number"] || "").replace(/[^0-9]/g, '');
 
-            for(let row of data) {
-                // Stringifying all properties in the JSON object
-                let allRowText = Object.values(row).map(v => String(v).replace(/[^0-9]/g, '')).join(" ");
-                
-                // Match entered mobile number inside row data
-                if(allRowText.includes(inputMob)) {
-                    isValidUser = true;
-                    break;
-                }
-            }
-
-            if(!isValidUser) {
-                Swal.fire("Access Denied", "Galat Mobile Number! Ye Mobile Number is Student ID se match nahi karta.", "error");
+            // Mobile number match check
+            if(sheetMob && !sheetMob.includes(inputMob) && !inputMob.includes(sheetMob)) {
+                Swal.fire("Access Denied", "Galat Mobile Number! Ye number is Student ID se match nahi karta.", "error");
                 return;
             }
 
-            studentRecords = data;
-            renderDashboard(data[0]);
+            globalFeeRecords = data.fees || [];
+            renderDashboard(globalStudent);
 
         } catch(e) {
             Swal.close();
-            Swal.fire("Error", "Server se connect karne mein samasya aayi.", "error");
+            Swal.fire("Error", "Server se connect karne me samasya aayi.", "error");
         }
     }
 
-    function renderDashboard(info) {
+    function renderDashboard(s) {
         document.getElementById('login-container').style.display = 'none';
         document.getElementById('portal-dashboard').style.display = 'block';
 
+        let defaultAvatar = "https://cdn-icons-png.flaticon.com/512/3135/3135715.png";
+        let photoUrl = s["Photo url"] || s["Photo URL"] || defaultAvatar;
+
         let profileHtml = `
-            <h4>${info["Student Name"] || info["Name"] || "Student Profile"}</h4>
-            <p><b>Student ID:</b> ${info["Student Id"] || info["ID"] || info["Roll No"]} | <b>Class:</b> ${info["Class"] || "N/A"}</p>
-            <p><b>Father's Name:</b> ${info["Father Name"] || info["Father's Name"] || "N/A"}</p>
-            <p style="color:red; margin-top:5px;"><b>Current Due Balance: ₹${info["Remaining"] || info["Due"] || 0}</b></p>
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img src="${photoUrl}" class="student-avatar" onerror="this.src='${defaultAvatar}'">
+                    <div class="student-title">
+                        <h3>${s["Student Name"] || "N/A"}</h3>
+                        <p>ID/Roll: ${s["Roll No"] || s["Student ID"] || s["ID"] || "N/A"} | Class: ${s["Class"] || "-"} (${s["Section"] || "-"})</p>
+                    </div>
+                </div>
+                <div class="profile-grid">
+                    <div><span>Father's Name</span><strong>${s["Father Name"] || "N/A"}</strong></div>
+                    <div><span>Mother's Name</span><strong>${s["Mother Name"] || "N/A"}</strong></div>
+                    <div><span>Date of Birth</span><strong>${s["DOB"] || "N/A"}</strong></div>
+                    <div><span>Mobile No</span><strong>${s["Mobile No"] || s["Mobile Number"] || "N/A"}</strong></div>
+                    <div style="grid-column: span 2;"><span>Address</span><strong>${s["Address"] || "N/A"}</strong></div>
+                </div>
+            </div>
         `;
-        document.getElementById('profile-box').innerHTML = profileHtml;
+        document.getElementById('student-profile-card').innerHTML = profileHtml;
 
         let listHtml = "";
-        studentRecords.forEach((r, index) => {
-            listHtml += `
-                <div class="history-card">
-                    <div class="history-info">
-                        <h5>Month: ${r.Month || "N/A"}</h5>
-                        <p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"] || r["Paid"] || 0} | Date: ${r["Paid Date"] || "N/A"}</p>
+        if(globalFeeRecords.length === 0) {
+            listHtml = `<p style="text-align:center; color:#777; font-size:13px; padding:15px;">Koi fee record uplabdh nahi hai.</p>`;
+        } else {
+            globalFeeRecords.forEach((r, index) => {
+                let month = r.Month || r.Months || "N/A";
+                let receiptNo = r["Receipt No"] || r["Receipt Number"] || "N/A";
+                let totalPaid = r["Total Paid"] || r["Paid"] || 0;
+                let remaining = r["Remaining"] || r["Due"] || 0;
+
+                listHtml += `
+                    <div class="history-card">
+                        <div class="history-info">
+                            <h5>Month: ${month}</h5>
+                            <p>Receipt: ${receiptNo} | Paid: ₹${totalPaid} | Due: ₹${remaining}</p>
+                        </div>
+                        <button class="btn-view" onclick="viewReceipt(${index})">VIEW RECEIPT</button>
                     </div>
-                    <button class="btn-view" onclick="viewReceipt(${index})">VIEW RECEIPT</button>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
         document.getElementById('history-list').innerHTML = listHtml;
     }
 
@@ -166,11 +190,12 @@
         document.getElementById('login-container').style.display = 'block';
         document.getElementById('login-sid').value = '';
         document.getElementById('login-mob').value = '';
-        studentRecords = [];
+        globalFeeRecords = [];
+        globalStudent = {};
     }
 
     function viewReceipt(index) {
-        let d = studentRecords[index];
+        let d = globalFeeRecords[index];
         if(!d) return;
         document.getElementById('single-receipt-view').innerHTML = generateReceiptHTML(d);
         document.getElementById('receipt-modal').style.display = 'block';
@@ -180,17 +205,9 @@
         document.getElementById('receipt-modal').style.display = 'none';
     }
 
-    function formatDateDDMMYYYY(dateObj) {
-        let d = dateObj ? new Date(dateObj) : new Date();
-        if (isNaN(d.getTime())) d = new Date();
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
-    }
-
+    // Receipt helper functions (Number to words & HTML)
     function roman(n) { const r = ["i","ii","iii","iv","v","vi","vii","viii","ix","x"]; return r[n-1] || n; }
-
+    
     function numberToWords(num) {
         var a = ['','One ','Two ','Three ','Four ', 'Five ','Six ','Seven ','Eight ','Nine ','Ten ','Eleven ','Twelve ','Thirteen ','Fourteen ','Fifteen ','Sixteen ','Seventeen ','Eighteen ','Nineteen '];
         var b = ['', '', 'Twenty','Thirty','Forty','Fifty', 'Sixty','Seventy','Eighty','Ninety'];
@@ -208,7 +225,10 @@
     function generateReceiptHTML(d) {
         let sl = 1; let rows = "";
         const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
-        main.forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+        main.forEach(k => { 
+            let val = Number(d[k]) || 0;
+            if(val > 0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+        });
         
         const lists = {
             "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
@@ -218,14 +238,22 @@
 
         for (let category in lists) {
             let tempRows = ""; let cSub = 1;
-            lists[category].forEach(k => { if(d[k]>0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+            lists[category].forEach(k => { 
+                let val = Number(d[k]) || 0;
+                if(val > 0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+            });
             if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
         }
 
-        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
-
         let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+        let totalPaidVal = Number(d["Total Paid"] || d["Paid"] || 0);
+        let remainingVal = Number(d["Remaining"] || d["Due"] || 0);
+        let receiptNo = d["Receipt No"] || d["Receipt Number"] || "________";
+        let paidDate = d["Paid Date"] || d["Date"] || "";
+        let studentName = d["Student Name"] || globalStudent["Student Name"] || "";
+        let studentId = d["Student Id"] || d["Student ID"] || globalStudent["Student ID"] || "";
+        let fatherName = d["Father Name"] || globalStudent["Father Name"] || "";
+        let className = d["Class"] || globalStudent["Class"] || "";
 
         return `
             <div class="receipt-box">
@@ -233,25 +261,21 @@
                     <img src="${logo}" class="school-logo">
                     <h2>BARSOI PUBLIC SCHOOL</h2>
                     <p>QUAZITOLA, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${receiptNo}</b></span><span>Date: ${paidDate}</span></div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${d["Student Name"] || d["Name"]}</div><div><b>ID:</b> ${d["Student Id"] || d["ID"]}</div>
-                    <div><b>Father:</b> ${d["Father Name"] || d["Father's Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"] || ""}</div><div><b>Month:</b> ${d["Month"]}</div>
+                    <div><b>Name:</b> ${studentName}</div><div><b>ID:</b> ${studentId}</div>
+                    <div><b>Father:</b> ${fatherName}</div><div><b>Class:</b> ${className}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"] || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${d["Discount"] || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${d["Total Paid"] || 0}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"] || 0}</b></td></tr>
+                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${totalPaidVal}</b></td></tr>
+                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${remainingVal}</b></td></tr>
                     </tfoot>
                 </table>
-                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"] || 0)} Only.</div>
+                <div class="words-section"><b>Words:</b> ${numberToWords(totalPaidVal)} Only.</div>
                 <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
             </div>`;
     }
