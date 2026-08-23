@@ -141,7 +141,7 @@
         </div>
         <div class="profile-grid">
             <div style="text-align:center;">
-                <img id="st-photo" class="avatar" src="https://via.placeholder.com/75x90?text=Photo" alt="Photo" onerror="this.src='https://lh3.googleusercontent.com/d/1hFBKLJM7GfIGvBrsiMxKmQpu3dVGWZvh=s300'">
+                <img id="st-photo" class="avatar" src="https://via.placeholder.com/75x90?text=No+Photo" alt="Photo" onerror="this.src='https://via.placeholder.com/75x90?text=No+Photo'">
                 <div id="st-name" style="font-weight:bold; font-size:12px; margin-top:4px; color:#1e293b;">-</div>
                 <div class="student-id-badge" id="st-badge">ID: -</div>
             </div>
@@ -218,16 +218,17 @@
     }
 
     function getDirectImageUrl(url) {
-        if (!url || url === "" || url === "N/A") {
-            return "https://lh3.googleusercontent.com/d/1hFBKLJM7GfIGvBrsiMxKmQpu3dVGWZvh=s300";
-        }
-        let match = url.match(/[-\w]{25,}/);
-        if (match) {
-            return `https://lh3.googleusercontent.com/d/${match[0]}=s300`;
-        }
-        return url;
+    // अगर URL खाली है या N/A है, तो एक न्यूट्रल Placeholder / Blank Photo दिखाएँ
+    if (!url || url === "" || url === "N/A" || typeof url !== 'string') {
+        return "https://via.placeholder.com/75x90?text=No+Photo";
     }
-
+    
+    let match = url.match(/[-\w]{25,}/);
+    if (match) {
+        return `https://lh3.googleusercontent.com/d/${match[0]}=s300`;
+    }
+    return url;
+}
     function formatDateDDMMYYYY(val) {
     if (!val || val === "" || val === "N/A") return "N/A";
 
