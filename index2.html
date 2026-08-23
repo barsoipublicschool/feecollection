@@ -7,227 +7,33 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root {
-            --primary: #3f51b5;
-            --primary-dark: #303f9f;
-            --bg: #f0f2f5;
-            --card-bg: #ffffff;
-            --text-dark: #2c3e50;
-            --text-muted: #7f8c8d;
-            --danger: #e74c3c;
-            --success: #2ecc71;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: var(--bg);
-            margin: 0;
-            padding: 20px 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            box-sizing: border-box;
-        }
-
-        .portal-card {
-            background: var(--card-bg);
-            width: 100%;
-            max-width: 420px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            overflow: hidden;
-        }
-
-        .header-banner {
-            background: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 20px 15px;
-        }
-
-        .header-banner h2 {
-            margin: 0;
-            font-size: 18px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .header-banner p {
-            margin: 3px 0 0;
-            font-size: 11px;
-            opacity: 0.85;
-            text-transform: uppercase;
-        }
-
-        .content-area {
-            padding: 20px;
-        }
-
-        /* LOGIN FORM */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 6px;
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid #dcdfe6;
-            border-radius: 8px;
-            font-size: 14px;
-            box-sizing: border-box;
-            outline: none;
-            transition: all 0.3s;
-        }
-
-        .form-group input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(63, 81, 181, 0.15);
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 13px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-
-        .btn-submit:hover {
-            background: var(--primary-dark);
-        }
-
-        /* DASHBOARD VIEW */
-        #dashboard-section {
-            display: none;
-        }
-
-        .profile-card {
-            background: #f8f9fa;
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 18px;
-            border: 1px solid #edf2f7;
-        }
-
-        .avatar-box {
-            width: 50px;
-            height: 50px;
-            border-radius: 10px;
-            background: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
-
-        .avatar-box img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .profile-info h4 {
-            margin: 0 0 3px 0;
-            font-size: 15px;
-            color: var(--text-dark);
-        }
-
-        .profile-info p {
-            margin: 1px 0;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-
-        .sec-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .sec-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .logout-link {
-            color: var(--danger);
-            font-size: 12px;
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .history-card {
-            background: #f8f9fa;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            border-left: 4px solid var(--primary);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .history-main h5 {
-            margin: 0;
-            font-size: 14px;
-            color: var(--text-dark);
-        }
-
-        .history-main p {
-            margin: 3px 0 0 0;
-            font-size: 10px;
-            color: var(--text-muted);
-        }
-
-        .history-side {
-            text-align: right;
-        }
-
-        .paid-amount {
-            font-size: 14px;
-            font-weight: 700;
-            color: var(--success);
-        }
-
-        .due-amount {
-            font-size: 10px;
-            font-weight: 600;
-            color: var(--danger);
-            margin-top: 2px;
-        }
-
-        .footer-note {
-            text-align: center;
-            font-size: 10px;
-            color: var(--text-muted);
-            margin-top: 15px;
-            border-top: 1px dashed #e2e8f0;
-            padding-top: 10px;
-        }
+        :root { --primary: #1e3c72; --secondary: #2a5298; --bg: #f4f7f6; --card: #ffffff; --text: #2c3e50; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px 10px; display: flex; justify-content: center; align-items: center; min-height: 100vh; box-sizing: border-box; }
+        .portal-card { background: var(--card); width: 100%; max-width: 420px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); overflow: hidden; }
+        .header-banner { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; text-align: center; padding: 22px 15px; }
+        .header-banner h2 { margin: 0; font-size: 18px; font-weight: 700; letter-spacing: 0.5px; }
+        .header-banner p { margin: 4px 0 0; font-size: 11px; opacity: 0.9; text-transform: uppercase; }
+        .content-area { padding: 22px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+        .form-group input { width: 100%; padding: 12px; border: 1px solid #dcdfe6; border-radius: 8px; font-size: 14px; box-sizing: border-box; outline: none; transition: border-color 0.2s; }
+        .form-group input:focus { border-color: var(--secondary); }
+        .btn-submit { width: 100%; padding: 13px; background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; }
+        
+        #dashboard-section { display: none; }
+        .profile-card { background: #f8fafc; border-radius: 12px; padding: 12px; display: flex; align-items: center; gap: 12px; margin-bottom: 18px; border: 1px solid #e2e8f0; }
+        .avatar-box { width: 55px; height: 55px; border-radius: 10px; background: #cbd5e1; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+        .avatar-box img { width: 100%; height: 100%; object-fit: cover; }
+        .profile-info h4 { margin: 0 0 4px 0; font-size: 15px; color: var(--text); }
+        .profile-info p { margin: 2px 0; font-size: 11px; color: #64748b; }
+        .sec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #edf2f7; padding-bottom: 6px; }
+        .sec-title { font-size: 13px; font-weight: 600; color: var(--primary); }
+        .logout-link { color: #ef4444; font-size: 12px; font-weight: 600; cursor: pointer; }
+        .history-card { background: #fff; border-radius: 10px; padding: 12px; margin-bottom: 10px; border: 1px solid #e2e8f0; border-left: 4px solid var(--secondary); display: flex; justify-content: space-between; align-items: center; }
+        .history-main h5 { margin: 0; font-size: 14px; color: var(--text); }
+        .history-main p { margin: 3px 0 0 0; font-size: 10px; color: #64748b; }
+        .paid-amount { font-size: 14px; font-weight: 700; color: #10b981; text-align: right; }
+        .due-amount { font-size: 10px; font-weight: 600; color: #ef4444; text-align: right; margin-top: 2px; }
     </style>
 </head>
 <body>
@@ -235,146 +41,116 @@
 <div class="portal-card">
     <div class="header-banner">
         <h2>BARSOI PUBLIC SCHOOL</h2>
-        <p>Student Fee & Profile Portal</p>
+        <p>Parent & Student Fee Portal</p>
     </div>
 
     <div class="content-area">
         <!-- LOGIN SECTION -->
         <div id="login-section">
             <div class="form-group">
-                <label>Student ID / Roll No</label>
-                <input type="text" id="sid" placeholder="e.g. 77">
+                <label>Reg No / Student ID</label>
+                <input type="text" id="sid" placeholder="e.g. 26">
             </div>
             <div class="form-group">
                 <label>Registered Mobile No.</label>
-                <input type="text" id="mobile" placeholder="e.g. 9471685668">
+                <input type="text" id="mobile" placeholder="e.g. 6207173992">
             </div>
-            <button class="btn-submit" onclick="loginParent()">VIEW FEE DETAILS</button>
+            <button class="btn-submit" onclick="loginParent()">LOGIN & VIEW FEES</button>
         </div>
 
         <!-- DASHBOARD SECTION -->
         <div id="dashboard-section">
-            <div class="profile-card" id="student-profile">
-                <!-- Profile loaded dynamically -->
-            </div>
+            <div class="profile-card" id="student-profile"></div>
 
             <div class="sec-header">
-                <span class="sec-title">📊 Fee Details & History</span>
-                <span class="logout-link" onclick="logout()">⏻ Logout</span>
+                <span class="sec-title">📊 Fee Payment History</span>
+                <span class="logout-link" onclick="logout()"> Logout</span>
             </div>
 
-            <div id="fee-history-container">
-                <!-- Records loaded dynamically -->
-            </div>
-
-            <div class="footer-note">
-                Barsoi Public School • Managed via Google Sheet API
-            </div>
+            <div id="fee-history-container"></div>
         </div>
     </div>
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby4Jrpt7eVk1erYOH41kJt6tfMTzbZO9vZGy_Iq2mH90whJWK2n8PiMQN4F1L-_x2T7Gw/exec";
+    // Apka Web App URL
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby99gppth0fRMxQGJrUoS0NuaTV0MQoqhDJ4PcO7Pv4-eWt3b8i6dSYO2CuyundA8t2/exec";
 
-    async function loginParent() {
+    function loginParent() {
         const idVal = document.getElementById('sid').value.trim();
-        const mobVal = document.getElementById('mobile').value.trim().replace(/[^0-9]/g, '');
+        const mobVal = document.getElementById('mobile').value.trim();
 
         if (!idVal || !mobVal) {
-            Swal.fire("Incomplete Data", "Kripya Roll/ID aur Mobile Number dono daalein.", "warning");
+            Swal.fire("Incomplete Info", "Reg No / Student ID aur Mobile Number dono bharna zaroori hai.", "warning");
             return;
         }
 
-        Swal.fire({
-            title: 'Fetching Data...',
-            text: 'Please wait',
-            didOpen: () => Swal.showLoading(),
-            allowOutsideClick: false
-        });
+        Swal.fire({ title: 'Searching Record...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
-        try {
-            // Fetching data using searchData action
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(idVal)}`);
-            const data = await res.json();
+        const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+        window[callbackName] = function(data) {
+            delete window[callbackName];
+            document.body.removeChild(script);
             Swal.close();
 
-            if (!data || data.length === 0) {
-                Swal.fire("Not Found", "Is Student ID / Roll No ka koi record nahi mila.", "error");
-                return;
+            if (data.status === "error") {
+                Swal.fire("Record Not Found", data.message, "error");
+            } else if (data.status === "success") {
+                renderDashboard(data.student, data.fees);
             }
+        };
 
-            // Mobile Match Logic Across 'All Students' Data Row
-            let matchedStudent = null;
-            let studentHistory = [];
-
-            data.forEach(row => {
-                let rowStr = Object.values(row).map(v => String(v).replace(/[^0-9]/g, '')).join(" ");
-                if (rowStr.includes(mobVal)) {
-                    matchedStudent = row;
-                    studentHistory.push(row);
-                }
-            });
-
-            if (!matchedStudent) {
-                Swal.fire("Access Denied", "Mobile Number match nahi hua!", "error");
-                return;
-            }
-
-            renderDashboard(matchedStudent, studentHistory);
-
-        } catch (e) {
+        const script = document.createElement('script');
+        script.src = `${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(idVal)}&mobile=${encodeURIComponent(mobVal)}&callback=${callbackName}`;
+        script.onerror = function() {
             Swal.close();
-            Swal.fire("Error", "Server se connect karne me samasya aayi.", "error");
-        }
+            Swal.fire("Connection Error", "Server se connectivity ki samasya aayi hai.", "error");
+        };
+        document.body.appendChild(script);
     }
 
-    function renderDashboard(profile, history) {
+    function renderDashboard(student, fees) {
         document.getElementById('login-section').style.display = 'none';
         document.getElementById('dashboard-section').style.display = 'block';
 
-        // Render Student Profile Box
-        const name = profile["Student Name"] || profile["Name"] || "Student";
-        const roll = profile["Roll No"] || profile["Roll"] || profile["ID"] || profile["Student Id"] || "N/A";
-        const cls = profile["Class"] || "N/A";
-        const sec = profile["Section"] ? ` (${profile["Section"]})` : '';
-        const father = profile["Father Name"] || profile["Father's Name"] || "N/A";
-        const mob = profile["Mobile"] || profile["Contact"] || document.getElementById('mobile').value;
+        let imgTag = student["Photo url"] && student["Photo url"].includes('http') 
+            ? `<img src="${student["Photo url"]}">` 
+            : `<span style="font-size:24px; color:#64748b;">👤</span>`;
 
         document.getElementById('student-profile').innerHTML = `
-            <div class="avatar-box">
-                <span style="font-size:24px; color:#a0aec0;">👤</span>
-            </div>
+            <div class="avatar-box">${imgTag}</div>
             <div class="profile-info">
-                <h4>${name}</h4>
-                <p>Class: <b>${cls}${sec}</b> | Roll: <b>${roll}</b></p>
-                <p>Father: <b>${father}</b></p>
-                <p>Mobile: <b>${mob}</b></p>
+                <h4>${student["Student Name"]}</h4>
+                <p>Class: <b>${student["Class"]}</b> | Sec: <b>${student["Section"]}</b> | Reg No: <b>${student["Reg No"]}</b></p>
+                <p>Father: <b>${student["Father Name"]}</b></p>
+                <p>Mobile: <b>${student["Mobile No"]}</b></p>
             </div>
         `;
 
-        // Render History Items
         let listHtml = "";
-        history.forEach(item => {
-            const month = item["Month"] || "N/A";
-            const date = item["Paid Date"] || item["Date"] || "N/A";
-            const receipt = item["Receipt No"] || item["Receipt"] || "N/A";
-            const paid = item["Total Paid"] || item["Paid"] || 0;
-            const due = item["Remaining"] || item["Due"] || 0;
+        if (!fees || fees.length === 0) {
+            listHtml = `<p style="text-align:center; font-size:12px; color:#94a3b8; padding: 20px 0;">Koi fee record nahi mila.</p>`;
+        } else {
+            fees.forEach(item => {
+                let paidVal = item["Total Paid"] || item["Paid"] || item["Amount Paid"] || 0;
+                let dueVal = item["Remaining"] || item["Remaining Fee"] || item["Due"] || 0;
+                let receiptVal = item["Receipt No"] || item["Receipt"] || "N/A";
+                let dateVal = item["Paid Date"] || item["Date"] || "N/A";
 
-            listHtml += `
-                <div class="history-card">
-                    <div class="history-main">
-                        <h5>${month} <span style="font-size:10px; background:#e2e8f0; padding:2px 6px; border-radius:4px; margin-left:4px;">${date}</span></h5>
-                        <p>Receipt: #${receipt}</p>
+                listHtml += `
+                    <div class="history-card">
+                        <div class="history-main">
+                            <h5>${item.Month} <span style="font-size:10px; background:#f1f5f9; padding:2px 6px; border-radius:4px; font-weight:normal;">${dateVal}</span></h5>
+                            <p>Receipt: #${receiptVal}</p>
+                        </div>
+                        <div>
+                            <div class="paid-amount">₹${paidVal}</div>
+                            <div class="due-amount">Due: ₹${dueVal}</div>
+                        </div>
                     </div>
-                    <div class="history-side">
-                        <div class="paid-amount">₹${paid}</div>
-                        <div class="due-amount">Due: ₹${due}</div>
-                    </div>
-                </div>
-            `;
-        });
+                `;
+            });
+        }
 
         document.getElementById('fee-history-container').innerHTML = listHtml;
     }
