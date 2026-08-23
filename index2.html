@@ -48,7 +48,7 @@
     <p class="sub-text">Parent Fee Portal - Check Records & Receipts</p>
     
     <label>Student ID / Roll No</label>
-    <input type="text" id="login-sid" placeholder="e.g. 11">
+    <input type="text" id="login-sid" placeholder="e.g. 1">
     
     <label>Registered Mobile Number</label>
     <input type="text" id="login-mob" placeholder="Enter mobile number">
@@ -89,50 +89,36 @@
             return;
         }
 
-        if(inputMob.length < 10) {
-            Swal.fire("Warning", "Kripya sahi 10-digit Mobile Number daalein.", "warning");
+        if(inputMob.length < 8) {
+            Swal.fire("Warning", "Kripya sahi Mobile Number daalein.", "warning");
             return;
         }
 
         Swal.fire({title:'Checking details...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
 
         try {
-            // Step 1: Fetch Fee Records
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${sid}`);
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(sid)}`);
             let data = await res.json();
+            Swal.close();
 
             if(!data || !data.length) {
-                Swal.close();
                 Swal.fire("Not Found", "Is Student ID ka koi record nahi mila.", "error");
                 return;
             }
 
-            // Step 2: Strict Mobile Check against Sheet Row Data
+            // Universal Flexible Mobile Checking Logic
             let isValidUser = false;
 
             for(let row of data) {
-                // Object ke sabhi values me search karenge ki kahin 10-digit mobile number match hota hai ya nahi
-                let rowValues = Object.values(row).map(v => String(v).replace(/[^0-9]/g, ''));
-                if(rowValues.some(val => val.includes(inputMob) && inputMob.length >= 10)) {
+                // Stringifying all properties in the JSON object
+                let allRowText = Object.values(row).map(v => String(v).replace(/[^0-9]/g, '')).join(" ");
+                
+                // Match entered mobile number inside row data
+                if(allRowText.includes(inputMob)) {
                     isValidUser = true;
                     break;
                 }
             }
-
-            // Agar pehle check me match nahi hua, toh Student ID ke sath Father Name / Mobile strictly check hoga
-            if(!isValidUser) {
-                // Check if any field key contains Mobile/Contact/Phone
-                data.forEach(r => {
-                    for(let k in r) {
-                        if(k.toLowerCase().includes("mobile") || k.toLowerCase().includes("contact") || k.toLowerCase().includes("phone")) {
-                            let mVal = String(r[k]).replace(/[^0-9]/g, '');
-                            if(mVal.includes(inputMob)) isValidUser = true;
-                        }
-                    }
-                });
-            }
-
-            Swal.close();
 
             if(!isValidUser) {
                 Swal.fire("Access Denied", "Galat Mobile Number! Ye Mobile Number is Student ID se match nahi karta.", "error");
@@ -153,10 +139,10 @@
         document.getElementById('portal-dashboard').style.display = 'block';
 
         let profileHtml = `
-            <h4>${info["Student Name"]}</h4>
-            <p><b>Student ID:</b> ${info["Student Id"]} | <b>Class:</b> ${info["Class"]}</p>
-            <p><b>Father's Name:</b> ${info["Father Name"]}</p>
-            <p style="color:red; margin-top:5px;"><b>Current Due Balance: ₹${info["Remaining"]}</b></p>
+            <h4>${info["Student Name"] || info["Name"] || "Student Profile"}</h4>
+            <p><b>Student ID:</b> ${info["Student Id"] || info["ID"] || info["Roll No"]} | <b>Class:</b> ${info["Class"] || "N/A"}</p>
+            <p><b>Father's Name:</b> ${info["Father Name"] || info["Father's Name"] || "N/A"}</p>
+            <p style="color:red; margin-top:5px;"><b>Current Due Balance: ₹${info["Remaining"] || info["Due"] || 0}</b></p>
         `;
         document.getElementById('profile-box').innerHTML = profileHtml;
 
@@ -165,8 +151,8 @@
             listHtml += `
                 <div class="history-card">
                     <div class="history-info">
-                        <h5>Month: ${r.Month}</h5>
-                        <p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"]} | Date: ${r["Paid Date"] || "N/A"}</p>
+                        <h5>Month: ${r.Month || "N/A"}</h5>
+                        <p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"] || r["Paid"] || 0} | Date: ${r["Paid Date"] || "N/A"}</p>
                     </div>
                     <button class="btn-view" onclick="viewReceipt(${index})">VIEW RECEIPT</button>
                 </div>
@@ -251,21 +237,21 @@
                 </div>
                 <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
-                    <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Month:</b> ${d["Month"]}</div>
+                    <div><b>Name:</b> ${d["Student Name"] || d["Name"]}</div><div><b>ID:</b> ${d["Student Id"] || d["ID"]}</div>
+                    <div><b>Father:</b> ${d["Father Name"] || d["Father's Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
+                    <div><b>Address:</b> ${d["Address"] || ""}</div><div><b>Month:</b> ${d["Month"]}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"]}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${d["Discount"]}</td></tr>
-                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${d["Total Paid"]}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"]}</b></td></tr>
+                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"] || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${d["Discount"] || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${d["Total Paid"] || 0}</b></td></tr>
+                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"] || 0}</b></td></tr>
                     </tfoot>
                 </table>
-                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"])} Only.</div>
+                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"] || 0)} Only.</div>
                 <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
             </div>`;
     }
