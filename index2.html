@@ -262,36 +262,55 @@
     }
 
     async function loginStudent() {
-        let sid = document.getElementById('login-sid').value.trim();
-        let mobile = document.getElementById('login-mobile').value.trim();
+    let sid = document.getElementById('login-sid').value.trim();
+    let mobile = document.getElementById('login-mobile').value.trim();
 
-        if(!sid || !mobile) {
-            Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein", "warning");
+    if(!sid || !mobile) {
+        Swal.fire("Warning", "Kripya Student ID aur Mobile Number dono bharein", "warning");
+        return;
+    }
+
+    Swal.fire({title: 'Authenticating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+
+    try {
+        // verifyLogin API se All Students aur Fees dono ka data ek sath aayega
+        const res = await fetch(`${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(sid)}&mobile=${encodeURIComponent(mobile)}`);
+        const result = await res.json();
+        Swal.close();
+
+        if(result.status === "error") {
+            Swal.fire("Error", result.message, "error");
             return;
         }
 
-        Swal.fire({title: 'Authenticating...', didOpen: () => Swal.showLoading(), allowOutsideClick: false});
+        let st = result.student;
+        studentRecords = result.fees || [];
 
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${sid}`);
-            const results = await res.json();
-            Swal.close();
+        // Profile Details Update (All Students Sheet Se)
+        document.getElementById('st-name').innerText = st["Student Name"] || "Student";
+        document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Roll No"] || sid);
+        document.getElementById('st-class').innerText = st["Class"] || "-";
+        document.getElementById('st-roll').innerText = st["Roll No"] || "-";
+        document.getElementById('st-father').innerText = st["Father Name"] || "N/A";
+        document.getElementById('st-mother').innerText = st["Mother Name"] || "N/A";
+        document.getElementById('st-dob').innerText = st["DOB"] || "N/A";
+        document.getElementById('st-address').innerText = st["Address"] || "N/A";
+        document.getElementById('st-mobile').innerText = st["Mobile No"] || mobile;
 
-            if(!results || results.length === 0) {
-                Swal.fire("Error", "Student ID nahi mila!", "error");
-                return;
-            }
+        // Photo Update
+        let photoRaw = st["Photo url"] || st["Photo"] || "";
+        document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            studentRecords = results;
-            renderDashboard(results, mobile);
+        // Dashboard Tables Render
+        renderFeeHistory(studentRecords);
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('dashboard-screen').style.display = 'block';
 
-        } catch(e) {
-            Swal.fire("Error", "Server connect nahi ho saka", "error");
-        }
+    } catch(e) {
+        Swal.fire("Error", "Server connect nahi ho saka: " + e.message, "error");
     }
+}
 
     function renderDashboard(records, inputMobile) {
         let first = records[0];
