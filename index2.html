@@ -13,7 +13,7 @@
         /* HEADER */
         .top-bar { background: #1e293b; color: white; padding: 10px; text-align: center; font-weight: 600; font-size: 13px; display: flex; justify-content: center; align-items: center; gap: 8px; }
 
-        /* EXACT LOGIN CARD DESIGN */
+        /* LOGIN SCREEN */
         #login-screen { display: flex; justify-content: center; align-items: center; min-height: 90vh; padding: 15px; box-sizing: border-box; }
         .login-card { background: white; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.08); width: 100%; max-width: 360px; overflow: hidden; text-align: center; }
         .login-header { background: linear-gradient(135deg, #5145cd, #4338ca); color: white; padding: 25px 15px; }
@@ -37,15 +37,21 @@
 
         /* DASHBOARD */
         #dashboard-screen { display: none; max-width: 650px; margin: 15px auto; padding: 0 10px; }
+        
+        /* BOLD TOTAL DUE BANNER */
+        .due-banner { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 12px 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 5px rgba(239, 68, 68, 0.08); }
+        .due-banner-text { color: #991b1b; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .due-banner-amount { color: #dc2626; font-size: 20px; font-weight: 900; }
+
         .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
-        .card-title { color: #3b82f6; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .card-title { color: #2563eb; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
         .btn-logout { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; }
 
         /* STUDENT PROFILE */
-        .profile-grid { display: grid; grid-template-columns: 80px 1fr; gap: 15px; align-items: center; }
-        .avatar { width: 70px; height: 70px; border-radius: 50%; background: #f1f5f9; border: 2px solid #cbd5e1; display: block; margin: 0 auto; }
-        .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 1px 6px; border-radius: 4px; font-weight: bold; margin-top: 4px; display: inline-block; }
+        .profile-grid { display: grid; grid-template-columns: 85px 1fr; gap: 15px; align-items: center; }
+        .avatar { width: 75px; height: 75px; border-radius: 50%; background: #f1f5f9; border: 2px solid #cbd5e1; object-fit: cover; display: block; margin: 0 auto; }
+        .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 4px; display: inline-block; }
         .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #64748b; }
         .info-grid div span { color: #1e293b; font-weight: 600; }
 
@@ -56,7 +62,7 @@
         td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
         .btn-view-rec { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
 
-        /* RECEIPT MODAL (SAME AS ADMIN FORM) */
+        /* RECEIPT MODAL */
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
         .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
@@ -105,7 +111,7 @@
                 <label>Student ID / Roll No</label>
                 <div class="input-field">
                     <span>💳</span>
-                    <input type="text" id="login-sid" placeholder="e.g. 24">
+                    <input type="text" id="login-sid" placeholder="e.g. 77">
                 </div>
             </div>
 
@@ -126,6 +132,12 @@
 <!-- 2. DASHBOARD SCREEN -->
 <div id="dashboard-screen" class="no-print">
     
+    <!-- TOTAL DUE BANNER -->
+    <div class="due-banner">
+        <div class="due-banner-text">⚠️ Total Remaining Dues:</div>
+        <div class="due-banner-amount" id="total-due-val">₹0</div>
+    </div>
+
     <!-- STUDENT PROFILE CARD -->
     <div class="card">
         <div class="card-header">
@@ -134,7 +146,7 @@
         </div>
         <div class="profile-grid">
             <div style="text-align:center;">
-                <div class="avatar"></div>
+                <img id="st-photo" class="avatar" src="https://via.placeholder.com/75" alt="Photo" onerror="this.src='https://via.placeholder.com/75?text=No+Img'">
                 <div id="st-name" style="font-weight:bold; font-size:12px; margin-top:4px; color:#1e293b;">-</div>
                 <div class="student-id-badge" id="st-badge">ID: -</div>
             </div>
@@ -178,21 +190,23 @@
 
 </div>
 
-<!-- 3. FULL DUAL RECEIPT MODAL -->
+<!-- 3. DUAL RECEIPT MODAL -->
 <div id="receipt-modal">
     <div class="print-wrapper">
         <div class="receipt-box" id="guardian-copy"></div>
         <div class="receipt-box" id="office-copy"></div>
     </div>
-    <div class="no-print" style="text-align:center; margin-top:20px; padding-bottom:40px;">
-        <button onclick="window.print()" style="padding:10px 20px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px;">PRINT / SAVE PDF 🖨️</button>
-        <button onclick="closeReceipt()" style="padding:10px 20px; background:#475569; color:white; border:none; border-radius:5px; margin-left:10px; cursor:pointer;">CLOSE ✖</button>
+    <div class="no-print" style="text-align:center; margin-top:15px; padding-bottom:30px; display:flex; justify-content:center; gap:8px;">
+        <button onclick="window.print()" style="padding:8px 16px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">PRINT / SAVE PDF 🖨️</button>
+        <button onclick="shareWhatsapp()" style="padding:8px 16px; background:#25d366; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">SHARE ON WHATSAPP 📲</button>
+        <button onclick="closeReceipt()" style="padding:8px 16px; background:#475569; color:white; border:none; border-radius:5px; cursor:pointer; font-size:11px;">CLOSE ✖</button>
     </div>
 </div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     let studentRecords = [];
+    let currentReceiptData = null;
 
     function getProp(obj, fieldName) {
         if(!obj) return "";
@@ -201,6 +215,16 @@
             if(key.toString().toLowerCase().replace(/[\s_]/g, '') === searchKey) return obj[key];
         }
         return "";
+    }
+
+    // Google Drive URL Convertor for Direct Image
+    function getDirectImageUrl(url) {
+        if (!url) return "https://via.placeholder.com/75?text=No+Img";
+        let match = url.match(/[-\w]{25,}/);
+        if (match) {
+            return `https://drive.google.com/thumbnail?id=${match[0]}&sz=w300`;
+        }
+        return url;
     }
 
     function formatDateDDMMYYYY(dateObj) {
@@ -263,6 +287,7 @@
     function renderDashboard(records, inputMobile) {
         let first = records[0];
 
+        // Profile Updates
         document.getElementById('st-name').innerText = getProp(first, "Student Name") || "Student";
         document.getElementById('st-badge').innerText = "ID: " + (getProp(first, "Student Id") || "-");
         document.getElementById('st-class').innerText = getProp(first, "Class") || "-";
@@ -271,6 +296,16 @@
         document.getElementById('st-address').innerText = getProp(first, "Address") || "N/A";
         document.getElementById('st-mobile').innerText = inputMobile || "N/A";
 
+        // Photo Fix
+        let photoRaw = getProp(first, "Photo") || getProp(first, "Student Photo") || getProp(first, "Image");
+        document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
+
+        // Latest Remaining Dues Banner
+        let latestRecord = records[records.length - 1];
+        let totalRemainingDues = getProp(latestRecord, "Remaining") || 0;
+        document.getElementById('total-due-val').innerText = "₹" + totalRemainingDues;
+
+        // History Table
         let rowsHtml = "";
         records.forEach((r, idx) => {
             let mFee = getProp(r, "School Fee") || 0;
@@ -296,6 +331,7 @@
 
     function showDualReceipt(d) {
         if(!d) return;
+        currentReceiptData = d;
         document.getElementById('guardian-copy').innerHTML = generateReceiptHTML(d, "Guardian's Copy");
         document.getElementById('office-copy').innerHTML = generateReceiptHTML(d, "Office Copy");
         document.getElementById('receipt-modal').style.display = 'block';
@@ -305,6 +341,16 @@
     function closeReceipt() {
         document.getElementById('receipt-modal').style.display = 'none';
         document.getElementById('dashboard-screen').style.display = 'block';
+    }
+
+    function shareWhatsapp() {
+        if(!currentReceiptData) return;
+        let name = getProp(currentReceiptData, "Student Name");
+        let recNo = getProp(currentReceiptData, "Receipt No");
+        let paid = getProp(currentReceiptData, "Total Paid");
+        let rem = getProp(currentReceiptData, "Remaining");
+        let text = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n\nStudent: ${name}\nReceipt No: ${recNo}\nAmount Paid: ₹${paid}\nRemaining Dues: ₹${rem}\n\nThank you!`;
+        window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
     }
 
     function logout() {
