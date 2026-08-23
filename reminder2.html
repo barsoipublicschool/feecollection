@@ -179,11 +179,14 @@
                     count++;
                     grandTotalDue += totalDue;
 
-                    // UPI payment link and short display texts
+                    // UPI payment link
                     const upiLink = `upi://pay?pa=riyazahmad5@okaxis&pn=Barsoi%20Public%20School&am=${totalDue}&cu=INR`;
-                    const qrCodeImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+                    
+                    // GitHub Raw Image URL for QR Code (Aap yahan apne GitHub repo ka link daal dein)
+                    // Example: https://raw.githubusercontent.com/AapkaUsername/AapkaRepo/main/qrcode.jpeg
+                    const githubQrImageUrl = "https://raw.githubusercontent.com/YOUR_GITHUB_USERNAME/YOUR_REPOSITORY_NAME/main/qrcode.jpeg";
 
-                    // Clean & Professional WhatsApp Message Template
+                    // WhatsApp Message Template with GitHub Image & Pay Link
                     const whatsappMsg = encodeURIComponent(`*BARSOI PUBLIC SCHOOL - FEE REMINDER*
 📍 Nehar Nagar, Barsoi (Katihar)
 -----------------------------------
@@ -197,11 +200,11 @@
 ✅ *Monthly:* ₹${monthlyFee}
 🔻 *Total Due Balance:* ₹${totalDue}
 -----------------------------------
-🚀 *[ PAY ₹${totalDue} NOW ]*
+🚀 *[ CLICK HERE TO PAY ₹${totalDue} ]*
 ${upiLink}
 
-📷 *[ VIEW PAYMENT QR CODE ]*
-${qrCodeImageUrl}
+📷 *Scan QR Code to Pay:*
+${githubQrImageUrl}
 
 Please pay the amount asap!
 _Barsoi Public School Management_`);
