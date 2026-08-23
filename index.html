@@ -78,6 +78,7 @@
 <div id="entry-view" class="container no-print">
     <input type="hidden" id="editing-receipt-no" value="">
     
+    <!-- MONTH DROPDOWN MOVED TO TOP -->
     <div style="margin-bottom: 12px; background: #e8eaf6; padding: 10px; border-radius: 6px; border: 1px solid var(--p);">
         <label style="color: var(--p); font-size: 13px;">Select Month First:</label>
         <select id="Month" style="font-weight: bold; font-size: 14px; background: white;">
@@ -408,12 +409,8 @@
 
             let html = "";
             results.reverse().forEach((r, i) => {
-                let receiptNo = r["Receipt No"] || r["receipt no"] || r["ReceiptNo"] || "N/A";
-                let totalPaid = r["Total Paid"] || r["total paid"] || r["TotalPaid"] || 0;
-                let monthVal = r["Month"] || r["month"] || "";
-                
                 html += `<div class="month-card">
-                    <div class="month-info"><h4>${monthVal}</h4><p>Receipt: ${receiptNo} | Paid: ₹${totalPaid}</p></div>
+                    <div class="month-info"><h4>${r.Month}</h4><p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"]}</p></div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn-edit" onclick="openEditModal(${i})">EDIT</button>
                         <button class="btn-view" onclick="showDualReceipt(allRecords[${i}])">VIEW RECEIPT</button>
@@ -428,13 +425,12 @@
         editingObject = allRecords[index];
         if(!editingObject) return;
 
-        let rNo = editingObject["Receipt No"] || editingObject["receipt no"] || "N/A";
-        document.getElementById('edit-receipt-title').innerText = "Receipt No: " + rNo;
-        document.getElementById('edit_Month').value = editingObject["Month"] || editingObject["month"] || "January";
-        document.getElementById('edit_sub_t').value = editingObject["Sub Total"] || editingObject["sub total"] || 0;
-        document.getElementById('edit_Discount').value = editingObject["Discount"] || editingObject["discount"] || 0;
-        document.getElementById('edit_Total_Paid').value = editingObject["Total Paid"] || editingObject["total paid"] || 0;
-        document.getElementById('edit_Remaining').value = editingObject["Remaining"] || editingObject["remaining"] || 0;
+        document.getElementById('edit-receipt-title').innerText = "Receipt No: " + (editingObject["Receipt No"] || "N/A");
+        document.getElementById('edit_Month').value = editingObject["Month"] || "January";
+        document.getElementById('edit_sub_t').value = editingObject["Sub Total"] || 0;
+        document.getElementById('edit_Discount').value = editingObject["Discount"] || 0;
+        document.getElementById('edit_Total_Paid').value = editingObject["Total Paid"] || 0;
+        document.getElementById('edit_Remaining').value = editingObject["Remaining"] || 0;
 
         document.getElementById('edit-modal').style.display = 'flex';
     }
@@ -496,31 +492,22 @@
         if(!currentActiveReceipt) return;
         let d = currentActiveReceipt;
         
-        let rNo = d["Receipt No"] || d["receipt no"] || "N/A";
-        let studentName = d["Student Name"] || d["student name"] || "";
-        let studentId = d["Student Id"] || d["student id"] || d["StudentId"] || "";
-        let className = d["Class"] || d["class"] || "";
-        let monthName = d["Month"] || d["month"] || "";
-        let subTot = d["Sub Total"] || d["sub total"] || 0;
-        let discVal = d["Discount"] || d["discount"] || 0;
-        let totalPaid = d["Total Paid"] || d["total paid"] || 0;
-        let remainingVal = d["Remaining"] || d["remaining"] || 0;
         let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
         let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
                   `📍 Quazitola, Barsoi (Katihar)\n` +
                   `-----------------------------------\n` +
-                  `📄 *Receipt No:* ${rNo}\n` +
+                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
                   `📅 *Date:* ${displayDate}\n` +
-                  `👤 *Student Name:* ${studentName}\n` +
-                  `🆔 *Student ID:* ${studentId}\n` +
-                  `🏫 *Class:* ${className}\n` +
-                  `🗓️ *Month:* ${monthName}\n` +
+                  `👤 *Student Name:* ${d["Student Name"]}\n` +
+                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
+                  `🏫 *Class:* ${d["Class"]}\n` +
+                  `🗓️ *Month:* ${d["Month"]}\n` +
                   `-----------------------------------\n` +
-                  `💵 *Total Amount:* ₹${subTot}\n` +
-                  `🎯 *Discount:* ₹${discVal}\n` +
-                  `✅ *Paid Amount:* ₹${totalPaid}\n` +
-                  `🔻 *Due Balance:* ₹${remainingVal}\n` +
+                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
+                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
                   `-----------------------------------\n` +
                   `Thank you for the payment!\n` +
                   `_Barsoi Public School Management_`;
@@ -531,30 +518,8 @@
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
-        
-        // Helper function to safely fetch values across different casing variations
-        function getVal(obj, keys) {
-            for(let k of keys) {
-                if(obj[k] !== undefined && obj[k] !== null && obj[k] !== "") return obj[k];
-            }
-            return 0;
-        }
-
-        const main = [
-            { key: ["Prev Dues", "prev dues", "PrevDues"], label: "Prev Dues" },
-            { key: ["Admission Fee", "admission fee", "AdmissionFee"], label: "Admission Fee" },
-            { key: ["School Fee", "school fee", "SchoolFee"], label: "School Fee" },
-            { key: ["School Van Fee", "school van fee", "SchoolVanFee"], label: "School Van Fee" },
-            { key: ["Hostel Fee", "hostel fee", "HostelFee"], label: "Hostel Fee" },
-            { key: ["Exam Fee", "exam fee", "ExamFee"], label: "Exam Fee" }
-        ];
-
-        main.forEach(item => {
-            let val = parseFloat(getVal(d, item.key)) || 0;
-            if(val > 0) {
-                rows += `<tr><td align="center">${sl++}.</td><td>${item.label}</td><td align="center">1</td><td align="center">${val}</td></tr>`;
-            }
-        });
+        const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
+        main.forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
         
         const lists = {
             "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
@@ -564,41 +529,11 @@
 
         for (let category in lists) {
             let tempRows = ""; let cSub = 1;
-            lists[category].forEach(k => {
-                let val = parseFloat(getVal(d, [k, k.toLowerCase(), k.replace(/\s+/g, '')])) || 0;
-                if(val > 0) {
-                    tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`;
-                }
-            });
-            if(tempRows) {
-                rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
-            }
+            lists[category].forEach(k => { if(d[k]>0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+            if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
         }
 
-        const additional = [
-            { key: ["School Bag", "school bag", "SchoolBag"], label: "School Bag" },
-            { key: ["Development Fee", "development fee", "DevelopmentFee"], label: "Development Fee" },
-            { key: ["Other Fee", "other fee", "OtherFee"], label: "Other Fee" }
-        ];
-
-        additional.forEach(item => {
-            let val = parseFloat(getVal(d, item.key)) || 0;
-            if(val > 0) {
-                rows += `<tr><td align="center">${sl++}.</td><td>${item.label}</td><td align="center">1</td><td align="center">${val}</td></tr>`;
-            }
-        });
-
-        let rNo = getVal(d, ["Receipt No", "receipt no", "ReceiptNo"]);
-        let studentName = getVal(d, ["Student Name", "student name", "StudentName"]);
-        let studentId = getVal(d, ["Student Id", "student id", "StudentId"]);
-        let fatherName = getVal(d, ["Father Name", "father name", "FatherName"]);
-        let className = getVal(d, ["Class", "class"]);
-        let addressVal = getVal(d, ["Address", "address"]);
-        let monthVal = getVal(d, ["Month", "month"]);
-        let subTotalVal = getVal(d, ["Sub Total", "sub total", "SubTotal"]);
-        let discountVal = getVal(d, ["Discount", "discount"]);
-        let totalPaidVal = getVal(d, ["Total Paid", "total paid", "TotalPaid"]);
-        let remainingVal = getVal(d, ["Remaining", "remaining"]);
+        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
 
         let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
         let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
@@ -617,23 +552,23 @@
                     <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
                     <p style="font-size:7px">email - sagarpublicschool2023@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${rNo || "________"}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${studentName}</div><div><b>ID:</b> ${studentId}</div>
-                    <div><b>Father:</b> ${fatherName}</div><div><b>Class:</b> ${className}</div>
-                    <div><b>Address:</b> ${addressVal}</div><div><b>Month:</b> ${monthVal}</div>
+                    <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
+                    <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
+                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Month:</b> ${d["Month"]}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${subTotalVal}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${discountVal}</td></tr>
-                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${totalPaidVal}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${remainingVal}</b></td></tr>
+                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"]}</td></tr>
+                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${d["Discount"]}</td></tr>
+                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${d["Total Paid"]}</b></td></tr>
+                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"]}</b></td></tr>
                     </tfoot>
                 </table>
-                <div class="words-section"><b>Words:</b> ${numberToWords(parseFloat(totalPaidVal) || 0)} Only.</div>
+                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"])} Only.</div>
                 <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
             </div>`;
     }
