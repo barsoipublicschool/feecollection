@@ -229,23 +229,38 @@
     }
 
     function formatDateDDMMYYYY(val) {
-        if (!val || val === "" || val === "N/A") return "N/A";
-        
-        if (typeof val === 'string' && (val.includes('/') || val.includes('-'))) {
-            let parts = val.split(/[/\-]/);
-            if(parts.length === 3) {
-                if(parts[0].length === 4) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-                return val;
-            }
-        }
+    if (!val || val === "" || val === "N/A") return "N/A";
 
-        let d = new Date(val);
-        if (isNaN(d.getTime())) return val;
+    // 1. अगर तारीख ISO String या JavaScript Date Object/Timestamp के रूप में है
+    let d = new Date(val);
+    if (!isNaN(d.getTime())) {
         let day = String(d.getDate()).padStart(2, '0');
         let month = String(d.getMonth() + 1).padStart(2, '0');
         let year = d.getFullYear();
         return `${day}/${month}/${year}`;
     }
+
+    // 2. अगर तारीख String (YYYY-MM-DD या MM/DD/YYYY या D/M/YYYY) में है
+    if (typeof val === 'string' && (val.includes('/') || val.includes('-'))) {
+        let parts = val.split(/[/\-]/);
+        if (parts.length === 3) {
+            // YYYY-MM-DD या YYYY/MM/DD के लिए
+            if (parts[0].length === 4) {
+                let day = parts[2].padStart(2, '0');
+                let month = parts[1].padStart(2, '0');
+                return `${day}/${month}/${parts[0]}`;
+            } 
+            // DD/MM/YYYY या D/M/YYYY के लिए (ताकि 2/5/2014 भी 02/05/2014 बन जाए)
+            else {
+                let day = parts[0].padStart(2, '0');
+                let month = parts[1].padStart(2, '0');
+                return `${day}/${month}/${parts[2]}`;
+            }
+        }
+    }
+
+    return val;
+}
 
     function roman(n) { const r = ["i","ii","iii","iv","v","vi","vii","viii","ix","x"]; return r[n-1] || n; }
 
