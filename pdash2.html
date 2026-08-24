@@ -33,7 +33,7 @@
         .btn-portal:hover { background: #4338ca; }
         .login-footer { font-size: 9px; color: #94a3b8; margin-top: 15px; margin-bottom: 5px; }
 
-        /* Dashboard Layout (Split screen: Left Sidebar & Right Content) */
+        /* Dashboard Layout */
         #dashboard-screen { display: none; max-width: 1100px; margin: 15px auto; padding: 0 10px; }
         .dashboard-container { display: flex; gap: 15px; align-items: flex-start; }
         
@@ -72,6 +72,11 @@
         .tab-section { display: none; }
         .tab-section.active { display: block; }
 
+        /* General Portal Box Styling */
+        .portal-link-card { text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 25px; border-radius: 12px; }
+        .portal-link-btn { display: inline-block; background: white; color: #4f46e5; padding: 10px 24px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 10px; transition: 0.2s; }
+        .portal-link-btn:hover { background: #f8fafc; transform: translateY(-1px); }
+
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
         .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
@@ -94,7 +99,6 @@
         .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
         .footer-sigs { display: flex; justify-content: space-between; margin-top: auto; padding-top: 15px; font-size: 9.5px; font-weight: bold; }
 
-        /* Responsive Media Query for Mobile */
         @media (max-width: 768px) {
             .dashboard-container { flex-direction: column; }
             .sidebar { width: 100%; box-sizing: border-box; padding: 10px; }
@@ -155,7 +159,7 @@
 <div id="dashboard-screen" class="no-print">
     <div class="dashboard-container">
         
-        <!-- Left Side: Dashboard Navigation Sidebar with Three-Line Toggle for Mobile -->
+        <!-- Sidebar Navigation -->
         <div class="sidebar">
             <button class="sidebar-toggle-btn" onclick="toggleSidebarMenu()">
                 <span>☰ Menu / Options</span>
@@ -171,10 +175,10 @@
             </div>
         </div>
 
-        <!-- Right Side: Student Profile & Options content -->
+        <!-- Right Side: Content Area -->
         <div class="main-content">
             
-            <!-- Student Profile Card (Always visible on right top) -->
+            <!-- Student Profile Card -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-title">👤 Student Details</div>
@@ -231,21 +235,23 @@
                 </div>
             </div>
 
-            <!-- 2. ADMIT CARD TAB SECTION (With Auto-Login Dynamic Link) -->
+            <!-- 2. ADMIT CARD TAB SECTION -->
             <div id="admit-section" class="tab-section">
-                <div class="card" style="text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 20px;">
-                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">🎫 Annual / Term Examination Admit Card</div>
-                    <a href="#" id="dynamic-admit-btn" target="_blank" style="display: inline-block; background: white; color: #4f46e5; padding: 8px 20px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                        View Admit Card ➔
+                <div class="card portal-link-card">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">🎫 Examination Admit Card</div>
+                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Click below to download or print your examination admit card.</p>
+                    <a href="#" id="btn-admit-link" target="_blank" class="portal-link-btn">
+                        Download Admit Card ➔
                     </a>
                 </div>
             </div>
 
-            <!-- 3. RESULT TAB SECTION (With Auto-Login Dynamic Link) -->
+            <!-- 3. RESULT TAB SECTION -->
             <div id="result-section" class="tab-section">
-                <div class="card" style="text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 20px;">
-                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">🎓 Annual / Term Exam Result Portal</div>
-                    <a href="#" id="dynamic-result-btn" target="_blank" style="display: inline-block; background: white; color: #4f46e5; padding: 8px 20px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <div class="card portal-link-card">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📊 Annual / Term Exam Result Portal</div>
+                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Click below to access your detailed report card and result.</p>
+                    <a href="#" id="btn-result-link" target="_blank" class="portal-link-btn">
                         View Exam Result ➔
                     </a>
                 </div>
@@ -253,25 +259,23 @@
 
             <!-- 4. HOMEWORK TAB SECTION -->
             <div id="homework-section" class="tab-section">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">📚 Daily Homework</div>
-                    </div>
-                    <div style="text-align:center; padding: 20px; color: #64748b; font-size: 12px;">
-                        Aaj ka koi homework uplabdh nahi hai.
-                    </div>
+                <div class="card portal-link-card">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📚 Daily Homework & Assignment</div>
+                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Access daily classwork, assignments, and study materials.</p>
+                    <a href="#" id="btn-homework-link" target="_blank" class="portal-link-btn">
+                        Open Homework Portal ➔
+                    </a>
                 </div>
             </div>
 
             <!-- 5. PROGRESS TAB SECTION -->
             <div id="progress-section" class="tab-section">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">📈 Student Progress Report</div>
-                    </div>
-                    <div style="text-align:center; padding: 20px; color: #64748b; font-size: 12px;">
-                        Progress report jald hi dikhegi.
-                    </div>
+                <div class="card portal-link-card">
+                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📈 Student Performance & Attendance</div>
+                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Track academic growth, test analytics, and attendance history.</p>
+                    <a href="#" id="btn-progress-link" target="_blank" class="portal-link-btn">
+                        View Progress Report ➔
+                    </a>
                 </div>
             </div>
 
@@ -292,9 +296,19 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    
+    // -------------------------------------------------------------
+    // SETUP YOUR EXTERNAL WEBSITES / MODULE URLS HERE
+    // -------------------------------------------------------------
+    const BASE_URLS = {
+        admit:    "https://barsoipublicschool.github.io/admitcard",
+        result:   "https://barsoipublicschool.github.io/result",
+        homework: "https://barsoipublicschool.github.io/homework",
+        progress: "https://barsoipublicschool.github.io/progress"
+    };
+
     let studentRecords = [];
 
-    // Toggle Sidebar Menu for Mobile screen
     function toggleSidebarMenu() {
         let menu = document.getElementById('sidebar-menu');
         let arrow = document.getElementById('toggle-arrow');
@@ -378,7 +392,6 @@
         return str.trim();
     }
 
-    // Switch Tabs from Sidebar
     function switchTab(tabId) {
         document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
         document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
@@ -386,7 +399,6 @@
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
 
-        // On mobile, auto close the menu after clicking an option
         if(window.innerWidth <= 768) {
             document.getElementById('sidebar-menu').style.display = 'none';
             document.getElementById('toggle-arrow').innerText = '▼';
@@ -430,16 +442,16 @@
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            // --- Dynamic Result & Admit Card Link Integration ---
+            // --- Dynamic Portal Links Configuration ---
             let studentRoll = st["Roll No"] || st["Roll"] || sid;
             let studentClass = st["Class"] || "";
+            let queryParams = `?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
 
-            let resultPortalUrl = `https://barsoipublicschool.github.io/result?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
-            document.getElementById('dynamic-result-btn').href = resultPortalUrl;
-
-            let admitPortalUrl = `https://barsoipublicschool.github.io/admitcard/?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
-            document.getElementById('dynamic-admit-btn').href = admitPortalUrl;
-            // ----------------------------------------------------
+            document.getElementById('btn-admit-link').href    = BASE_URLS.admit + queryParams;
+            document.getElementById('btn-result-link').href   = BASE_URLS.result + queryParams;
+            document.getElementById('btn-homework-link').href = BASE_URLS.homework + queryParams;
+            document.getElementById('btn-progress-link').href = BASE_URLS.progress + queryParams;
+            // ------------------------------------------
 
             renderDashboard(studentRecords);
 
@@ -557,7 +569,22 @@
                 <div class="student-details">
                     <div><b>Name:</b> ${fetchAnyProp(d, ["Student Name", "Name"])}</div><div><b>ID:</b> ${fetchAnyProp(d, ["Student Id", "ID"])}</div>
                     <div><b>Father:</b> ${fetchAnyProp(d, ["Father Name", "Father"])}</div><div><b>Class:</b> ${fetchAnyProp(d, ["Class"])}</div>
-                    <div>`;
+                    <div><b>Address:</b> ${fetchAnyProp(d, ["Address"])}</div><div><b>Month:</b> ${fetchAnyProp(d, ["Month"])}</div>
+                </div>
+                <table class="r-table">
+                    <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
+                    <tbody>${rows}</tbody>
+                    <tfoot>
+                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${fetchAnyProp(d, ["Sub Total"]) || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${fetchAnyProp(d, ["Discount"]) || 0}</td></tr>
+                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${totalPaidNum}</b></td></tr>
+                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${fetchAnyProp(d, ["Remaining", "Due Balance"]) || 0}</b></td></tr>
+                    </tfoot>
+                </table>
+                <div class="words-section"><b>Words:</b> ${numberToWords(totalPaidNum)} Only.</div>
+                <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
+            </div>`;
+    }
 </script>
 </body>
 </html>
