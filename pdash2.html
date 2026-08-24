@@ -72,7 +72,7 @@
         .tab-section { display: none; }
         .tab-section.active { display: block; }
 
-        /* General Module Link Card Styling */
+        /* General Portal Box Styling */
         .portal-link-card { text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 25px; border-radius: 12px; }
         .portal-link-btn { display: inline-block; background: white; color: #4f46e5; padding: 10px 24px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 10px; transition: 0.2s; }
         .portal-link-btn:hover { background: #f8fafc; transform: translateY(-1px); }
@@ -235,7 +235,7 @@
                 </div>
             </div>
 
-            <!-- 2. ADMIT CARD TAB SECTION (AUTO LOGIN LINK) -->
+            <!-- 2. ADMIT CARD TAB SECTION -->
             <div id="admit-section" class="tab-section">
                 <div class="card portal-link-card">
                     <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">🎫 Examination Admit Card</div>
@@ -246,7 +246,7 @@
                 </div>
             </div>
 
-            <!-- 3. RESULT TAB SECTION (AUTO LOGIN LINK) -->
+            <!-- 3. RESULT TAB SECTION -->
             <div id="result-section" class="tab-section">
                 <div class="card portal-link-card">
                     <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📊 Annual / Term Exam Result Portal</div>
@@ -296,6 +296,17 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    
+    // -------------------------------------------------------------
+    // SETUP YOUR EXTERNAL WEBSITES / MODULE URLS HERE
+    // -------------------------------------------------------------
+    const BASE_URLS = {
+        admit:    "https://barsoipublicschool.github.io/admitcard",
+        result:   "https://barsoipublicschool.github.io/result",
+        homework: "https://barsoipublicschool.github.io/homework",
+        progress: "https://barsoipublicschool.github.io/progress"
+    };
+
     let studentRecords = [];
 
     function toggleSidebarMenu() {
@@ -418,7 +429,6 @@
             let st = result.student || {};
             studentRecords = result.fees || [];
 
-            // Student Profile Render
             document.getElementById('st-name').innerText = st["Student Name"] || "Student";
             document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Student ID"] || sid);
             document.getElementById('st-class').innerText = st["Class"] || "-";
@@ -432,19 +442,18 @@
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            // ==================== AUTO LOGIN URLS GENERATION ====================
+            // --- Dynamic Portal Links Configuration ---
+            let studentId    = st["Reg No/ Student ID"] || st["Reg No"] || st["Student ID"] || sid;
             let studentRoll  = st["Roll No"] || st["Roll"] || sid;
             let studentClass = st["Class"] || "";
-            let studentId    = st["Student ID"] || st["Reg No"] || sid;
 
             let queryParams = `?id=${encodeURIComponent(studentId)}&roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
 
-            // Auto-Login Links Binds
-            document.getElementById('btn-admit-link').href    = `https://barsoipublicschool.github.io/admitcard${queryParams}`;
-            document.getElementById('btn-result-link').href   = `https://barsoipublicschool.github.io/result${queryParams}`;
-            document.getElementById('btn-homework-link').href = `https://barsoipublicschool.github.io/homework${queryParams}`;
-            document.getElementById('btn-progress-link').href = `https://barsoipublicschool.github.io/progress${queryParams}`;
-            // =====================================================================
+            document.getElementById('btn-admit-link').href    = BASE_URLS.admit + queryParams;
+            document.getElementById('btn-result-link').href   = BASE_URLS.result + queryParams;
+            document.getElementById('btn-homework-link').href = BASE_URLS.homework + queryParams;
+            document.getElementById('btn-progress-link').href = BASE_URLS.progress + queryParams;
+            // ------------------------------------------
 
             renderDashboard(studentRecords);
 
