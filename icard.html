@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barsoi Public School - Professional ID Card Generator</title>
+    <title>Barsoi Public School - Student ID Card Generator</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -17,7 +17,6 @@
         * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
         body { background: var(--bg); margin: 0; padding: 20px; }
 
-        /* Controls Area */
         .controls-container {
             max-width: 900px;
             margin: 0 auto 20px;
@@ -37,7 +36,7 @@
         }
 
         .input-group label { display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px; }
-        .input-group input, .input-group select {
+        .input-group input {
             width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;
         }
 
@@ -50,7 +49,6 @@
         .btn-print { background: #16a34a; color: white; }
         .btn-print:hover { background: #15803d; }
 
-        /* ID Cards Grid View */
         .cards-preview-area {
             display: flex;
             flex-wrap: wrap;
@@ -60,7 +58,6 @@
             margin: 0 auto;
         }
 
-        /* Single ID Card Design (Exact Standard CR80 Ratio 85.6mm x 54mm equivalent) */
         .id-card {
             width: 330px;
             height: 215px;
@@ -74,7 +71,6 @@
             background: linear-gradient(180deg, #ffffff 68%, #f8fafc 100%);
         }
 
-        /* Top Curved Header */
         .id-header {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #3b82f6 100%);
             color: white;
@@ -101,7 +97,6 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
 
-        /* Main ID Details Body */
         .id-body {
             display: flex;
             padding: 6px 10px 0px 10px;
@@ -109,7 +104,6 @@
             align-items: flex-start;
         }
 
-        /* Student Photo Box */
         .photo-container {
             width: 82px;
             text-align: center;
@@ -134,7 +128,6 @@
             word-break: break-all;
         }
 
-        /* Student Details Table */
         .details-container { flex-grow: 1; font-size: 10px; color: #1e293b; line-height: 1.25; }
         
         .st-name-row { font-size: 12px; font-weight: 800; color: #0f172a; margin-bottom: 3px; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
@@ -145,7 +138,6 @@
         .info-table td.colon { width: 8px; font-weight: 600; }
         .info-table td.val { font-weight: 700; color: #0f172a; word-break: break-word; }
 
-        /* Bottom Footer Ribbon */
         .id-footer {
             position: absolute;
             bottom: 0;
@@ -160,7 +152,6 @@
             letter-spacing: 0.2px;
         }
 
-        /* Print Media Styles for A4 Sheet */
         @media print {
             .no-print { display: none !important; }
             body { background: white; padding: 0; margin: 0; }
@@ -183,22 +174,21 @@
 </head>
 <body>
 
-<!-- Controls Header Section -->
 <div class="controls-container no-print">
     <div class="controls-title">🪪 Professional Student ID Card Generator</div>
     
     <div class="filter-grid">
         <div class="input-group">
-            <label>School Logo (Google Drive / Direct URL)</label>
+            <label>School Logo (Google Drive Link)</label>
             <input type="text" id="logo-url-input" value="https://drive.google.com/file/d/14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE/view?usp=drivesdk">
         </div>
         <div class="input-group">
             <label>Filter by Class</label>
-            <input type="text" id="class-filter" placeholder="e.g. 8th or 5th (Leave blank for All)">
+            <input type="text" id="class-filter" placeholder="e.g. 8th or 5th">
         </div>
         <div class="input-group">
-            <label>Search Student Name / ID</label>
-            <input type="text" id="search-filter" placeholder="Search by Roll / Name">
+            <label>Search Student Name / Reg No</label>
+            <input type="text" id="search-filter" placeholder="Search by Reg No / Name">
         </div>
     </div>
 
@@ -208,20 +198,15 @@
     </div>
 </div>
 
-<!-- ID Cards Preview Area -->
 <div class="cards-preview-area" id="cards-container">
     <div class="no-print" style="text-align:center; color:#64748b; font-size:13px; margin-top:30px;">
-        Click <b>"Load ID Cards"</b> to fetch records from your Google Sheet.
+        Click <b>"Load ID Cards"</b> to fetch records from your sheet.
     </div>
 </div>
 
 <script>
-    // Web App URL
     const API_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
-    
-    let rawStudentData = [];
 
-    // Helper Function to convert Google Drive shareable links to Direct Embeddable Image URLs
     function getDirectDriveImageUrl(url) {
         if (!url || typeof url !== 'string' || url.trim() === "") {
             return "https://via.placeholder.com/80x95?text=No+Photo";
@@ -234,7 +219,21 @@
         return cleanUrl;
     }
 
-    // Helper function to safely read header fields
+    // Explicitly targeting Column B Header (Reg No / Student ID / Registration No)
+    function getRegNoColumnB(obj) {
+        if (!obj) return "";
+        let possibleColumnBKeys = ["reg no", "registration no", "student id", "regno", "studentid", "id no", "id"];
+        for (let key of possibleColumnBKeys) {
+            for (let objKey in obj) {
+                let cleanKey = objKey.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
+                if (cleanKey === key && obj[objKey] !== "" && obj[objKey] !== null) {
+                    return obj[objKey];
+                }
+            }
+        }
+        return "";
+    }
+
     function getField(obj, possibleKeys) {
         if (!obj) return "";
         for (let key of possibleKeys) {
@@ -249,7 +248,6 @@
         return "";
     }
 
-    // Date Format Helper (DD-MM-YYYY)
     function formatDate(val) {
         if (!val) return "N/A";
         let d = new Date(val);
@@ -261,7 +259,33 @@
         return val;
     }
 
-    // Fetch Student data from Google Apps Script Web App
+    // Advanced Data Fetching (Fetch with JSONP fallback to prevent Failed to fetch CORS issues)
+    async function fetchSheetData() {
+        try {
+            const res = await fetch(`${API_URL}?action=getAllStudents`);
+            if (res.ok) {
+                return await res.json();
+            }
+        } catch (e) {
+            console.warn("Direct fetch failed, attempting JSONP fallback...", e);
+        }
+
+        // JSONP Fallback
+        return new Promise((resolve, reject) => {
+            const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                resolve(data);
+            };
+
+            const script = document.createElement('script');
+            script.src = `${API_URL}?action=getAllStudents&callback=${callbackName}`;
+            script.onerror = () => reject(new Error("Failed to load script via JSONP"));
+            document.body.appendChild(script);
+        });
+    }
+
     async function loadStudentCards() {
         let logoInput = document.getElementById('logo-url-input').value;
         let logoUrl = getDirectDriveImageUrl(logoInput);
@@ -270,20 +294,19 @@
 
         Swal.fire({
             title: 'Fetching Students...',
-            text: 'Reading header data from All Students Sheet',
+            text: 'Connecting to Google Sheets Server',
             didOpen: () => Swal.showLoading(),
             allowOutsideClick: false
         });
 
         try {
-            const response = await fetch(`${API_URL}?action=getAllStudents`);
-            const data = await response.json();
+            const data = await fetchSheetData();
             Swal.close();
 
             let studentsList = [];
             if (Array.isArray(data)) {
                 studentsList = data;
-            } else if (data.students && Array.isArray(data.students)) {
+            } else if (data && data.students && Array.isArray(data.students)) {
                 studentsList = data.students;
             }
 
@@ -292,16 +315,14 @@
                 return;
             }
 
-            rawStudentData = studentsList;
             renderCards(studentsList, logoUrl, classFilter, searchFilter);
 
         } catch (e) {
             Swal.close();
-            Swal.fire("Error", "Failed to load data: " + e.message, "error");
+            Swal.fire("Error", "Server connect nahi ho saka. Please check Web App URL or Network.", "error");
         }
     }
 
-    // Render Cards Grid
     function renderCards(students, logoUrl, classFilter, searchFilter) {
         let container = document.getElementById('cards-container');
         container.innerHTML = "";
@@ -309,16 +330,16 @@
         let filtered = students.filter(st => {
             let stClass = String(getField(st, ["Class"]) || "").toLowerCase();
             let stName = String(getField(st, ["Student Name", "Name"]) || "").toLowerCase();
-            let stRoll = String(getField(st, ["Roll No", "Roll", "Student ID", "Reg No"]) || "").toLowerCase();
+            let stRegNo = String(getRegNoColumnB(st)).toLowerCase();
 
             let matchClass = !classFilter || stClass.includes(classFilter);
-            let matchSearch = !searchFilter || stName.includes(searchFilter) || stRoll.includes(searchFilter);
+            let matchSearch = !searchFilter || stName.includes(searchFilter) || stRegNo.includes(searchFilter);
 
             return matchClass && matchSearch;
         });
 
         if (filtered.length === 0) {
-            container.innerHTML = `<div class="no-print" style="text-align:center; color:#ef4444; font-size:13px; margin-top:20px;">No matching students found for selected criteria.</div>`;
+            container.innerHTML = `<div class="no-print" style="text-align:center; color:#ef4444; font-size:13px; margin-top:20px;">No matching records found.</div>`;
             return;
         }
 
@@ -329,7 +350,10 @@
             let bg = getField(st, ["Blood Group", "Blood", "BG"]) || "N/A";
             let address = getField(st, ["Address", "Village"]) || "Barsoi, Katihar";
             let mobile = getField(st, ["Mobile No", "Mobile", "Contact", "Phone"]) || "N/A";
-            let idNo = getField(st, ["Reg No", "Student ID", "Roll No", "ID"]) || "BPS-STU";
+            
+            // Priority: Column B Reg No / Student ID
+            let idNo = getRegNoColumnB(st) || getField(st, ["Roll No", "ID"]) || "BPS-001";
+            
             let photoRaw = getField(st, ["Photo url", "Photo", "Image"]);
             let photoUrl = getDirectDriveImageUrl(photoRaw);
 
@@ -346,7 +370,7 @@
                     <div class="id-body">
                         <div class="photo-container">
                             <img src="${photoUrl}" class="student-photo" alt="Photo" onerror="this.src='https://via.placeholder.com/80x95?text=No+Photo'">
-                            <div class="id-no-tag">ID: ${idNo}</div>
+                            <div class="id-no-tag">ID No-${idNo}</div>
                         </div>
                         
                         <div class="details-container">
