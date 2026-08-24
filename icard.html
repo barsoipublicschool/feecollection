@@ -219,7 +219,6 @@
         return cleanUrl;
     }
 
-    // Explicitly targeting Column B Header (Reg No / Student ID / Registration No)
     function getRegNoColumnB(obj) {
         if (!obj) return "";
         let possibleColumnBKeys = ["reg no", "registration no", "student id", "regno", "studentid", "id no", "id"];
@@ -259,31 +258,17 @@
         return val;
     }
 
-    // Advanced Data Fetching (Fetch with JSONP fallback to prevent Failed to fetch CORS issues)
     async function fetchSheetData() {
-        try {
-            const res = await fetch(`${API_URL}?action=getAllStudents`);
-            if (res.ok) {
-                return await res.json();
-            }
-        } catch (e) {
-            console.warn("Direct fetch failed, attempting JSONP fallback...", e);
-        }
-
-        // JSONP Fallback
-        return new Promise((resolve, reject) => {
-            const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                resolve(data);
-            };
-
-            const script = document.createElement('script');
-            script.src = `${API_URL}?action=getAllStudents&callback=${callbackName}`;
-            script.onerror = () => reject(new Error("Failed to load script via JSONP"));
-            document.body.appendChild(script);
+        // Fetch data with redirect tracking for Google Apps Script
+        const response = await fetch(`${API_URL}?action=getAllStudents`, {
+            method: 'GET',
+            redirect: 'follow'
         });
+        
+        if (!response.ok) {
+            throw new Error("HTTP error " + response.status);
+        }
+        return await response.json();
     }
 
     async function loadStudentCards() {
@@ -308,6 +293,9 @@
                 studentsList = data;
             } else if (data && data.students && Array.isArray(data.students)) {
                 studentsList = data.students;
+            } else if (data && typeof data === 'object') {
+                // If single object returned wrapped in key
+                studentsList = Object.values(data).find(v => Array.isArray(v)) || [];
             }
 
             if (studentsList.length === 0) {
@@ -318,8 +306,13 @@
             renderCards(studentsList, logoUrl, classFilter, searchFilter);
 
         } catch (e) {
+            console.error(e);
             Swal.close();
-            Swal.fire("Error", "Server connect nahi ho saka. Please check Web App URL or Network.", "error");
+            Swal.fire({
+                icon: "error",
+                title: "Server Error",
+                html: "Data fetch nahi ho pa raha hai.<br><br><b>Remedy:</b> Web App ki Deployment setting Check karein: <br>1. Execute as: <b>Me</b><br>2. Who has access: <b>Anyone</b>"
+            });
         }
     }
 
@@ -351,7 +344,6 @@
             let address = getField(st, ["Address", "Village"]) || "Barsoi, Katihar";
             let mobile = getField(st, ["Mobile No", "Mobile", "Contact", "Phone"]) || "N/A";
             
-            // Priority: Column B Reg No / Student ID
             let idNo = getRegNoColumnB(st) || getField(st, ["Roll No", "ID"]) || "BPS-001";
             
             let photoRaw = getField(st, ["Photo url", "Photo", "Image"]);
