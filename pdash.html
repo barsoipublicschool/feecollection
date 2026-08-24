@@ -37,8 +37,10 @@
         #dashboard-screen { display: none; max-width: 1100px; margin: 15px auto; padding: 0 10px; }
         .dashboard-container { display: flex; gap: 15px; align-items: flex-start; }
         
-        /* Left Sidebar */
+        /* Left Sidebar & Mobile Toggle Button */
         .sidebar { width: 240px; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .sidebar-toggle-btn { display: none; width: 100%; background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        
         .sidebar h3 { font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
         .nav-btn { width: 100%; text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
         .nav-btn:hover, .nav-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
@@ -92,9 +94,13 @@
         .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
         .footer-sigs { display: flex; justify-content: space-between; margin-top: auto; padding-top: 15px; font-size: 9.5px; font-weight: bold; }
 
+        /* Responsive Media Query for Mobile */
         @media (max-width: 768px) {
             .dashboard-container { flex-direction: column; }
-            .sidebar { width: 100%; }
+            .sidebar { width: 100%; box-sizing: border-box; padding: 10px; }
+            .sidebar-toggle-btn { display: flex; }
+            .sidebar-menu-content { display: none; }
+            .sidebar-menu-content.open { display: block; }
         }
 
         @media print { 
@@ -149,14 +155,20 @@
 <div id="dashboard-screen" class="no-print">
     <div class="dashboard-container">
         
-        <!-- Left Side: Dashboard Navigation Sidebar -->
+        <!-- Left Side: Dashboard Navigation Sidebar with Three-Line Toggle for Mobile -->
         <div class="sidebar">
-            <h3>Dashboard Menu</h3>
-            <button class="nav-btn active" onclick="switchTab('fees-section')">💳 Fees</button>
-            <button class="nav-btn" onclick="switchTab('admit-section')">🎫 Admit Card</button>
-            <button class="nav-btn" onclick="switchTab('result-section')">📊 Result</button>
-            <button class="nav-btn" onclick="switchTab('homework-section')">📚 Homework</button>
-            <button class="nav-btn" onclick="switchTab('progress-section')">📈 Progress</button>
+            <button class="sidebar-toggle-btn" onclick="toggleSidebarMenu()">
+                <span>☰ Menu / Options</span>
+                <span id="toggle-arrow">▼</span>
+            </button>
+            <div class="sidebar-menu-content" id="sidebar-menu">
+                <h3>Dashboard Menu</h3>
+                <button class="nav-btn active" onclick="switchTab('fees-section')">💳 Fees</button>
+                <button class="nav-btn" onclick="switchTab('admit-section')">🎫 Admit Card</button>
+                <button class="nav-btn" onclick="switchTab('result-section')">📊 Result</button>
+                <button class="nav-btn" onclick="switchTab('homework-section')">📚 Homework</button>
+                <button class="nav-btn" onclick="switchTab('progress-section')">📈 Progress</button>
+            </div>
         </div>
 
         <!-- Right Side: Student Profile & Options content -->
@@ -231,15 +243,13 @@
                 </div>
             </div>
 
-            <!-- 3. RESULT TAB SECTION -->
+            <!-- 3. RESULT TAB SECTION (With Auto-Login Dynamic Link) -->
             <div id="result-section" class="tab-section">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">📊 Examination Result</div>
-                    </div>
-                    <div style="text-align:center; padding: 20px; color: #64748b; font-size: 12px;">
-                        Result abhi upload nahi hua hai.
-                    </div>
+                <div class="card" style="text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 20px;">
+                    <div style="font-size: 13px; font-weight: 600; margin-bottom: 10px;">🎓 Annual / Term Exam Result Portal</div>
+                    <a href="#" id="dynamic-result-btn" target="_blank" style="display: inline-block; background: white; color: #4f46e5; padding: 8px 20px; border-radius: 6px; font-size: 12px; font-weight: bold; text-decoration: none; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        View Exam Result ➔
+                    </a>
                 </div>
             </div>
 
@@ -285,6 +295,19 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     let studentRecords = [];
+
+    // Toggle Sidebar Menu for Mobile screen
+    function toggleSidebarMenu() {
+        let menu = document.getElementById('sidebar-menu');
+        let arrow = document.getElementById('toggle-arrow');
+        if(menu.style.display === 'block') {
+            menu.style.display = 'none';
+            arrow.innerText = '▼';
+        } else {
+            menu.style.display = 'block';
+            arrow.innerText = '▲';
+        }
+    }
 
     function fetchAnyProp(obj, possibleKeys) {
         if(!obj) return "";
@@ -364,6 +387,12 @@
         
         document.getElementById(tabId).classList.add('active');
         event.currentTarget.classList.add('active');
+
+        // On mobile, auto close the menu after clicking an option
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar-menu').style.display = 'none';
+            document.getElementById('toggle-arrow').innerText = '▼';
+        }
     }
 
     async function loginStudent() {
@@ -402,6 +431,13 @@
 
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
+
+            // --- Dynamic Result Link Integration ---
+            let studentRoll = st["Roll No"] || st["Roll"] || sid;
+            let studentClass = st["Class"] || "";
+            let resultPortalUrl = `https://barsoipublicschool.github.io/result?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
+            document.getElementById('dynamic-result-btn').href = resultPortalUrl;
+            // ---------------------------------------
 
             renderDashboard(studentRecords);
 
@@ -519,7 +555,7 @@
                 <div class="student-details">
                     <div><b>Name:</b> ${fetchAnyProp(d, ["Student Name", "Name"])}</div><div><b>ID:</b> ${fetchAnyProp(d, ["Student Id", "ID"])}</div>
                     <div><b>Father:</b> ${fetchAnyProp(d, ["Father Name", "Father"])}</div><div><b>Class:</b> ${fetchAnyProp(d, ["Class"])}</div>
-                    <div><b>Address:</b> ${fetchAnyProp(d, ["Address"])}</div><div><b>Month:</b> ${fetchAnyProp(d, ["Month"])}</div>
+                    <div><b>Address:</b> ${fetchAnyProperty ? '' : ''}${fetchAnyProp(d, ["Address"])}</div><div><b>Month:</b> ${fetchAnyProp(d, ["Month"])}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
