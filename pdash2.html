@@ -162,8 +162,8 @@
             <div class="sidebar-menu-content" id="sidebar-menu">
                 <h3>Dashboard Menu</h3>
                 <button class="nav-btn active" onclick="switchTab('fees-section')">💳 Fees</button>
-                <button class="nav-btn" onclick="switchTab('icard-section')">💳 Identity Card</button>
                 <button class="nav-btn" onclick="switchTab('admit-section')">🎫 Admit Card</button>
+                <button class="nav-btn" onclick="switchTab('icard-section')">🪪 Identity Card</button>
                 <button class="nav-btn" onclick="switchTab('result-section')">📊 Result</button>
                 <button class="nav-btn" onclick="switchTab('homework-section')">📚 Homework</button>
                 <button class="nav-btn" onclick="switchTab('progress-section')">📈 Progress</button>
@@ -228,23 +228,23 @@
                 </div>
             </div>
 
-            <!-- 2. IDENTITY CARD TAB SECTION -->
-            <div id="icard-section" class="tab-section">
-                <div class="card" style="padding: 10px;">
-                    <div class="card-header">
-                        <div class="card-title">💳 Student Identity Card</div>
-                    </div>
-                    <iframe id="iframe-icard" class="portal-iframe" src=""></iframe>
-                </div>
-            </div>
-
-            <!-- 3. ADMIT CARD TAB SECTION -->
+            <!-- 2. ADMIT CARD TAB SECTION -->
             <div id="admit-section" class="tab-section">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header">
                         <div class="card-title">🎫 Examination Admit Card</div>
                     </div>
                     <iframe id="iframe-admit" class="portal-iframe" src=""></iframe>
+                </div>
+            </div>
+
+            <!-- 3. IDENTITY CARD TAB SECTION -->
+            <div id="icard-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">🪪 Student Identity Card</div>
+                    </div>
+                    <iframe id="iframe-icard" class="portal-iframe" src=""></iframe>
                 </div>
             </div>
 
@@ -294,11 +294,11 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdsLSoc6h2MGWiuj3IMqspRQ_ggeixSurxTKvgDnXApmpjeXN37seZCFwJ_OwEJ2q_/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     
     const BASE_URLS = {
-        icard:    "https://barsoipublicschool.github.io/icard",
         admit:    "https://barsoipublicschool.github.io/admitcard",
+        icard:    "https://barsoipublicschool.github.io/icard",
         result:   "https://barsoipublicschool.github.io/result",
         homework: "https://barsoipublicschool.github.io/homework",
         progress: "https://barsoipublicschool.github.io/progress"
@@ -439,14 +439,14 @@
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            // --- CLASS AUR ROLL PASS KIYA GAYA HAI AUTO LOGIN KE LIYE ---
+            // --- CLASS AUR ROLL PASS KIYA GAYA HAI ---
             let studentRoll  = st["Roll No"] || st["Roll"] || sid;
             let studentClass = st["Class"] || "";
 
             let queryParams = `?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
 
-            document.getElementById('iframe-icard').src    = BASE_URLS.icard + queryParams;
             document.getElementById('iframe-admit').src    = BASE_URLS.admit + queryParams;
+            document.getElementById('iframe-icard').src    = BASE_URLS.icard + queryParams;
             document.getElementById('iframe-result').src   = BASE_URLS.result + queryParams;
             document.getElementById('iframe-homework').src = BASE_URLS.homework + queryParams;
             document.getElementById('iframe-progress').src = BASE_URLS.progress + queryParams;
@@ -515,8 +515,8 @@
         document.getElementById('login-sid').value = '';
         document.getElementById('login-mobile').value = '';
         
-        document.getElementById('iframe-icard').src = '';
         document.getElementById('iframe-admit').src = '';
+        document.getElementById('iframe-icard').src = '';
         document.getElementById('iframe-result').src = '';
         document.getElementById('iframe-homework').src = '';
         document.getElementById('iframe-progress').src = '';
