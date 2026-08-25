@@ -62,11 +62,11 @@
         border-radius: 5px;
     }
 
-    /* ID Card Horizontal Canvas (CR-80 Standard Landscape Ratio) */
+    /* ID Card Horizontal Canvas (CR-80 Ratio) */
     .id-card {
         width: 500px;
         height: 310px;
-        background: #ffffff;
+        background: #ffffff !important;
         border-radius: 10px;
         box-shadow: 0 8px 20px rgba(0,0,0,0.15);
         position: relative;
@@ -74,10 +74,9 @@
         border: 1px solid #198754;
         box-sizing: border-box;
         display: none;
-        background-color: #fff !important;
     }
 
-    /* Curved Header */
+    /* Header */
     .header {
         background: linear-gradient(135deg, #0f5132, #198754) !important;
         color: #ffffff !important;
@@ -124,7 +123,7 @@
         padding: 2px;
     }
 
-    /* Card Main Layout (2 Columns) */
+    /* Layout */
     .card-body {
         display: flex;
         padding: 10px 15px;
@@ -132,7 +131,6 @@
         align-items: flex-start;
     }
 
-    /* Left Photo Layout */
     .left-section {
         width: 125px;
         display: flex;
@@ -160,7 +158,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* Right Details Table Layout */
     .right-section {
         flex: 1;
     }
@@ -202,7 +199,6 @@
         -webkit-print-color-adjust: exact !important;
     }
 
-    /* Curved Footer */
     .footer {
         position: absolute;
         bottom: 0;
@@ -225,7 +221,7 @@
     .btn-print { background: #198754; }
     .btn-back { background: #6c757d; }
 
-    /* EXACT COLOR PRINT ENGINE */
+    /* Print Color Preservation */
     @media print {
         * {
             -webkit-print-color-adjust: exact !important;
@@ -267,12 +263,10 @@
     </div>
 
     <div class="card-body">
-        <!-- Left Side: Photo -->
         <div class="left-section">
             <img id="card-photo" src="" class="student-photo" alt="Student Photo">
         </div>
 
-        <!-- Right Side: Details -->
         <div class="right-section">
             <div class="id-no-txt">ID No : <span id="card-id">BPS-000</span></div>
             
@@ -300,7 +294,7 @@
                 <tr>
                     <td class="label">Blood Group</td>
                     <td class="colon">:</td>
-                    <td class="value" id="card-blood">A+</td>
+                    <td class="value" id="card-blood">-</td>
                 </tr>
                 <tr>
                     <td class="label">Address</td>
@@ -351,10 +345,10 @@
         fetchIDData(cls, roll);
     }
 
-    // Helper to format ISO Date to DD-MM-YYYY
+    // Dynamic Safe Date Formatter
     function formatDate(rawDate) {
         if (!rawDate) return "-";
-        if (rawDate.includes("T")) {
+        if (typeof rawDate === 'string' && rawDate.includes("T")) {
             const d = new Date(rawDate);
             if (!isNaN(d.getTime())) {
                 const day = String(d.getDate()).padStart(2, '0');
@@ -364,6 +358,21 @@
             }
         }
         return rawDate;
+    }
+
+    // Dynamic Field Extractor with Fallbacks
+    function getDynamicField(dataObj, possibleKeys, defaultValue = "-") {
+        if (!dataObj || typeof dataObj !== 'object') return defaultValue;
+        
+        // Match exact or lowercase keys dynamically
+        const objectKeys = Object.keys(dataObj);
+        for (let pKey of possibleKeys) {
+            let foundKey = objectKeys.find(k => k.toLowerCase().replace(/[^a-z]/g, '') === pKey.toLowerCase().replace(/[^a-z]/g, ''));
+            if (foundKey && dataObj[foundKey] && String(dataObj[foundKey]).trim() !== "") {
+                return String(dataObj[foundKey]).trim();
+            }
+        }
+        return defaultValue;
     }
 
     function fetchIDData(cls, roll) {
@@ -377,14 +386,27 @@
                     return Swal.fire('Error', 'Student record not found!', 'error');
                 }
 
-                // Fill Data
-                document.getElementById('card-id').innerText = d.regNo || ("BPS-" + d.rollNo);
-                document.getElementById('card-name').innerText = d.name || "-";
-                document.getElementById('card-father').innerText = d.father || "-";
-                document.getElementById('card-class').innerText = d.classFromSheet || cls;
-                document.getElementById('card-roll').innerText = d.rollNo || roll;
-                document.getElementById('card-dob').innerText = formatDate(d.dob);
-                document.getElementById('card-photo').src = d.photo || "https://via.placeholder.com/110x130?text=No+Photo";
+                // Dynamic Field Assignments
+                document.getElementById('card-id').innerText = getDynamicField(d, ['regNo', 'studentId', 'idNo'], "BPS-" + roll);
+                document.getElementById('card-name').innerText = getDynamicField(d, ['name', 'studentName', 'studentsName']);
+                document.getElementById('card-father').innerText = getDynamicField(d, ['father', 'fatherName', 'fathersName']);
+                document.getElementById('card-class').innerText = getDynamicField(d, ['classFromSheet', 'class', 'className'], cls);
+                document.getElementById('card-roll').innerText = getDynamicField(d, ['rollNo', 'roll'], roll);
+                
+                // Date of Birth
+                const rawDob = getDynamicField(d, ['dob', 'dateOfBirth']);
+                document.getElementById('card-dob').innerText = formatDate(rawDob);
+                
+                // Dynamic Blood Group Mapping (Will pick 'Blood Group', 'Blood', 'bloodGroup', etc.)
+                document.getElementById('card-blood').innerText = getDynamicField(d, ['bloodGroup', 'blood', 'bGroup'], "N/A");
+                
+                // Address & Mobile
+                document.getElementById('card-address').innerText = getDynamicField(d, ['address', 'addr'], "Barsoi, Katihar");
+                document.getElementById('card-mobile').innerText = getDynamicField(d, ['mobile', 'mobileNo', 'phone'], "-");
+                
+                // Photo Parsing
+                const photoVal = getDynamicField(d, ['photo', 'photoUrl', 'photo_url', 'image'], "");
+                document.getElementById('card-photo').src = photoVal !== "-" ? photoVal : "https://via.placeholder.com/110x130?text=No+Photo";
                 
                 // UI Toggle
                 document.getElementById('search-box').style.display = 'none';
