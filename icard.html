@@ -16,7 +16,52 @@
         align-items: center;
     }
 
-    /* ID Card Canvas (Standard CR80 Size Aspect Ratio) */
+    /* Manual Search Box */
+    #search-box {
+        max-width: 350px;
+        width: 100%;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .input-row {
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+        margin-bottom: 12px;
+    }
+
+    .input-row label {
+        font-size: 13px;
+        font-weight: bold;
+        margin-bottom: 4px;
+        color: #333;
+    }
+
+    .input-row input {
+        padding: 8px 12px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        outline: none;
+    }
+
+    .check-btn {
+        width: 100%;
+        background: #198754;
+        color: white;
+        border: none;
+        padding: 10px;
+        cursor: pointer;
+        font-weight: bold;
+        border-radius: 5px;
+    }
+
+    /* ID Card Canvas */
     .id-card {
         width: 350px;
         height: 540px;
@@ -30,7 +75,6 @@
         display: none; /* Auto-shows after fetch */
     }
 
-    /* Curved Colorful Header */
     .header {
         background: linear-gradient(135deg, #0f5132, #198754);
         color: #ffffff;
@@ -64,7 +108,6 @@
         letter-spacing: 1px;
     }
 
-    /* Logo Styling */
     .logo-img {
         position: absolute;
         left: 12px;
@@ -76,7 +119,6 @@
         padding: 2px;
     }
 
-    /* ID Number Top Bar */
     .id-no-bar {
         text-align: right;
         padding: 8px 15px 0 0;
@@ -85,15 +127,8 @@
         color: #d97706;
     }
 
-    /* Main Content Body */
-    .card-body {
-        padding: 5px 15px;
-    }
-
-    .photo-section {
-        text-align: center;
-        margin-bottom: 10px;
-    }
+    .card-body { padding: 5px 15px; }
+    .photo-section { text-align: center; margin-bottom: 10px; }
 
     .student-photo {
         width: 100px;
@@ -105,43 +140,13 @@
         background: #e9ecef;
     }
 
-    /* Details Table Layout */
-    .details-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 13px;
-    }
+    .details-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .details-table td { padding: 4px 2px; vertical-align: top; }
+    .label { font-weight: 700; color: #495057; width: 35%; }
+    .colon { width: 5%; font-weight: bold; color: #198754; }
+    .value { font-weight: 600; color: #212529; width: 60%; }
+    .highlight-name { color: #0f5132; font-size: 15px; font-weight: 800; }
 
-    .details-table td {
-        padding: 4px 2px;
-        vertical-align: top;
-    }
-
-    .label {
-        font-weight: 700;
-        color: #495057;
-        width: 35%;
-    }
-
-    .colon {
-        width: 5%;
-        font-weight: bold;
-        color: #198754;
-    }
-
-    .value {
-        font-weight: 600;
-        color: #212529;
-        width: 60%;
-    }
-
-    .highlight-name {
-        color: #0f5132;
-        font-size: 15px;
-        font-weight: 800;
-    }
-
-    /* Curved Footer */
     .footer {
         position: absolute;
         bottom: 0;
@@ -157,35 +162,35 @@
         box-sizing: border-box;
     }
 
-    /* Action Buttons */
-    .btn-group {
-        margin-top: 20px;
-        display: flex;
-        gap: 10px;
-    }
-
-    .btn {
-        padding: 10px 20px;
-        border: none;
-        border-radius: 6px;
-        font-weight: bold;
-        cursor: pointer;
-        color: #fff;
-    }
-
+    .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+    .btn { padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: #fff; }
     .btn-print { background: #198754; }
     .btn-back { background: #6c757d; }
 
-    /* Print Styles */
     @media print {
         body { background: #fff; padding: 0; }
-        .btn-group { display: none; }
+        #search-box, .btn-group { display: none !important; }
         .id-card { display: block !important; box-shadow: none; border: 1px solid #000; }
     }
 </style>
 </head>
 <body>
 
+<!-- Manual Search Box (Shows if URL parameter is missing) -->
+<div id="search-box">
+    <h3 style="margin-top:0; color:#0f5132;">Student ID Card Search</h3>
+    <div class="input-row">
+        <label>Class:</label>
+        <input type="text" id="cls" placeholder="e.g. 7th">
+    </div>
+    <div class="input-row">
+        <label>Roll No:</label>
+        <input type="text" id="roll" placeholder="Enter Roll No">
+    </div>
+    <button class="check-btn" onclick="manualSearch()">Generate ID Card</button>
+</div>
+
+<!-- ID Card Container -->
 <div id="idCard" class="id-card">
     <div class="header">
         <img src="https://drive.google.com/thumbnail?id=18zW3xG-nsyBUrn2FdLLIzoUPaSZVura3&sz=w300" class="logo-img" alt="Logo">
@@ -248,7 +253,7 @@
 
 <div class="btn-group" id="btnGroup" style="display:none;">
     <button class="btn btn-print" onclick="window.print()">PRINT / SAVE PDF</button>
-    <button class="btn btn-back" onclick="history.back()">BACK</button>
+    <button class="btn btn-back" onclick="location.reload()">BACK</button>
 </div>
 
 <script>
@@ -260,11 +265,21 @@
         const roll = params.get('roll');
 
         if (cls && roll) {
+            document.getElementById('cls').value = cls;
+            document.getElementById('roll').value = roll;
             fetchIDData(cls, roll);
-        } else {
-            Swal.fire('Error', 'Class and Roll No missing in URL!', 'error');
         }
     });
+
+    function manualSearch() {
+        const cls = document.getElementById('cls').value;
+        const roll = document.getElementById('roll').value;
+
+        if (!cls || !roll) {
+            return Swal.fire('Warning', 'Please enter Class and Roll No!', 'warning');
+        }
+        fetchIDData(cls, roll);
+    }
 
     function fetchIDData(cls, roll) {
         Swal.fire({ title: 'Generating ID Card...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
@@ -277,7 +292,7 @@
                     return Swal.fire('Error', 'Student record not found!', 'error');
                 }
 
-                // Fill Data into Card
+                // Fill Data
                 document.getElementById('card-id').innerText = d.regNo || ("BPS-" + d.rollNo);
                 document.getElementById('card-name').innerText = d.name || "-";
                 document.getElementById('card-father').innerText = d.father || "-";
@@ -286,7 +301,8 @@
                 document.getElementById('card-dob').innerText = d.dob || "-";
                 document.getElementById('card-photo').src = d.photo || "https://via.placeholder.com/100x120?text=No+Photo";
                 
-                // Show Card & Buttons
+                // UI Toggle
+                document.getElementById('search-box').style.display = 'none';
                 document.getElementById('idCard').style.display = 'block';
                 document.getElementById('btnGroup').style.display = 'flex';
             })
