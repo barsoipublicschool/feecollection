@@ -162,6 +162,7 @@
             <div class="sidebar-menu-content" id="sidebar-menu">
                 <h3>Dashboard Menu</h3>
                 <button class="nav-btn active" onclick="switchTab('fees-section')">💳 Fees</button>
+                <button class="nav-btn" onclick="switchTab('icard-section')">💳 Identity Card</button>
                 <button class="nav-btn" onclick="switchTab('admit-section')">🎫 Admit Card</button>
                 <button class="nav-btn" onclick="switchTab('result-section')">📊 Result</button>
                 <button class="nav-btn" onclick="switchTab('homework-section')">📚 Homework</button>
@@ -227,7 +228,17 @@
                 </div>
             </div>
 
-            <!-- 2. ADMIT CARD TAB SECTION -->
+            <!-- 2. IDENTITY CARD TAB SECTION -->
+            <div id="icard-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">💳 Student Identity Card</div>
+                    </div>
+                    <iframe id="iframe-icard" class="portal-iframe" src=""></iframe>
+                </div>
+            </div>
+
+            <!-- 3. ADMIT CARD TAB SECTION -->
             <div id="admit-section" class="tab-section">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header">
@@ -237,7 +248,7 @@
                 </div>
             </div>
 
-            <!-- 3. RESULT TAB SECTION -->
+            <!-- 4. RESULT TAB SECTION -->
             <div id="result-section" class="tab-section">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header">
@@ -247,7 +258,7 @@
                 </div>
             </div>
 
-            <!-- 4. HOMEWORK TAB SECTION -->
+            <!-- 5. HOMEWORK TAB SECTION -->
             <div id="homework-section" class="tab-section">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header">
@@ -257,7 +268,7 @@
                 </div>
             </div>
 
-            <!-- 5. PROGRESS TAB SECTION -->
+            <!-- 6. PROGRESS TAB SECTION -->
             <div id="progress-section" class="tab-section">
                 <div class="card" style="padding: 10px;">
                     <div class="card-header">
@@ -283,9 +294,10 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzdsLSoc6h2MGWiuj3IMqspRQ_ggeixSurxTKvgDnXApmpjeXN37seZCFwJ_OwEJ2q_/exec";
     
     const BASE_URLS = {
+        icard:    "https://barsoipublicschool.github.io/icard",
         admit:    "https://barsoipublicschool.github.io/admitcard",
         result:   "https://barsoipublicschool.github.io/result",
         homework: "https://barsoipublicschool.github.io/homework",
@@ -427,12 +439,13 @@
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            // --- SIRF CLASS AUR ROLL PASS KIYA GAYA HAI (ID HATA DIYA GAYA HAI) ---
+            // --- CLASS AUR ROLL PASS KIYA GAYA HAI AUTO LOGIN KE LIYE ---
             let studentRoll  = st["Roll No"] || st["Roll"] || sid;
             let studentClass = st["Class"] || "";
 
             let queryParams = `?roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
 
+            document.getElementById('iframe-icard').src    = BASE_URLS.icard + queryParams;
             document.getElementById('iframe-admit').src    = BASE_URLS.admit + queryParams;
             document.getElementById('iframe-result').src   = BASE_URLS.result + queryParams;
             document.getElementById('iframe-homework').src = BASE_URLS.homework + queryParams;
@@ -502,6 +515,7 @@
         document.getElementById('login-sid').value = '';
         document.getElementById('login-mobile').value = '';
         
+        document.getElementById('iframe-icard').src = '';
         document.getElementById('iframe-admit').src = '';
         document.getElementById('iframe-result').src = '';
         document.getElementById('iframe-homework').src = '';
