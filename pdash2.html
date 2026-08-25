@@ -72,10 +72,8 @@
         .tab-section { display: none; }
         .tab-section.active { display: block; }
 
-        /* General Portal Box Styling */
-        .portal-link-card { text-align: center; background: linear-gradient(135deg, #4f46e5, #4338ca); color: white; padding: 25px; border-radius: 12px; }
-        .portal-link-btn { display: inline-block; background: white; color: #4f46e5; padding: 10px 24px; border-radius: 6px; font-size: 13px; font-weight: bold; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 10px; transition: 0.2s; }
-        .portal-link-btn:hover { background: #f8fafc; transform: translateY(-1px); }
+        /* Embedded Dynamic Portal Frame */
+        .portal-iframe { width: 100%; height: 650px; border: none; border-radius: 8px; background: #ffffff; }
 
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
@@ -105,6 +103,7 @@
             .sidebar-toggle-btn { display: flex; }
             .sidebar-menu-content { display: none; }
             .sidebar-menu-content.open { display: block; }
+            .portal-iframe { height: 500px; }
         }
 
         @media print { 
@@ -237,45 +236,41 @@
 
             <!-- 2. ADMIT CARD TAB SECTION -->
             <div id="admit-section" class="tab-section">
-                <div class="card portal-link-card">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">🎫 Examination Admit Card</div>
-                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Click below to download or print your examination admit card.</p>
-                    <a href="#" id="btn-admit-link" target="_blank" class="portal-link-btn">
-                        Download Admit Card ➔
-                    </a>
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">🎫 Examination Admit Card</div>
+                    </div>
+                    <iframe id="iframe-admit" class="portal-iframe" src=""></iframe>
                 </div>
             </div>
 
             <!-- 3. RESULT TAB SECTION -->
             <div id="result-section" class="tab-section">
-                <div class="card portal-link-card">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📊 Annual / Term Exam Result Portal</div>
-                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Click below to access your detailed report card and result.</p>
-                    <a href="#" id="btn-result-link" target="_blank" class="portal-link-btn">
-                        View Exam Result ➔
-                    </a>
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">📊 Annual / Term Exam Result Card</div>
+                    </div>
+                    <iframe id="iframe-result" class="portal-iframe" src=""></iframe>
                 </div>
             </div>
 
             <!-- 4. HOMEWORK TAB SECTION -->
             <div id="homework-section" class="tab-section">
-                <div class="card portal-link-card">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📚 Daily Homework & Assignment</div>
-                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Access daily classwork, assignments, and study materials.</p>
-                    <a href="#" id="btn-homework-link" target="_blank" class="portal-link-btn">
-                        Open Homework Portal ➔
-                    </a>
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">📚 Daily Homework & Assignment</div>
+                    </div>
+                    <iframe id="iframe-homework" class="portal-iframe" src=""></iframe>
                 </div>
             </div>
 
             <!-- 5. PROGRESS TAB SECTION -->
             <div id="progress-section" class="tab-section">
-                <div class="card portal-link-card">
-                    <div style="font-size: 14px; font-weight: 600; margin-bottom: 6px;">📈 Student Performance & Attendance</div>
-                    <p style="font-size: 11px; margin: 0 0 10px; opacity: 0.9;">Track academic growth, test analytics, and attendance history.</p>
-                    <a href="#" id="btn-progress-link" target="_blank" class="portal-link-btn">
-                        View Progress Report ➔
-                    </a>
+                <div class="card" style="padding: 10px;">
+                    <div class="card-header">
+                        <div class="card-title">📈 Student Performance & Attendance</div>
+                    </div>
+                    <iframe id="iframe-progress" class="portal-iframe" src=""></iframe>
                 </div>
             </div>
 
@@ -298,7 +293,7 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     
     // -------------------------------------------------------------
-    // SETUP YOUR EXTERNAL WEBSITES / MODULE URLS HERE
+    // EXTERNAL MODULE BASE URLS
     // -------------------------------------------------------------
     const BASE_URLS = {
         admit:    "https://barsoipublicschool.github.io/admitcard",
@@ -442,17 +437,17 @@
             let photoRaw = st["Photo url"] || st["Photo"] || "";
             document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
-            // --- Dynamic Portal Links Configuration ---
+            // --- Dynamic Iframes Parameters Binding ---
             let studentId    = st["Reg No/ Student ID"] || st["Reg No"] || st["Student ID"] || sid;
             let studentRoll  = st["Roll No"] || st["Roll"] || sid;
             let studentClass = st["Class"] || "";
 
             let queryParams = `?id=${encodeURIComponent(studentId)}&roll=${encodeURIComponent(studentRoll)}&class=${encodeURIComponent(studentClass)}`;
 
-            document.getElementById('btn-admit-link').href    = BASE_URLS.admit + queryParams;
-            document.getElementById('btn-result-link').href   = BASE_URLS.result + queryParams;
-            document.getElementById('btn-homework-link').href = BASE_URLS.homework + queryParams;
-            document.getElementById('btn-progress-link').href = BASE_URLS.progress + queryParams;
+            document.getElementById('iframe-admit').src    = BASE_URLS.admit + queryParams;
+            document.getElementById('iframe-result').src   = BASE_URLS.result + queryParams;
+            document.getElementById('iframe-homework').src = BASE_URLS.homework + queryParams;
+            document.getElementById('iframe-progress').src = BASE_URLS.progress + queryParams;
             // ------------------------------------------
 
             renderDashboard(studentRecords);
@@ -517,6 +512,12 @@
         document.getElementById('login-screen').style.display = 'flex';
         document.getElementById('login-sid').value = '';
         document.getElementById('login-mobile').value = '';
+        
+        // Clear Iframes on Logout
+        document.getElementById('iframe-admit').src = '';
+        document.getElementById('iframe-result').src = '';
+        document.getElementById('iframe-homework').src = '';
+        document.getElementById('iframe-progress').src = '';
     }
 
     function generateReceiptHTML(d, type) {
