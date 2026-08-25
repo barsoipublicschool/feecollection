@@ -300,8 +300,8 @@
         admit:    "https://barsoipublicschool.github.io/admitcard",
         icard:    "https://barsoipublicschool.github.io/icard",
         result:   "https://barsoipublicschool.github.io/result",
-        homework: "https://barsoipublicschool.github.io/homework",
-        progress: "https://barsoipublicschool.github.io/progress"
+        homework: "#",
+        progress: "#"
     };
 
     let studentRecords = [];
@@ -551,7 +551,7 @@
             if(val > 0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
         });
 
-        let logo = "https://lh3.googleusercontent.com/d/1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe=s300";
+        let logo = "https://lh3.googleusercontent.com/d/14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE=s300";
         let pDate = fetchAnyProp(d, ["Paid Date", "Date"]);
         let displayDate = pDate ? formatDateDDMMYYYY(pDate) : formatDateDDMMYYYY(new Date());
         let totalPaidNum = parseFloat(fetchAnyProp(d, ["Total Paid", "Paid Amount"])) || 0;
@@ -566,9 +566,9 @@
                     </div>
                     <img src="${logo}" class="school-logo">
                     <h2>BARSOI PUBLIC SCHOOL</h2>
-                    <p>QUAZITOLA, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
-                    <p style="font-size:7px">email - sagarpublicschool2023@gmail.com</p>
+                    <p>NEHAR NAGAR, BARSOI (KATIHAR)</p>
+                    <p style="font-size:7px">RTE Reg No. | UDISE No.10101119902</p>
+                    <p style="font-size:7px">email - barsoipublicschool125@gmail.com</p>
                 </div>
                 <div class="top-info"><span>Receipt No: <b>${fetchAnyProp(d, ["Receipt No", "Receipt"]) || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
