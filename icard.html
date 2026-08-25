@@ -1,409 +1,298 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Barsoi Public School - Student ID Card Generator</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        :root {
-            --primary: #1e3a8a;
-            --secondary: #d97706;
-            --accent: #2563eb;
-            --bg: #f8fafc;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student ID Card - Barsoi Public School</title>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+    body {
+        font-family: 'Segoe UI', Arial, sans-serif;
+        background-color: #f4f7f6;
+        margin: 0;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
 
-        * { box-sizing: border-box; font-family: 'Poppins', sans-serif; }
-        body { background: var(--bg); margin: 0; padding: 20px; }
+    /* ID Card Canvas (Standard CR80 Size Aspect Ratio) */
+    .id-card {
+        width: 350px;
+        height: 540px;
+        background: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        position: relative;
+        overflow: hidden;
+        border: 1px solid #ddd;
+        box-sizing: border-box;
+        display: none; /* Auto-shows after fetch */
+    }
 
-        .controls-container {
-            max-width: 900px;
-            margin: 0 auto 20px;
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
+    /* Curved Colorful Header */
+    .header {
+        background: linear-gradient(135deg, #0f5132, #198754);
+        color: #ffffff;
+        text-align: center;
+        padding: 15px 10px 30px 10px;
+        border-bottom-left-radius: 50% 20px;
+        border-bottom-right-radius: 50% 20px;
+        position: relative;
+    }
 
-        .controls-title { font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 15px; text-align: center; }
+    .school-title {
+        font-size: 20px;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        margin: 0;
+        text-transform: uppercase;
+        color: #ffffff;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    }
 
-        .filter-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+    .badge-tag {
+        background: #ffc107;
+        color: #000;
+        font-size: 11px;
+        font-weight: bold;
+        padding: 3px 12px;
+        border-radius: 12px;
+        display: inline-block;
+        margin-top: 5px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
 
-        .input-group label { display: block; font-size: 11px; font-weight: 600; color: #475569; margin-bottom: 4px; }
-        .input-group input {
-            width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 12px; outline: none;
-        }
+    /* Logo Styling */
+    .logo-img {
+        position: absolute;
+        left: 12px;
+        top: 12px;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: #fff;
+        padding: 2px;
+    }
 
-        .btn-group { display: flex; gap: 10px; justify-content: center; }
-        .btn {
-            padding: 9px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 12px; cursor: pointer; transition: 0.2s;
-        }
-        .btn-fetch { background: var(--accent); color: white; }
-        .btn-fetch:hover { background: #1d4ed8; }
-        .btn-print { background: #16a34a; color: white; }
-        .btn-print:hover { background: #15803d; }
+    /* ID Number Top Bar */
+    .id-no-bar {
+        text-align: right;
+        padding: 8px 15px 0 0;
+        font-size: 12px;
+        font-weight: bold;
+        color: #d97706;
+    }
 
-        .cards-preview-area {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: center;
-            max-width: 1100px;
-            margin: 0 auto;
-        }
+    /* Main Content Body */
+    .card-body {
+        padding: 5px 15px;
+    }
 
-        .id-card {
-            width: 330px;
-            height: 215px;
-            background: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-            position: relative;
-            overflow: hidden;
-            border: 1px solid #cbd5e1;
-            flex-shrink: 0;
-            background: linear-gradient(180deg, #ffffff 68%, #f8fafc 100%);
-        }
+    .photo-section {
+        text-align: center;
+        margin-bottom: 10px;
+    }
 
-        .id-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 60%, #3b82f6 100%);
-            color: white;
-            padding: 8px 10px 18px 10px;
-            text-align: center;
-            position: relative;
-            clip-path: ellipse(120% 100% at 50% 0%);
-        }
+    .student-photo {
+        width: 100px;
+        height: 120px;
+        border-radius: 8px;
+        border: 3px solid #198754;
+        object-fit: cover;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        background: #e9ecef;
+    }
 
-        .header-content { display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 2px; }
-        .school-logo { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #fff; background: white; object-fit: contain; }
-        .school-name { font-size: 14px; font-weight: 900; letter-spacing: 0.3px; text-transform: uppercase; color: #ffffff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+    /* Details Table Layout */
+    .details-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
 
-        .id-badge-tag {
-            background: #d97706;
-            color: #ffffff;
-            font-size: 8px;
-            font-weight: 800;
-            padding: 1.5px 10px;
-            border-radius: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            display: inline-block;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
-        }
+    .details-table td {
+        padding: 4px 2px;
+        vertical-align: top;
+    }
 
-        .id-body {
-            display: flex;
-            padding: 6px 10px 0px 10px;
-            gap: 10px;
-            align-items: flex-start;
-        }
+    .label {
+        font-weight: 700;
+        color: #495057;
+        width: 35%;
+    }
 
-        .photo-container {
-            width: 82px;
-            text-align: center;
-            flex-shrink: 0;
-        }
+    .colon {
+        width: 5%;
+        font-weight: bold;
+        color: #198754;
+    }
 
-        .student-photo {
-            width: 80px;
-            height: 94px;
-            border-radius: 6px;
-            border: 2px solid #1e3a8a;
-            object-fit: cover;
-            background: #e2e8f0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.15);
-        }
+    .value {
+        font-weight: 600;
+        color: #212529;
+        width: 60%;
+    }
 
-        .id-no-tag {
-            font-size: 9px;
-            font-weight: 700;
-            color: #1e3a8a;
-            margin-top: 3px;
-            word-break: break-all;
-        }
+    .highlight-name {
+        color: #0f5132;
+        font-size: 15px;
+        font-weight: 800;
+    }
 
-        .details-container { flex-grow: 1; font-size: 10px; color: #1e293b; line-height: 1.25; }
-        
-        .st-name-row { font-size: 12px; font-weight: 800; color: #0f172a; margin-bottom: 3px; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 190px; }
-        
-        .info-table { width: 100%; border-collapse: collapse; }
-        .info-table td { padding: 1px 0; vertical-align: top; }
-        .info-table td.lbl { font-weight: 600; color: #475569; width: 68px; }
-        .info-table td.colon { width: 8px; font-weight: 600; }
-        .info-table td.val { font-weight: 700; color: #0f172a; word-break: break-word; }
+    /* Curved Footer */
+    .footer {
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        background: linear-gradient(135deg, #198754, #0f5132);
+        color: #ffffff;
+        text-align: center;
+        padding: 8px 5px;
+        font-size: 10px;
+        font-weight: 600;
+        border-top-left-radius: 50% 15px;
+        border-top-right-radius: 50% 15px;
+        box-sizing: border-box;
+    }
 
-        .id-footer {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(90deg, #1e3a8a, #0f172a);
-            color: white;
-            text-align: center;
-            font-size: 7.5px;
-            font-weight: 600;
-            padding: 4px 5px;
-            letter-spacing: 0.2px;
-        }
+    /* Action Buttons */
+    .btn-group {
+        margin-top: 20px;
+        display: flex;
+        gap: 10px;
+    }
 
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white; padding: 0; margin: 0; }
-            .cards-preview-area {
-                display: flex !important;
-                flex-wrap: wrap !important;
-                gap: 8mm 6mm !important;
-                justify-content: flex-start !important;
-                padding: 8mm !important;
-            }
-            .id-card {
-                box-shadow: none !important;
-                border: 1px solid #94a3b8 !important;
-                page-break-inside: avoid;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-            }
-        }
-    </style>
+    .btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: bold;
+        cursor: pointer;
+        color: #fff;
+    }
+
+    .btn-print { background: #198754; }
+    .btn-back { background: #6c757d; }
+
+    /* Print Styles */
+    @media print {
+        body { background: #fff; padding: 0; }
+        .btn-group { display: none; }
+        .id-card { display: block !important; box-shadow: none; border: 1px solid #000; }
+    }
+</style>
 </head>
 <body>
 
-<div class="controls-container no-print">
-    <div class="controls-title">🪪 Professional Student ID Card Generator</div>
-    
-    <div class="filter-grid">
-        <div class="input-group">
-            <label>School Logo (Google Drive Link)</label>
-            <input type="text" id="logo-url-input" value="https://drive.google.com/file/d/14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE/view?usp=drivesdk">
-        </div>
-        <div class="input-group">
-            <label>Filter by Class</label>
-            <input type="text" id="class-filter" placeholder="e.g. 8th or 5th">
-        </div>
-        <div class="input-group">
-            <label>Search Student Name / Reg No</label>
-            <input type="text" id="search-filter" placeholder="Search by Reg No / Name">
-        </div>
+<div id="idCard" class="id-card">
+    <div class="header">
+        <img src="https://drive.google.com/thumbnail?id=18zW3xG-nsyBUrn2FdLLIzoUPaSZVura3&sz=w300" class="logo-img" alt="Logo">
+        <div class="school-title">Barsoi Public School</div>
+        <div class="badge-tag">Identity Card</div>
     </div>
 
-    <div class="btn-group">
-        <button class="btn btn-fetch" onclick="loadStudentCards()">Load ID Cards ➔</button>
-        <button class="btn btn-print" onclick="window.print()">Print ID Cards 🖨️</button>
+    <div class="id-no-bar">
+        ID No: <span id="card-id">BPS-000</span>
+    </div>
+
+    <div class="card-body">
+        <div class="photo-section">
+            <img id="card-photo" src="" class="student-photo" alt="Student Photo">
+        </div>
+
+        <table class="details-table">
+            <tr>
+                <td class="label">Name</td>
+                <td class="colon">:</td>
+                <td class="value highlight-name" id="card-name">-</td>
+            </tr>
+            <tr>
+                <td class="label">Father's Name</td>
+                <td class="colon">:</td>
+                <td class="value" id="card-father">-</td>
+            </tr>
+            <tr>
+                <td class="label">Class & Roll</td>
+                <td class="colon">:</td>
+                <td class="value"><span id="card-class">-</span> (Roll: <span id="card-roll">-</span>)</td>
+            </tr>
+            <tr>
+                <td class="label">Date of Birth</td>
+                <td class="colon">:</td>
+                <td class="value" id="card-dob">-</td>
+            </tr>
+            <tr>
+                <td class="label">Blood Group</td>
+                <td class="colon">:</td>
+                <td class="value" id="card-blood">A+</td>
+            </tr>
+            <tr>
+                <td class="label">Address</td>
+                <td class="colon">:</td>
+                <td class="value" id="card-address">Barsoi, Katihar</td>
+            </tr>
+            <tr>
+                <td class="label">Mobile No.</td>
+                <td class="colon">:</td>
+                <td class="value" id="card-mobile">-</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="footer">
+        NIHAR NAGAR BLOCK ROAD, BARSOI, KATIHAR, BIHAR
     </div>
 </div>
 
-<div class="cards-preview-area" id="cards-container">
-    <div class="no-print" style="text-align:center; color:#64748b; font-size:13px; margin-top:30px;">
-        Click <b>"Load ID Cards"</b> to fetch records from your sheet.
-    </div>
+<div class="btn-group" id="btnGroup" style="display:none;">
+    <button class="btn btn-print" onclick="window.print()">PRINT / SAVE PDF</button>
+    <button class="btn btn-back" onclick="history.back()">BACK</button>
 </div>
 
 <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycbxyNwy4iC62bBAo2S6AZ41fquTPMqDzrzzMOTRVhapoU7pM1flSFrgsvwOxO_gvoNrr/exec";
 
-    function getDirectDriveImageUrl(url) {
-        if (!url || typeof url !== 'string' || url.trim() === "") {
-            return "https://via.placeholder.com/80x95?text=No+Photo";
-        }
-        let cleanUrl = url.trim();
-        let fileIdMatch = cleanUrl.match(/[-\w]{25,}/);
-        if (fileIdMatch) {
-            return `https://lh3.googleusercontent.com/d/${fileIdMatch[0]}=s400`;
-        }
-        return cleanUrl;
-    }
+    window.addEventListener('DOMContentLoaded', () => {
+        const params = new URLSearchParams(window.location.search);
+        const cls = params.get('class');
+        const roll = params.get('roll');
 
-    function getRegNoColumnB(obj) {
-        if (!obj) return "";
-        let possibleColumnBKeys = ["reg no", "registration no", "student id", "regno", "studentid", "id no", "id"];
-        for (let key of possibleColumnBKeys) {
-            for (let objKey in obj) {
-                let cleanKey = objKey.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
-                if (cleanKey === key && obj[objKey] !== "" && obj[objKey] !== null) {
-                    return obj[objKey];
+        if (cls && roll) {
+            fetchIDData(cls, roll);
+        } else {
+            Swal.fire('Error', 'Class and Roll No missing in URL!', 'error');
+        }
+    });
+
+    function fetchIDData(cls, roll) {
+        Swal.fire({ title: 'Generating ID Card...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+        fetch(`${API_URL}?action=getResult&rollNo=${roll}&className=${cls}`)
+            .then(res => res.json())
+            .then(d => {
+                Swal.close();
+                if (d == "Not Found" || d == "Invalid Class") {
+                    return Swal.fire('Error', 'Student record not found!', 'error');
                 }
-            }
-        }
-        return "";
-    }
 
-    function getField(obj, possibleKeys) {
-        if (!obj) return "";
-        for (let key of possibleKeys) {
-            let targetKey = key.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
-            for (let objKey in obj) {
-                let cleanObjKey = objKey.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
-                if (cleanObjKey === targetKey && obj[objKey] !== "" && obj[objKey] !== null) {
-                    return obj[objKey];
-                }
-            }
-        }
-        return "";
-    }
-
-    function formatDate(val) {
-        if (!val) return "N/A";
-        let d = new Date(val);
-        if (!isNaN(d.getTime())) {
-            let day = String(d.getDate()).padStart(2, '0');
-            let month = String(d.getMonth() + 1).padStart(2, '0');
-            return `${day}-${month}-${d.getFullYear()}`;
-        }
-        return val;
-    }
-
-    async function fetchSheetData() {
-        // Fetch data with redirect tracking for Google Apps Script
-        const response = await fetch(`${API_URL}?action=getAllStudents`, {
-            method: 'GET',
-            redirect: 'follow'
-        });
-        
-        if (!response.ok) {
-            throw new Error("HTTP error " + response.status);
-        }
-        return await response.json();
-    }
-
-    async function loadStudentCards() {
-        let logoInput = document.getElementById('logo-url-input').value;
-        let logoUrl = getDirectDriveImageUrl(logoInput);
-        let classFilter = document.getElementById('class-filter').value.trim().toLowerCase();
-        let searchFilter = document.getElementById('search-filter').value.trim().toLowerCase();
-
-        Swal.fire({
-            title: 'Fetching Students...',
-            text: 'Connecting to Google Sheets Server',
-            didOpen: () => Swal.showLoading(),
-            allowOutsideClick: false
-        });
-
-        try {
-            const data = await fetchSheetData();
-            Swal.close();
-
-            let studentsList = [];
-            if (Array.isArray(data)) {
-                studentsList = data;
-            } else if (data && data.students && Array.isArray(data.students)) {
-                studentsList = data.students;
-            } else if (data && typeof data === 'object') {
-                // If single object returned wrapped in key
-                studentsList = Object.values(data).find(v => Array.isArray(v)) || [];
-            }
-
-            if (studentsList.length === 0) {
-                Swal.fire("Info", "No student records found in sheet", "info");
-                return;
-            }
-
-            renderCards(studentsList, logoUrl, classFilter, searchFilter);
-
-        } catch (e) {
-            console.error(e);
-            Swal.close();
-            Swal.fire({
-                icon: "error",
-                title: "Server Error",
-                html: "Data fetch nahi ho pa raha hai.<br><br><b>Remedy:</b> Web App ki Deployment setting Check karein: <br>1. Execute as: <b>Me</b><br>2. Who has access: <b>Anyone</b>"
+                // Fill Data into Card
+                document.getElementById('card-id').innerText = d.regNo || ("BPS-" + d.rollNo);
+                document.getElementById('card-name').innerText = d.name || "-";
+                document.getElementById('card-father').innerText = d.father || "-";
+                document.getElementById('card-class').innerText = d.classFromSheet || cls;
+                document.getElementById('card-roll').innerText = d.rollNo || roll;
+                document.getElementById('card-dob').innerText = d.dob || "-";
+                document.getElementById('card-photo').src = d.photo || "https://via.placeholder.com/100x120?text=No+Photo";
+                
+                // Show Card & Buttons
+                document.getElementById('idCard').style.display = 'block';
+                document.getElementById('btnGroup').style.display = 'flex';
+            })
+            .catch(err => {
+                Swal.fire('Error', 'Could not connect to server', 'error');
             });
-        }
-    }
-
-    function renderCards(students, logoUrl, classFilter, searchFilter) {
-        let container = document.getElementById('cards-container');
-        container.innerHTML = "";
-
-        let filtered = students.filter(st => {
-            let stClass = String(getField(st, ["Class"]) || "").toLowerCase();
-            let stName = String(getField(st, ["Student Name", "Name"]) || "").toLowerCase();
-            let stRegNo = String(getRegNoColumnB(st)).toLowerCase();
-
-            let matchClass = !classFilter || stClass.includes(classFilter);
-            let matchSearch = !searchFilter || stName.includes(searchFilter) || stRegNo.includes(searchFilter);
-
-            return matchClass && matchSearch;
-        });
-
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="no-print" style="text-align:center; color:#ef4444; font-size:13px; margin-top:20px;">No matching records found.</div>`;
-            return;
-        }
-
-        filtered.forEach(st => {
-            let name = getField(st, ["Student Name", "Name"]) || "Student Name";
-            let father = getField(st, ["Father Name", "Father's Name", "Father"]) || "N/A";
-            let dob = formatDate(getField(st, ["DOB", "Date of Birth"]));
-            let bg = getField(st, ["Blood Group", "Blood", "BG"]) || "N/A";
-            let address = getField(st, ["Address", "Village"]) || "Barsoi, Katihar";
-            let mobile = getField(st, ["Mobile No", "Mobile", "Contact", "Phone"]) || "N/A";
-            
-            let idNo = getRegNoColumnB(st) || getField(st, ["Roll No", "ID"]) || "BPS-001";
-            
-            let photoRaw = getField(st, ["Photo url", "Photo", "Image"]);
-            let photoUrl = getDirectDriveImageUrl(photoRaw);
-
-            let cardHtml = `
-                <div class="id-card">
-                    <div class="id-header">
-                        <div class="header-content">
-                            <img src="${logoUrl}" class="school-logo" alt="Logo" onerror="this.src='https://via.placeholder.com/34?text=BPS'">
-                            <div class="school-name">BARSOI PUBLIC SCHOOL</div>
-                        </div>
-                        <div class="id-badge-tag">IDENTITY CARD</div>
-                    </div>
-                    
-                    <div class="id-body">
-                        <div class="photo-container">
-                            <img src="${photoUrl}" class="student-photo" alt="Photo" onerror="this.src='https://via.placeholder.com/80x95?text=No+Photo'">
-                            <div class="id-no-tag">ID No-${idNo}</div>
-                        </div>
-                        
-                        <div class="details-container">
-                            <div class="st-name-row" title="${name}">${name}</div>
-                            <table class="info-table">
-                                <tr>
-                                    <td class="lbl">Father's Name</td>
-                                    <td class="colon">:</td>
-                                    <td class="val">${father}</td>
-                                </tr>
-                                <tr>
-                                    <td class="lbl">Date of Birth</td>
-                                    <td class="colon">:</td>
-                                    <td class="val">${dob}</td>
-                                </tr>
-                                <tr>
-                                    <td class="lbl">Blood Group</td>
-                                    <td class="colon">:</td>
-                                    <td class="val" style="color:#dc2626;">${bg}</td>
-                                </tr>
-                                <tr>
-                                    <td class="lbl">Address</td>
-                                    <td class="colon">:</td>
-                                    <td class="val" style="font-size:9.5px;">${address}</td>
-                                </tr>
-                                <tr>
-                                    <td class="lbl">Mobile No.</td>
-                                    <td class="colon">:</td>
-                                    <td class="val">${mobile}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-
-                    <div class="id-footer">
-                        NIHAR NAGAR BLOCK ROAD, BARSOI, KATIHAR, BIHAR
-                    </div>
-                </div>
-            `;
-            container.insertAdjacentHTML('beforeend', cardHtml);
-        });
     }
 </script>
 </body>
