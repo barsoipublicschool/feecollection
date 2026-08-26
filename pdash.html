@@ -288,7 +288,7 @@
         <div class="receipt-box" id="office-copy"></div>
     </div>
     <div class="no-print" style="text-align:center; margin-top:15px; padding-bottom:30px; display:flex; justify-content:center; gap:10px;">
-        <button onclick="window.print()" style="padding:8px 20px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">PRINT / SAVE PDF 🖨️</button>
+        <button onclick="if(window.AndroidPrint){ AndroidPrint.triggerPrint(); } else { window.print(); }" style="padding:8px 20px; background:#16a34a; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px; font-size:11px;">PRINT / SAVE PDF 🖨️</button>
         <button onclick="closeReceipt()" style="padding:8px 20px; background:#475569; color:white; border:none; border-radius:5px; cursor:pointer; font-size:11px;">CLOSE ✖</button>
     </div>
 </div>
