@@ -602,11 +602,27 @@
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
-                        <tr><th colspan="3" align="right">Sub Total</th><td align="center">${fetchAnyProp(d, ["Sub Total"]) || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Discount (-)</th><td align="center">${fetchAnyProp(d, ["Discount"]) || 0}</td></tr>
-                        <tr><th colspan="3" align="right">Net Paid</th><td align="center"><b>${totalPaidNum}</b></td></tr>
-                        <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${fetchAnyProp(d, ["Remaining", "Due Balance"]) || 0}</b></td></tr>
-                    </tfoot>
+    <tr>
+        <th colspan="3" align="right">Sub Total</th>
+        <td align="center">${fetchAnyProp(d, ["Sub Total"]) || 0}</td>
+    </tr>
+    <!-- DISCOUNT (Yellow Background & Bold Dark Yellow Text) -->
+    <tr style="background-color: #fef9c3;">
+        <th colspan="3" align="right" style="color: #854d0e;">Discount (-)</th>
+        <td align="center" style="color: #854d0e; font-weight: bold;">${fetchAnyProp(d, ["Discount"]) || 0}</td>
+    </tr>
+    <!-- NET PAID (Green Text & Light Green Background) -->
+    <tr style="background-color: #dcfce7;">
+        <th colspan="3" align="right" style="color: #15803d;">Net Paid</th>
+        <td align="center" style="color: #15803d; font-weight: bold;">${totalPaidNum}</td>
+    </tr>
+    <!-- DUE BALANCE (Red Text & Light Red Background) -->
+    <tr style="background-color: #fee2e2;">
+        <th colspan="3" align="right" style="color: #b91c1c;">Due Balance</th>
+        <td align="center" style="color: #b91c1c; font-weight: bold;">${fetchAnyProp(d, ["Remaining", "Due Balance"]) || 0}</td>
+    </tr>
+</tfoot>
+
                 </table>
                 <div class="words-section"><b>Words:</b> ${numberToWords(totalPaidNum)} Only.</div>
                 <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
