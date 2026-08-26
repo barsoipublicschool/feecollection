@@ -620,7 +620,7 @@
         }
 
         let receiptContent = document.getElementById('guardian-copy').innerHTML;
-        let printWin = window.open('', '_blank', 'width=800,height=600');
+        let printWin = window.open('', '_blank');
         
         if (printWin) {
             printWin.document.open();
@@ -629,8 +629,9 @@
                 <html>
                 <head>
                     <title>Fee Receipt</title>
+                    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
                     <style>
-                        body { margin: 0; padding: 15px; background: white; font-family: Arial, sans-serif; display: flex; justify-content: center; }
+                        body { margin: 0; padding: 15px; background: white; font-family: 'Poppins', Arial, sans-serif; display: flex; justify-content: center; }
                         .receipt-box { width: 100%; max-width: 500px; background: #ffdae9; border: 1.5px solid #000; padding: 12px; color: #000; box-sizing: border-box; display: flex; flex-direction: column; }
                         .r-header { position: relative; }
                         .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; text-align: center; color: #000; }
@@ -652,8 +653,10 @@
                         window.onload = function() {
                             setTimeout(function() {
                                 window.print();
-                                window.close();
-                            }, 300);
+                            }, 500);
+                        };
+                        window.onafterprint = function() {
+                            window.close();
                         };
                     <\/script>
                 </body>
