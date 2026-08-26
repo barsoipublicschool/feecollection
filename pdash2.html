@@ -101,27 +101,26 @@
             .portal-iframe { height: 500px; }
         }
 
-        /* Full Print Fix for Android Mobile Print Spooler */
+        /* Fixed Native Android System Spooler View Rules */
         @media print { 
             @page { 
                 size: A4 portrait; 
                 margin: 0; 
             } 
-            body * { 
-                visibility: hidden !important; 
-            } 
-            #receipt-modal, #receipt-modal * { 
-                visibility: visible !important; 
+            body > *:not(#receipt-modal) { 
+                display: none !important; 
             } 
             #receipt-modal { 
+                display: block !important; 
                 position: absolute !important; 
                 left: 0 !important; 
                 top: 0 !important; 
                 width: 100% !important; 
                 height: auto !important;
-                background: white !important;
-                display: block !important;
-            }
+                background: #ffffff !important;
+                padding: 0 !important;
+                margin: 0 !important;
+            } 
             .no-print { 
                 display: none !important; 
             } 
@@ -129,11 +128,13 @@
                 width: 100% !important; 
                 padding: 5mm !important; 
                 display: flex !important; 
+                justify-content: center !important;
                 box-sizing: border-box !important;
             }
             .receipt-box { 
                 -webkit-print-color-adjust: exact !important; 
                 print-color-adjust: exact !important; 
+                width: 100% !important;
                 max-width: 100% !important;
             }
         }
@@ -524,12 +525,10 @@
         if(!d) return;
         document.getElementById('guardian-copy').innerHTML = generateReceiptHTML(d, "Guardian's Copy");
         document.getElementById('receipt-modal').style.display = 'block';
-        document.getElementById('dashboard-screen').style.display = 'none';
     }
 
     function closeReceipt() {
         document.getElementById('receipt-modal').style.display = 'none';
-        document.getElementById('dashboard-screen').style.display = 'block';
     }
 
     function logout() {
@@ -620,8 +619,10 @@
             return;
         }
 
-        // Directly trigger native print without opening popups (Fixes Android Spooler crash)
-        window.print();
+        // Delay execution so Android Webview renders modal content before Spooler capture
+        setTimeout(function() {
+            window.print();
+        }, 150);
     }
 </script>
 </body>
