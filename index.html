@@ -495,7 +495,7 @@
         let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
         let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-                  `📍 Quazitola, Barsoi (Katihar)\n` +
+                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
                   `-----------------------------------\n` +
                   `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
                   `📅 *Date:* ${displayDate}\n` +
@@ -535,7 +535,7 @@
 
         ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
 
-        let logo = "https://drive.google.com/thumbnail?id=1pWEjzAU2G4AUC0RhIJ8cMHdLtLvQ4YJe&sz=w300";
+        let logo = "https://drive.google.com/thumbnail?id=14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE&sz=w300";
         let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
         return `
@@ -549,8 +549,8 @@
                     <img src="${logo}" class="school-logo">
                     <h2>BARSOI PUBLIC SCHOOL</h2>
                     <p>QUAZITOLA, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No.21211472023218114225 | UDISE No.10101122703</p>
-                    <p style="font-size:7px">email - sagarpublicschool2023@gmail.com</p>
+                    <p style="font-size:7px">RTE Reg No. __ | UDISE No.10101119902</p>
+                    <p style="font-size:7px">email - barsoipublicschool125@gmail.com</p>
                 </div>
                 <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
