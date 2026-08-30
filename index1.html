@@ -585,7 +585,8 @@
                 <div class="student-details">
                     <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Month:</b> ${d["Month"]}</div>
+                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${d["Mobile"] || d["Phone"] || ""}</div>
+                    <div><b>Month:</b> ${d["Month"]}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
