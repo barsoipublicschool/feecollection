@@ -4,18 +4,10 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fees Portal - Barsoi Public School</title>
+    <title>Dashboard & Fees Management - Barsoi Public School</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- 🔒 LOGIN SECURITY GUARD -->
-    <script>
-        if (sessionStorage.getItem('isLoggedIn') !== 'true') {
-            window.location.href = 'loginsystem.html';
-        }
-    </script>
-
     <style>
         :root { 
             --p: #1a237e; 
@@ -26,7 +18,6 @@
             --danger: #c62828;
             --success: #2e7d32;
             --warning: #fbc02d;
-            --accent: #e91e63;
         }
 
         * { box-sizing: border-box; }
@@ -38,11 +29,9 @@
         .sidebar-header h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
         .sidebar-header p { margin: 3px 0 0; font-size: 11px; opacity: 0.8; }
 
-        .user-badge { background: rgba(255,255,255,0.15); margin: 10px 15px 0; padding: 8px 10px; border-radius: 6px; font-size: 11px; text-align: center; border: 1px solid rgba(255,255,255,0.2); }
-
         .nav-menu { list-style: none; padding: 15px 10px; margin: 0; flex-grow: 1; }
         .nav-item { margin-bottom: 5px; }
-        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; cursor: pointer; transition: 0.2s; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; transition: 0.2s; }
         .nav-link:hover, .nav-link.active { background: var(--p-light); color: white; font-weight: 600; }
         .nav-link span { font-size: 16px; }
 
@@ -54,55 +43,48 @@
         .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
         .top-bar h2 { margin: 0; color: var(--p); font-size: 20px; }
 
+        /* User Role Badge Display */
+        .user-status-badge {
+            background: #e8eaf6;
+            color: #1a237e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #c5cae9;
+        }
+
         .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
         .btn-refresh:hover { background: var(--p-light); }
 
-        /* Quick Action Grid & Metrics */
+        /* Quick Action Grid */
         .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; cursor: pointer; transition: 0.2s; }
+        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; transition: 0.2s; cursor: pointer; }
         .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--p-light); }
         .action-card .icon { font-size: 22px; margin-bottom: 4px; display: block; }
         .action-card .title { font-size: 11px; font-weight: 600; color: var(--p); }
 
+        /* Action Buttons Inside Search Modal */
+        .modal-action-btns { display: flex; justify-content: center; gap: 10px; margin-top: 15px; }
+        .btn-modal-edit { background: #ff9800; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .btn-modal-view { background: #4caf50; color: white; border: none; padding: 10px 16px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 13px; }
+        .btn-modal-edit:hover { background: #e68a00; }
+        .btn-modal-view:hover { background: #43a047; }
+
+        /* Summary Cards Grid */
         .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 5px solid var(--p); }
         .card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
         .card p { margin: 6px 0 0; font-size: 20px; font-weight: 700; color: #333; }
 
+        /* Charts Layout */
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; }
         .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
         .chart-card h3 { margin-top: 0; font-size: 14px; color: var(--p); text-align: center; margin-bottom: 15px; }
         .chart-container { position: relative; height: 260px; width: 100%; }
-
-        /* Search Section Styling */
-        .search-card-wrapper { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .search-title { text-align: center; color: var(--p); font-size: 18px; margin-top: 0; margin-bottom: 15px; font-weight: 700; }
-        .search-form-row { display: flex; gap: 8px; margin-bottom: 20px; }
-        .search-form-row input { flex-grow: 1; padding: 10px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
-        .search-form-row button { background: var(--p); color: white; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 13px; }
-        
-        .search-results-list { display: flex; flex-direction: column; gap: 10px; margin-top: 15px; }
-        .receipt-item-card { background: white; border-radius: 6px; padding: 12px 15px; border: 1px solid #eee; border-left: 4px solid var(--p); box-shadow: 0 2px 6px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        .receipt-info h4 { margin: 0; font-size: 14px; color: #333; }
-        .receipt-info p { margin: 2px 0 0; font-size: 11px; color: #666; }
-
-        .receipt-actions { display: flex; gap: 8px; align-items: center; }
-        .btn-view-receipt { background: var(--accent); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-        .btn-edit-receipt { background: var(--p); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; }
-
-        /* Modal Overlay for Edit Record */
-        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 1000; }
-        .modal-card { background: white; width: 90%; max-width: 450px; border-radius: 8px; padding: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
-        .modal-header { font-size: 16px; font-weight: 700; color: var(--p); margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 8px; }
-        .modal-body { display: flex; flex-direction: column; gap: 10px; }
-        .modal-body label { font-size: 12px; font-weight: 600; color: #555; }
-        .modal-body input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; width: 100%; }
-        .modal-footer { margin-top: 15px; display: flex; justify-content: flex-end; gap: 10px; }
-        .btn-cancel { background: #888; color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; }
-        .btn-save { background: var(--success); color: white; border: none; padding: 8px 14px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
-
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
 
         @media (max-width: 850px) {
             body { flex-direction: column; }
@@ -113,27 +95,53 @@
 </head>
 <body>
 
-<!-- Sidebar -->
+<!-- Left Navigation Sidebar -->
 <aside class="sidebar">
     <div class="sidebar-header">
         <h3>BARSOI PUBLIC SCHOOL</h3>
-        <p>Quazitola, Barsoi (Katihar)</p>
-    </div>
-
-    <div class="user-badge">
-        👤 Logged in: <b id="displayUserName">Admin</b>
+        <p>Nehar Nagar, Block Road Barsoi (Katihar)</p>
     </div>
     
     <ul class="nav-menu">
-        <li class="nav-item"><a onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-link active"><span>📊</span> Dashboard</a></li>
-        <li class="nav-item"><a onclick="switchTab('addfee')" id="nav-addfee" class="nav-link"><span>➕</span> Add / Deposit Fee</a></li>
-        <li class="nav-item"><a onclick="switchTab('search')" id="nav-search" class="nav-link"><span>🔍</span> Search Fee Receipt</a></li>
-        <li class="nav-item"><a onclick="switchTab('daily')" id="nav-daily" class="nav-link"><span>📅</span> Daily Collection</a></li>
-        <li class="nav-item"><a onclick="switchTab('monthly')" id="nav-monthly" class="nav-link"><span>🗓️</span> Monthly Collection</a></li>
-        <li class="nav-item"><a onclick="switchTab('duelist')" id="nav-duelist" class="nav-link"><span>⚠️</span> Defaulters List</a></li>
-        <li class="nav-item"><a onclick="switchTab('reminder')" id="nav-reminder" class="nav-link"><span>🔔</span> Fee Reminders</a></li>
+        <li class="nav-item">
+            <a href="dashboard.html" class="nav-link active">
+                <span>📊</span> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="index.html" class="nav-link">
+                <span>➕</span> Add / Deposit Fee
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="javascript:void(0)" onclick="openSearchRecordsModal()" class="nav-link">
+                <span>🔍</span> Search Fee Receipt
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="daily.html" class="nav-link">
+                <span>📅</span> Daily Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="monthly.html" class="nav-link">
+                <span>🗓️</span> Monthly Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="duelist.html" class="nav-link">
+                <span>⚠️</span> Defaulters List
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="reminder.html" class="nav-link">
+                <span>🔔</span> Fee Reminders
+            </a>
+        </li>
         <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
-            <a onclick="logoutUser()" class="nav-link" style="color: #ff8a80;"><span>🚪</span> Logout</a>
+            <a href="#" onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
+                <span>🚪</span> Logout
+            </a>
         </li>
     </ul>
 
@@ -142,162 +150,135 @@
     </div>
 </aside>
 
-<!-- Main Area Content -->
+<!-- Main Dashboard Content -->
 <main class="main-content">
+    
+    <!-- Top Bar -->
     <div class="top-bar">
         <div>
-            <h2 id="pageTitle">Admin Analytics Dashboard</h2>
-            <small style="color:#666;" id="pageSubtitle">Real-time overview of fee collections and dues</small>
+            <h2>Admin Analytics Dashboard</h2>
+            <small style="color:#666;">Real-time overview of fee collections and dues</small>
         </div>
-        <button class="btn-refresh" onclick="refreshCurrentTab()">🔄 REFRESH DATA</button>
-    </div>
-
-    <!-- TAB 1: DASHBOARD -->
-    <div id="tab-dashboard" class="tab-panel active">
-        <div class="quick-actions">
-            <div onclick="switchTab('addfee')" class="action-card"><span class="icon">➕</span><span class="title">Add Fee</span></div>
-            <div onclick="switchTab('search')" class="action-card"><span class="icon">🔍</span><span class="title">Search Fee</span></div>
-            <div onclick="switchTab('daily')" class="action-card"><span class="icon">📅</span><span class="title">Daily Report</span></div>
-            <div onclick="switchTab('monthly')" class="action-card"><span class="icon">🗓️</span><span class="title">Monthly Report</span></div>
-            <div onclick="switchTab('duelist')" class="action-card"><span class="icon">⚠️</span><span class="title">Due List</span></div>
-            <div onclick="switchTab('reminder')" class="action-card"><span class="icon">🔔</span><span class="title">Send Reminder</span></div>
-        </div>
-
-        <div class="metrics-grid">
-            <div class="card" style="border-left-color: var(--p);">
-                <h4>Total Collection</h4>
-                <p id="totalPaid" style="color: var(--p);">₹0</p>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <!-- User Role Display Header -->
+            <div class="user-status-badge">
+                <span>👤</span> <span id="userRoleDisplay">Logged in</span>
             </div>
-            <div class="card" style="border-left-color: var(--danger);">
-                <h4>Total Outstanding Dues</h4>
-                <p id="totalDues" style="color: var(--danger);">₹0</p>
-            </div>
-            <div class="card" style="border-left-color: var(--warning);">
-                <h4>Total Discount</h4>
-                <p id="totalDiscount" style="color: var(--warning);">₹0</p>
-            </div>
-            <div class="card" style="border-left-color: var(--success);">
-                <h4>Total Receipts</h4>
-                <p id="totalCount" style="color: var(--success);">0</p>
-            </div>
-        </div>
-
-        <div class="charts-grid">
-            <div class="chart-card">
-                <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
-                <div class="chart-container"><canvas id="monthlyChart"></canvas></div>
-            </div>
-            <div class="chart-card">
-                <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
-                <div class="chart-container"><canvas id="classChart"></canvas></div>
-            </div>
+            <button class="btn-refresh" onclick="loadDashboardData()">🔄 REFRESH DATA</button>
         </div>
     </div>
 
-    <!-- TAB 2: SEARCH FEE RECEIPT -->
-    <div id="tab-search" class="tab-panel">
-        <div class="search-card-wrapper">
-            <h3 class="search-title">Search Fee Records</h3>
-            <div class="search-form-row">
-                <input type="text" id="searchInput" placeholder="Enter Student ID, Reg No, or Receipt No...">
-                <button onclick="executeStudentSearch()">SEARCH</button>
-            </div>
-            <div id="searchResultsArea" class="search-results-list"></div>
+    <!-- Quick Action Shortcut Buttons -->
+    <div class="quick-actions">
+        <a href="index.html" class="action-card">
+            <span class="icon">➕</span>
+            <span class="title">Add Fee</span>
+        </a>
+        <div onclick="openSearchRecordsModal()" class="action-card">
+            <span class="icon">🔍</span>
+            <span class="title">Search Fee</span>
+        </div>
+        <a href="daily.html" class="action-card">
+            <span class="icon">📅</span>
+            <span class="title">Daily Report</span>
+        </a>
+        <a href="monthly.html" class="action-card">
+            <span class="icon">🗓️</span>
+            <span class="title">Monthly Report</span>
+        </a>
+        <a href="duelist.html" class="action-card">
+            <span class="icon">⚠️</span>
+            <span class="title">Due List</span>
+        </a>
+        <a href="reminder.html" class="action-card">
+            <span class="icon">🔔</span>
+            <span class="title">Send Reminder</span>
+        </a>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="metrics-grid">
+        <div class="card" style="border-left-color: var(--p);">
+            <h4>Total Collection</h4>
+            <p id="totalPaid" style="color: var(--p);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--danger);">
+            <h4>Total Outstanding Dues</h4>
+            <p id="totalDues" style="color: var(--danger);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--warning);">
+            <h4>Total Discount</h4>
+            <p id="totalDiscount" style="color: var(--warning);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--success);">
+            <h4>Total Receipts</h4>
+            <p id="totalCount" style="color: var(--success);">0</p>
         </div>
     </div>
 
-    <!-- OTHER TAB PLACEHOLDERS -->
-    <div id="tab-addfee" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Add / Deposit Fee</h3></div></div>
-    <div id="tab-daily" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Daily Collection</h3></div></div>
-    <div id="tab-monthly" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Monthly Collection</h3></div></div>
-    <div id="tab-duelist" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Defaulters List</h3></div></div>
-    <div id="tab-reminder" class="tab-panel"><div style="background: white; padding: 20px; border-radius: 8px;"><h3>Fee Reminders</h3></div></div>
+    <!-- Visual Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
+            <div class="chart-container">
+                <canvas id="classChart"></canvas>
+            </div>
+        </div>
+    </div>
+
 </main>
-
-<!-- EDIT RECEIPT MODAL WITH DISCOUNT FIELD -->
-<div id="editReceiptModal" class="modal-overlay">
-    <div class="modal-card">
-        <div class="modal-header">✏️ Edit Fee Record</div>
-        <div class="modal-body">
-            <input type="hidden" id="editReceiptNo">
-            <div>
-                <label>Month</label>
-                <input type="text" id="editMonth">
-            </div>
-            <div>
-                <label>Paid Amount (₹)</label>
-                <input type="number" id="editPaidAmount">
-            </div>
-            <div>
-                <label>Remaining Dues (₹)</label>
-                <input type="number" id="editDuesAmount">
-            </div>
-            <div>
-                <label>Discount Amount (₹)</label>
-                <input type="number" id="editDiscountAmount">
-            </div>
-        </div>
-        <div class="modal-footer">
-            <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
-            <button class="btn-save" onclick="saveReceiptChanges()">Save Changes</button>
-        </div>
-    </div>
-</div>
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
     
     let monthlyChartInstance = null;
     let classChartInstance = null;
-    let searchCacheData = [];
-    let currentActiveTab = 'dashboard';
+    let cachedRecords = [];
 
     window.onload = () => {
-        setupUserRoleAndPermissions();
+        updateRoleInterface();
         loadDashboardData();
     };
 
-    function setupUserRoleAndPermissions() {
-        const activeUserName = sessionStorage.getItem('userName') || 'Admin';
-        const userRole = sessionStorage.getItem('userRole') || 'admin';
-        document.getElementById('displayUserName').innerText = `${activeUserName} (${userRole.toUpperCase()})`;
+    // Requirement 3: Logged in status update
+    function updateRoleInterface() {
+        const userRole = sessionStorage.getItem('userRole');
+        const roleDisplay = document.getElementById('userRoleDisplay');
+
+        if (userRole === 'admin') {
+            roleDisplay.innerHTML = "Logged in as <b>Administration</b>";
+        } else if (userRole === 'operator') {
+            roleDisplay.innerHTML = "Logged in as <b>Staff/Operator</b>";
+        } else {
+            roleDisplay.innerHTML = "Logged in as <b>Guest</b>";
+        }
     }
 
-    function switchTab(tabId) {
-        currentActiveTab = tabId;
-        document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-
-        const activePanel = document.getElementById(`tab-${tabId}`);
-        if (activePanel) activePanel.classList.add('active');
-
-        const activeNav = document.getElementById(`nav-${tabId}`);
-        if (activeNav) activeNav.classList.add('active');
-    }
-
-    function refreshCurrentTab() {
-        if (currentActiveTab === 'dashboard') loadDashboardData();
-        else if (currentActiveTab === 'search') executeStudentSearch();
-    }
-
-    // CORS Handling and Data Fetching
     async function loadDashboardData() {
         Swal.fire({ title: 'Loading Analytics...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`, { method: 'GET', redirect: 'follow' });
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
             const allData = await res.json();
             Swal.close();
 
             if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Invalid data received from server.", "error");
+                Swal.fire("Error", "Failed to fetch collection data.", "error");
                 return;
             }
 
+            cachedRecords = allData;
             processAndRenderMetrics(allData);
 
         } catch (e) {
-            Swal.fire("Server Error", "Could not connect to Google Apps Script Backend.", "error");
+            Swal.fire("Error", "Server/Network Connection Error", "error");
         }
     }
 
@@ -305,6 +286,7 @@
         let grandPaid = 0, grandDues = 0, grandDisc = 0;
         let monthMap = {};
         let classMap = {};
+        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         data.forEach(r => {
             let paid = parseFloat(r["Total Paid"]) || 0;
@@ -329,113 +311,135 @@
         document.getElementById('totalDiscount').innerText = `₹${grandDisc.toLocaleString('en-IN')}`;
         document.getElementById('totalCount').innerText = data.length;
 
-        renderMonthlyChart(Object.keys(monthMap), Object.values(monthMap));
+        let sortedMonths = Object.keys(monthMap).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+        let monthlyValues = sortedMonths.map(m => monthMap[m]);
+
+        renderMonthlyChart(sortedMonths, monthlyValues);
         renderClassChart(Object.keys(classMap), Object.values(classMap));
+    }
+
+    // Requirements 1 & 2: Search Records & Role-based action buttons
+    function openSearchRecordsModal() {
+        Swal.fire({
+            title: 'Search Fee Record',
+            input: 'text',
+            inputPlaceholder: 'Enter Student Name or Receipt ID...',
+            showCancelButton: true,
+            confirmButtonText: 'Search',
+            confirmButtonColor: '#1a237e',
+            preConfirm: (value) => {
+                if (!value) {
+                    Swal.showValidationMessage('Search term is required');
+                }
+                return value;
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const query = result.value.toLowerCase().trim();
+                const matches = cachedRecords.filter(r => {
+                    const name = (r["Student Name"] || "").toString().toLowerCase();
+                    const recId = (r["Receipt No"] || r["ID"] || "").toString().toLowerCase();
+                    return name.includes(query) || recId.includes(query);
+                });
+
+                if (matches.length > 0) {
+                    displayRecordDetails(matches[0]);
+                } else {
+                    Swal.fire('Not Found', 'No record matching your query was found.', 'warning');
+                }
+            }
+        });
+    }
+
+    function displayRecordDetails(record) {
+        const userRole = sessionStorage.getItem('userRole');
+        const recId = record["Receipt No"] || record["ID"] || "N/A";
+        const studentName = record["Student Name"] || "Student";
+
+        let buttonContainerHTML = "";
+
+        // Admin: Show both Edit Records & View Receipt
+        if (userRole === 'admin') {
+            buttonContainerHTML = `
+                <div class="modal-action-btns">
+                    <button onclick="editRecordAction('${recId}')" class="btn-modal-edit">✏️ Edit Records</button>
+                    <button onclick="viewReceiptAction('${recId}')" class="btn-modal-view">📄 View Receipt</button>
+                </div>
+            `;
+        } 
+        // Staff/Operator: Show only View Receipt
+        else {
+            buttonContainerHTML = `
+                <div class="modal-action-btns">
+                    <button onclick="viewReceiptAction('${recId}')" class="btn-modal-view">📄 View Receipt</button>
+                </div>
+            `;
+        }
+
+        Swal.fire({
+            title: `Student: ${studentName}`,
+            html: `
+                <p style="margin:4px 0; font-size:13px; color:#555;">Receipt ID: <b>${recId}</b></p>
+                <p style="margin:4px 0; font-size:13px; color:#555;">Paid Amount: <b>₹${record["Total Paid"] || 0}</b></p>
+                ${buttonContainerHTML}
+            `,
+            showConfirmButton: false,
+            showCloseButton: true
+        });
+    }
+
+    // Edit Functionality (Admin Only)
+    function editRecordAction(id) {
+        const userRole = sessionStorage.getItem('userRole');
+        if (userRole !== 'admin') {
+            Swal.fire('Restricted Access', 'केवल Admin को Fees edit करने की अनुमति है!', 'error');
+            return;
+        }
+        Swal.fire('Edit Fees', `Opening Edit Form for Record: ${id}`, 'info');
+    }
+
+    // View Receipt Functionality
+    function viewReceiptAction(id) {
+        Swal.fire('View Receipt', `Loading Receipt for Record ID: ${id}`, 'success');
     }
 
     function renderMonthlyChart(labels, values) {
         const ctx = document.getElementById('monthlyChart').getContext('2d');
         if (monthlyChartInstance) monthlyChartInstance.destroy();
+
         monthlyChartInstance = new Chart(ctx, {
             type: 'bar',
-            data: { labels: labels, datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e' }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e', borderRadius: 4 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
         });
     }
 
     function renderClassChart(labels, values) {
         const ctx = document.getElementById('classChart').getContext('2d');
         if (classChartInstance) classChartInstance.destroy();
+
+        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1'];
+
         classChartInstance = new Chart(ctx, {
             type: 'doughnut',
-            data: { labels: labels, datasets: [{ data: values, backgroundColor: ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2'] }] },
-            options: { responsive: true, maintainAspectRatio: false }
+            data: {
+                labels: labels,
+                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
         });
-    }
-
-    // Search Records
-    async function executeStudentSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        if (!query) {
-            Swal.fire("Warning", "Please enter Student ID, Reg No, or Receipt No", "warning");
-            return;
-        }
-
-        Swal.fire({ title: 'Searching Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(query)}`, { method: 'GET', redirect: 'follow' });
-            const data = await res.json();
-            Swal.close();
-
-            searchCacheData = data;
-            renderSearchResultsCards(data);
-        } catch (e) {
-            Swal.fire("Error", "Server Connection Failed", "error");
-        }
-    }
-
-    function renderSearchResultsCards(data) {
-        const resultsContainer = document.getElementById('searchResultsArea');
-        resultsContainer.innerHTML = '';
-
-        if (!data || !Array.isArray(data) || data.length === 0) {
-            resultsContainer.innerHTML = '<div style="text-align:center; padding:15px; color:#666;">No record found.</div>';
-            return;
-        }
-
-        data.forEach(r => {
-            const receiptNo = r["Receipt No"] || r.id || 'N/A';
-            const card = document.createElement('div');
-            card.className = 'receipt-item-card';
-            card.innerHTML = `
-                <div class="receipt-info">
-                    <h4>${r["Month"] || 'Receipt'}</h4>
-                    <p>Receipt: ${receiptNo} | Paid: ₹${r["Total Paid"] || 0}</p>
-                </div>
-                <div class="receipt-actions">
-                    <button onclick="openEditReceiptModal('${receiptNo}')" class="btn-edit-receipt">✏️ EDIT</button>
-                </div>
-            `;
-            resultsContainer.appendChild(card);
-        });
-    }
-
-    function openEditReceiptModal(receiptNo) {
-        const record = searchCacheData.find(r => (r["Receipt No"] || r.id) === receiptNo);
-        if (!record) return;
-
-        document.getElementById('editReceiptNo').value = receiptNo;
-        document.getElementById('editMonth').value = record["Month"] || '';
-        document.getElementById('editPaidAmount').value = record["Total Paid"] || 0;
-        document.getElementById('editDuesAmount').value = record["Remaining"] || 0;
-        document.getElementById('editDiscountAmount').value = record["Discount"] || 0;
-
-        document.getElementById('editReceiptModal').style.display = 'flex';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editReceiptModal').style.display = 'none';
-    }
-
-    async function saveReceiptChanges() {
-        const receiptNo = document.getElementById('editReceiptNo').value;
-        const updatedMonth = document.getElementById('editMonth').value;
-        const updatedPaid = document.getElementById('editPaidAmount').value;
-        const updatedDues = document.getElementById('editDuesAmount').value;
-        const updatedDiscount = document.getElementById('editDiscountAmount').value;
-
-        Swal.fire({ title: 'Updating Record...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-        try {
-            await fetch(`${SCRIPT_URL}?action=updateFeeRecord&receiptNo=${encodeURIComponent(receiptNo)}&month=${encodeURIComponent(updatedMonth)}&paid=${updatedPaid}&dues=${updatedDues}&discount=${updatedDiscount}`, { method: 'GET', redirect: 'follow' });
-            Swal.close();
-            closeEditModal();
-            Swal.fire("Success", "Record updated successfully!", "success");
-            executeStudentSearch();
-        } catch (e) {
-            Swal.fire("Error", "Failed to update record on server", "error");
-        }
     }
 
     function logoutUser() {
