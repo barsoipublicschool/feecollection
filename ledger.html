@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Ledger & Profile History - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root {
+            --p: #1a237e;
+            --p-light: #3f51b5;
+            --bg: #f4f7f6;
+            --text: #333;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #f57f17;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: var(--text); }
+
+        .container { max-width: 900px; margin: 0 auto; }
+
+        /* Header & Search Area */
+        .search-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .search-card h2 { margin-top: 0; color: var(--p); font-size: 20px; }
+        
+        .search-box { display: flex; gap: 10px; margin-top: 15px; }
+        .search-box input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 6px; font-size: 14px; font-family: inherit; }
+        .search-box button { background: var(--p); color: white; border: none; padding: 12px 24px; border-radius: 6px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        .search-box button:hover { background: var(--p-light); }
+
+        /* Student Profile Card Layout */
+        .ledger-container { display: none; background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+
+        .student-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f0f0f0; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .student-info h3 { margin: 0; color: var(--p); font-size: 22px; }
+        .student-info p { margin: 4px 0 0; color: #666; font-size: 13px; }
+
+        /* Financial Summary Badges */
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .summary-box { padding: 15px; border-radius: 8px; text-align: center; }
+        .summary-box.assigned { background: #e8eaf6; border-left: 4px solid var(--p); }
+        .summary-box.paid { background: #e8f5e9; border-left: 4px solid var(--success); }
+        .summary-box.due { background: #ffebee; border-left: 4px solid var(--danger); }
+        
+        .summary-box small { font-size: 11px; font-weight: 600; text-transform: uppercase; color: #555; }
+        .summary-box h3 { margin: 6px 0 0; font-size: 22px; font-weight: 700; }
+
+        /* Transaction History Table */
+        .table-title { font-size: 16px; font-weight: 600; color: var(--p); margin-bottom: 12px; }
+        .table-responsive { overflow-x: auto; }
+        .ledger-table { width: 100%; border-collapse: collapse; font-size: 13px; text-align: left; }
+        .ledger-table th { background: #f8f9fa; color: var(--p); padding: 10px 12px; border-bottom: 2px solid #e0e0e0; font-weight: 600; }
+        .ledger-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; color: #444; }
+        .ledger-table tr:hover { background: #fafafa; }
+
+        .btn-print { background: #333; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; }
+
+        @media print {
+            .search-card, .btn-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .ledger-container { box-shadow: none; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- Search Section -->
+    <div class="search-card">
+        <h2>Student Ledger & Profile History</h2>
+        <p style="margin:0; color:#666; font-size:12px;">Roll Number ya Student ID daalkar full session fee ledger dekhein.</p>
+        
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Enter Roll No or Student ID...">
+            <button onclick="fetchStudentLedger()">SEARCH PROFILE</button>
+        </div>
+    </div>
+
+    <!-- Printable Ledger Output Card -->
+    <div class="ledger-container" id="ledgerCard">
+        
+        <!-- School Header for Print -->
+        <div style="text-align: center; margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px;">
+            <h2 style="margin: 0; color: var(--p); font-size: 20px;">BARSOI PUBLIC SCHOOL</h2>
+            <p style="margin: 2px 0; font-size: 11px; color: #555;">Nehar Nagar, Block Road Barsoi (Katihar) | Fee Ledger Statement</p>
+        </div>
+
+        <!-- Student Basic Profile Info -->
+        <div class="student-header">
+            <div class="student-info">
+                <h3 id="stName">Student Name</h3>
+                <p>Roll No / ID: <b id="stId">-</b> | Class: <b id="stClass">-</b> | Father's Name: <b id="stFather">-</b></p>
+            </div>
+            <div>
+                <button class="btn-print" onclick="window.print()">🖨️ Print Ledger</button>
+            </div>
+        </div>
+
+        <!-- Financial Overview Badges -->
+        <div class="summary-grid">
+            <div class="summary-box assigned">
+                <small>Total Fee Calculated</small>
+                <h3 id="txtTotalFee" style="color: var(--p);">₹0</h3>
+            </div>
+            <div class="summary-box paid">
+                <small>Total Amount Paid</small>
+                <h3 id="txtTotalPaid" style="color: var(--success);">₹0</h3>
+            </div>
+            <div class="summary-box due">
+                <small>Outstanding Balance Due</small>
+                <h3 id="txtTotalDue" style="color: var(--danger);">₹0</h3>
+            </div>
+        </div>
+
+        <!-- History Breakdown Table -->
+        <div class="table-title">Fee Transaction Statement</div>
+        <div class="table-responsive">
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Receipt No</th>
+                        <th>Month</th>
+                        <th>Paid Amount</th>
+                        <th>Discount</th>
+                        <th>Remaining Due</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerTableBody">
+                    <!-- Transactions dynamic rows here -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+
+    async function fetchStudentLedger() {
+        const query = document.getElementById('searchInput').value.trim();
+        if (!query) {
+            Swal.fire("Attention", "Please enter a Roll No or Student ID.", "warning");
+            return;
+        }
+
+        Swal.fire({ title: 'Searching Records...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(query)}`);
+            const records = await res.json();
+            Swal.close();
+
+            if (!records || records.length === 0) {
+                document.getElementById('ledgerCard').style.display = 'none';
+                Swal.fire("Not Found", "Is Roll No/Student ID ka koi record nahi mila.", "info");
+                return;
+            }
+
+            renderLedger(records, query);
+
+        } catch (err) {
+            Swal.close();
+            Swal.fire("Error", "Server connection error.", "error");
+        }
+    }
+
+    function renderLedger(records, queryId) {
+        let totalPaid = 0;
+        let totalDiscount = 0;
+        let latestRemainingDue = 0;
+
+        const tbody = document.getElementById('ledgerTableBody');
+        tbody.innerHTML = '';
+
+        // Extract student details from first record entry
+        const firstRec = records[0];
+        document.getElementById('stName').innerText = firstRec["Student Name"] || "N/A";
+        document.getElementById('stId').innerText = queryId;
+        document.getElementById('stClass').innerText = firstRec["Class"] || "N/A";
+        document.getElementById('stFather').innerText = firstRec["Father Name"] || firstRec["Father's Name"] || "N/A";
+
+        records.forEach((row, index) => {
+            const paid = parseFloat(row["Total Paid"] || 0);
+            const disc = parseFloat(row["Discount"] || 0);
+            const due = parseFloat(row["Remaining"] || 0);
+
+            totalPaid += paid;
+            totalDiscount += disc;
+
+            // Last row ka remaining due
+            if (index === records.length - 1) {
+                latestRemainingDue = due;
+            }
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${row["Receipt No"] || row["ID"] || "-"}</b></td>
+                <td>${row["Month"] || "-"}</td>
+                <td style="color: var(--success); font-weight: 600;">₹${paid.toLocaleString('en-IN')}</td>
+                <td>₹${disc.toLocaleString('en-IN')}</td>
+                <td style="color: var(--danger);">₹${due.toLocaleString('en-IN')}</td>
+                <td><span style="background: #e8f5e9; color: var(--success); padding: 3px 8px; border-radius: 4px; font-weight: 600; font-size: 11px;">PAID</span></td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        const grandTotalAssigned = totalPaid + latestRemainingDue + totalDiscount;
+
+        document.getElementById('txtTotalPaid').innerText = `₹${totalPaid.toLocaleString('en-IN')}`;
+        document.getElementById('txtTotalDue').innerText = `₹${latestRemainingDue.toLocaleString('en-IN')}`;
+        document.getElementById('txtTotalFee').innerText = `₹${grandTotalAssigned.toLocaleString('en-IN')}`;
+
+        document.getElementById('ledgerCard').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
