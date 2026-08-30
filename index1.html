@@ -581,12 +581,11 @@
                     <p style="font-size:7px">RTE Reg No. __ | UDISE No.10101119902</p>
                     <p style="font-size:7px">email - barsoipublicschool125@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Month: <b>${d["Month"]}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
                     <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
                     <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${d["Mobile"] || d["Phone"] || ""}</div>
-                    <div><b>Month:</b> ${d["Month"]}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
