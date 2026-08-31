@@ -78,7 +78,7 @@
 <div id="entry-view" class="container no-print">
     <input type="hidden" id="editing-receipt-no" value="">
     
-    <!-- 3. MONTH & DATE IN THE SAME ROW -->
+    <!-- MONTH & DATE IN THE SAME ROW -->
     <div style="margin-bottom: 12px; background: #e8eaf6; padding: 10px; border-radius: 6px; border: 1px solid var(--p);">
         <div class="grid-row" style="margin-bottom: 0;">
             <div>
@@ -110,7 +110,6 @@
         <div><label>Father Name</label><input type="text" id="Father Name"></div>
     </div>
 
-    <!-- Address & Mobile No Row -->
     <div class="grid-row">
         <div><label>Address</label><input type="text" id="Address"></div>
         <div><label>Mobile No</label><input type="text" id="Mobile" placeholder="e.g. 9876543210"></div>
@@ -259,7 +258,6 @@
     let editingObject = null;
 
     window.onload = async () => {
-        // Set Default Date to Today
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('EntryDate').value = today;
 
@@ -296,13 +294,14 @@
             const res = await fetch(`${SCRIPT_URL}?action=getStudentByClassRoll&sClass=${encodeURIComponent(sClass)}&rollNo=${encodeURIComponent(rollNo)}`);
             let resData = await res.json();
             if(resData && resData.success) {
-                document.getElementById('Student Name').value = resData.name || "";
-                document.getElementById('Father Name').value = resData.father || "";
+                document.getElementById('Student Name').value = resData.name || resData.studentName || "";
+                document.getElementById('Father Name').value = resData.father || resData.fatherName || "";
                 document.getElementById('Address').value = resData.address || "";
-                // 1. Mobile Number Mapping Fix
-                if(resData.mobile || resData.phone || resData.mobileNo || resData["Mobile No"]) {
-                    document.getElementById('Mobile').value = resData.mobile || resData.phone || resData.mobileNo || resData["Mobile No"] || "";
-                }
+                
+                // 1. Mobile Number Auto Fill Fix
+                let mob = resData.mobile || resData.phone || resData.mobileNo || resData["Mobile No"] || resData["Mobile"] || resData["Phone"] || "";
+                if(mob) document.getElementById('Mobile').value = mob;
+                
                 fetchStudentData();
             }
         } catch(e) { console.log("Class-Roll Fetch Error"); }
@@ -312,31 +311,35 @@
         let sid = document.getElementById('Student Id').value.trim();
         let sClass = document.getElementById('Class').value.trim();
         
-        if(sClass && sid) {
-            autoFetchByClassRoll();
-        }
-
         if(!sid) return;
         
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getStudentDues&id=${sid}`);
             let resData = await res.json();
             if(resData) {
-                // 2. Outstanding Balance Due Fix (Checks balance due first)
-                let actualDue = (resData.outstandingDue !== undefined) ? resData.outstandingDue : (resData.totalDues || 0);
-                document.getElementById('Prev Dues').value = actualDue;
+                // 2. Previous Fee (Actual Outstanding Balance) Fix
+                let dueVal = 0;
+                if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
+                    dueVal = parseFloat(resData.outstandingDue) || 0;
+                } else if(resData.netDue !== undefined && resData.netDue !== null) {
+                    dueVal = parseFloat(resData.netDue) || 0;
+                } else if(resData.due !== undefined && resData.due !== null) {
+                    dueVal = parseFloat(resData.due) || 0;
+                } else if(resData.info && (resData.info.due || resData.info.Remaining)) {
+                    dueVal = parseFloat(resData.info.due || resData.info.Remaining) || 0;
+                }
+                
+                document.getElementById('Prev Dues').value = dueVal;
 
                 if(resData.info) {
-                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = resData.info.name || "";
-                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = resData.info.father || "";
-                    if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || "";
+                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = resData.info.name || resData.info.studentName || "";
+                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = resData.info.father || resData.info.fatherName || "";
+                    if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || resData.info.class || "";
                     if(!document.getElementById('Address').value) document.getElementById('Address').value = resData.info.address || "";
                     
-                    // 1. Mobile Number Mapping Fix
-                    let mobVal = resData.info.mobile || resData.info.phone || resData.info.mobileNo || resData.info["Mobile No"] || "";
-                    if(mobVal) {
-                        document.getElementById('Mobile').value = mobVal;
-                    }
+                    // 1. Mobile Number Auto Fill Fix
+                    let mob = resData.info.mobile || resData.info.phone || resData.info.mobileNo || resData.info["Mobile No"] || resData.info["Mobile"] || resData.info["Phone"] || "";
+                    if(mob) document.getElementById('Mobile').value = mob;
                 }
                 calculate();
             }
@@ -387,7 +390,6 @@
         let nextSerial = (allRecords && allRecords.length > 0) ? allRecords.length + 1 : 1;
         let rNo = "BPS/" + currentYear + "/" + nextSerial.toString().padStart(2, '0');
         
-        // 3. Dynamic Date Picker formatting
         let selectedDateVal = document.getElementById('EntryDate').value;
         let formattedDate = selectedDateVal ? formatDateDDMMYYYY(new Date(selectedDateVal)) : formatDateDDMMYYYY(now);
         
