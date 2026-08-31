@@ -490,31 +490,48 @@
     }
 
     function shareWhatsApp() {
-        if(!currentActiveReceipt) return;
-        let d = currentActiveReceipt;
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+    if(!currentActiveReceipt) return;
+    let d = currentActiveReceipt;
+    
+    let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
-        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-                  `-----------------------------------\n` +
-                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
-                  `📅 *Date:* ${displayDate}\n` +
-                  `👤 *Student Name:* ${d["Student Name"]}\n` +
-                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
-                  `🏫 *Class:* ${d["Class"]}\n` +
-                  `🗓️ *Month:* ${d["Month"]}\n` +
-                  `-----------------------------------\n` +
-                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
-                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-                  `-----------------------------------\n` +
-                  `Thank you for the payment!\n` +
-                  `_Barsoi Public School Management_`;
+    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+              `-----------------------------------\n` +
+              `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
+              `📅 *Date:* ${displayDate}\n` +
+              `👤 *Student Name:* ${d["Student Name"]}\n` +
+              `🆔 *Student ID:* ${d["Student Id"]}\n` +
+              `🏫 *Class:* ${d["Class"]}\n` +
+              `🗓️ *Month:* ${d["Month"]}\n` +
+              `-----------------------------------\n` +
+              `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+              `🎯 *Discount:* ₹${d["Discount"]}\n` +
+              `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+              `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
+              `-----------------------------------\n` +
+              `Thank you for the payment!\n` +
+              `_Barsoi Public School Management_`;
 
-        let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
+    // Mobile number formatting (Mobile ya Phone column se auto pick karega)
+    let phoneNum = (d["Mobile"] || d["Phone"] || "").toString().replace(/[^0-9]/g, '');
+    
+    // Agar 10 digit ka number hai to '91' prefix add karega
+    if (phoneNum.length === 10) {
+        phoneNum = "91" + phoneNum;
     }
+
+    let url = "";
+    if (phoneNum && phoneNum.length >= 10) {
+        // Direct us mobile number par chat kholega
+        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+    } else {
+        // Agar mobile number missing ya invalid hai to direct share option kholega
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    
+    window.open(url, '_blank');
+}
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
