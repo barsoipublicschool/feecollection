@@ -21,7 +21,6 @@
         .card-box { border: 1px solid #dcdfe6; border-radius: 8px; padding: 15px; background: #fafafa; margin-bottom: 15px; }
         .section-title { font-size: 13px; font-weight: 700; color: var(--p); margin-bottom: 12px; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px; }
 
-        /* Row layout for Month & Date */
         .row-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; }
         .row-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; }
 
@@ -55,7 +54,6 @@
     </div>
 
     <form id="feeForm">
-        <!-- 3. Month & Date in Same Row -->
         <div class="card-box">
             <div class="row-grid-2">
                 <div class="form-group">
@@ -89,11 +87,10 @@
                 </div>
                 <div class="form-group">
                     <label for="studentId">Roll No / Student ID</label>
-                    <input type="text" id="studentId" placeholder="Enter Roll / ID" oninput="autoFillStudentData(this.value)">
+                    <input type="text" id="studentId" placeholder="Enter Roll / ID" onchange="autoFillStudentData(this.value)">
                 </div>
             </div>
 
-            <!-- 1. Mobile Number Auto-fill Included -->
             <div class="row-grid-4">
                 <div class="form-group">
                     <label for="studentName">Student Name</label>
@@ -121,9 +118,8 @@
             <div class="section-title">1-5. Regular Fees (Manual Input)</div>
             <div class="row-grid-4">
                 <div class="form-group">
-                    <!-- 2. Outstanding Due Balance Fix -->
                     <label for="previousDue">Previous Due (Auto Calculated)</label>
-                    <input type="number" id="previousDue" value="0" readonly>
+                    <input type="number" id="previousDue" value="0" oninput="calculateTotal()">
                 </div>
                 <div class="form-group">
                     <label for="admissionFee">Admission Fee</label>
@@ -222,45 +218,64 @@
 </div>
 
 <script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+
     // Set Default Date to Today
     document.getElementById('entryDate').valueAsDate = new Date();
 
-    // Mock Database (Replace with Google Sheet / Backend API Fetch)
-    const studentDB = {
-        "20260824": {
-            name: "MUNTASERA KHATOON",
-            father: "MD AFAK",
-            class: "8th",
-            address: "KUMEDPUR, KATIHAR",
-            mobile: "9876543210", // Mobile number added
-            totalFeeCalculated: 24800,
-            totalAmountPaid: 15800,
-            outstandingDue: 9000 // Total Fee (24800) - Total Paid (15800) = 9000
+    // Helper Function to extract Mobile Key
+    function extractMobile(obj) {
+        if (!obj || typeof obj !== 'object') return "";
+        let keys = Object.keys(obj);
+        for (let key of keys) {
+            if (/mobile|phone|contact|mob/i.test(key)) {
+                let val = obj[key];
+                if (val !== undefined && val !== null && val !== "") return val.toString().trim();
+            }
         }
-    };
+        if (obj.info) return extractMobile(obj.info);
+        return "";
+    }
 
-    // 1. Auto Fill Functionality
-    function autoFillStudentData(id) {
-        const student = studentDB[id];
-        if (student) {
-            document.getElementById('studentName').value = student.name;
-            document.getElementById('fatherName').value = student.father;
-            document.getElementById('studentClass').value = student.class;
-            document.getElementById('address').value = student.address;
-            document.getElementById('mobileNo').value = student.mobile; // Fix 1: Mobile set here
-            
-            // Fix 2: Setting actual Net Outstanding Due instead of total fee
-            document.getElementById('previousDue').value = student.outstandingDue;
-        } else {
-            // Reset if ID not found
-            document.getElementById('studentName').value = '';
-            document.getElementById('fatherName').value = '';
-            document.getElementById('studentClass').value = '';
-            document.getElementById('address').value = '';
-            document.getElementById('mobileNo').value = '';
-            document.getElementById('previousDue').value = 0;
+    // Auto Fill Functionality from Google Apps Script
+    async function autoFillStudentData(id) {
+        let sid = id ? id.toString().trim() : "";
+        if (!sid) return;
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=getStudentDues&id=${encodeURIComponent(sid)}`);
+            let resData = await res.json();
+
+            if (resData) {
+                let dataObj = resData.info || resData;
+
+                // 1. Sheet ke 'Remaining' Column se Data Uthakar 'Prev Due' me Fill karna
+                let dueVal = 0;
+                if (dataObj["Remaining"] !== undefined && dataObj["Remaining"] !== null) {
+                    dueVal = parseFloat(dataObj["Remaining"]);
+                } else if (dataObj.outstandingDue !== undefined && dataObj.outstandingDue !== null) {
+                    dueVal = parseFloat(dataObj.outstandingDue);
+                } else if (dataObj["Prev Dues"] !== undefined && dataObj["Prev Dues"] !== null) {
+                    dueVal = parseFloat(dataObj["Prev Dues"]);
+                }
+
+                document.getElementById('previousDue').value = isNaN(dueVal) ? 0 : dueVal;
+
+                // 2. Student Info & Mobile Number Assignment
+                document.getElementById('studentName').value = dataObj["Student Name"] || dataObj.name || dataObj.studentName || "";
+                document.getElementById('fatherName').value = dataObj["Father Name"] || dataObj.father || dataObj.fatherName || "";
+                document.getElementById('studentClass').value = dataObj["Class"] || dataObj.sClass || dataObj.class || "";
+                document.getElementById('address').value = dataObj["Address"] || dataObj.address || "";
+
+                // Mobile Column Lookup
+                let mobVal = dataObj["Mobile"] || extractMobile(dataObj);
+                document.getElementById('mobileNo').value = mobVal;
+
+                calculateTotal();
+            }
+        } catch (e) {
+            console.log("Error fetching student details:", e);
         }
-        calculateTotal();
     }
 
     // Dynamic Total Calculation
