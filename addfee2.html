@@ -285,6 +285,11 @@
         document.getElementById('btn-nav-search').className = view === 'search' ? 'active' : '';
     }
 
+    function extractMobile(obj) {
+        if(!obj) return "";
+        return obj["Mobile"] || obj["mobile"] || obj["Mobile No"] || obj["mobileNo"] || obj["Phone"] || obj["phone"] || obj["Mobile Number"] || obj["MobileNo"] || "";
+    }
+
     async function autoFetchByClassRoll() {
         let sClass = document.getElementById('Class').value.trim();
         let rollNo = document.getElementById('Student Id').value.trim();
@@ -298,8 +303,7 @@
                 document.getElementById('Father Name').value = resData.father || resData.fatherName || resData["Father Name"] || "";
                 document.getElementById('Address').value = resData.address || resData["Address"] || "";
                 
-                // 1. Mobile Key Auto-Fill (Checks 'Mobile' exact Sheet Name)
-                let mob = resData.Mobile || resData.mobile || resData["Mobile No"] || resData.mobileNo || resData.phone || resData.Phone || "";
+                let mob = extractMobile(resData);
                 if(mob) document.getElementById('Mobile').value = mob;
                 
                 fetchStudentData();
@@ -315,20 +319,25 @@
             const res = await fetch(`${SCRIPT_URL}?action=getStudentDues&id=${sid}`);
             let resData = await res.json();
             if(resData) {
-                // 2. Exact Dues Extraction Logic
+                // Correct Due Balance Extraction Logic
                 let dueVal = 0;
-                if(typeof resData === 'number') {
-                    dueVal = resData;
-                } else if(resData.totalDues !== undefined && resData.totalDues !== null) {
-                    dueVal = parseFloat(resData.totalDues) || 0;
-                } else if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
+                if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
                     dueVal = parseFloat(resData.outstandingDue) || 0;
+                } else if(resData.outstandingBalanceDue !== undefined && resData.outstandingBalanceDue !== null) {
+                    dueVal = parseFloat(resData.outstandingBalanceDue) || 0;
                 } else if(resData.netDue !== undefined && resData.netDue !== null) {
                     dueVal = parseFloat(resData.netDue) || 0;
                 } else if(resData.due !== undefined && resData.due !== null) {
                     dueVal = parseFloat(resData.due) || 0;
-                } else if(resData.info && (resData.info.due || resData.info.Remaining || resData.info["Prev Dues"])) {
-                    dueVal = parseFloat(resData.info.due || resData.info.Remaining || resData.info["Prev Dues"]) || 0;
+                } else if(resData.totalFeeCalculated !== undefined && resData.totalAmountPaid !== undefined) {
+                    let totalCalc = parseFloat(resData.totalFeeCalculated) || 0;
+                    let totalPaid = parseFloat(resData.totalAmountPaid) || 0;
+                    let totalDisc = parseFloat(resData.totalDiscount || 0) || 0;
+                    dueVal = totalCalc - totalPaid - totalDisc;
+                } else if(typeof resData === 'number') {
+                    dueVal = resData;
+                } else if(resData.info) {
+                    dueVal = parseFloat(resData.info.outstandingDue || resData.info.due || resData.info.Remaining || resData.info["Prev Dues"]) || 0;
                 }
 
                 document.getElementById('Prev Dues').value = dueVal;
@@ -339,11 +348,11 @@
                     if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || resData.info.class || resData.info["Class"] || "";
                     if(!document.getElementById('Address').value) document.getElementById('Address').value = resData.info.address || resData.info["Address"] || "";
                     
-                    // 1. Mobile Key Auto-Fill
-                    let mob = resData.info.Mobile || resData.info.mobile || resData.info["Mobile No"] || resData.info.mobileNo || resData.info.phone || resData.info.Phone || "";
+                    let mob = extractMobile(resData.info);
                     if(mob) document.getElementById('Mobile').value = mob;
-                } else if (resData.Mobile || resData.mobile) {
-                    document.getElementById('Mobile').value = resData.Mobile || resData.mobile || "";
+                } else {
+                    let mob = extractMobile(resData);
+                    if(mob) document.getElementById('Mobile').value = mob;
                 }
                 
                 calculate();
