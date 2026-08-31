@@ -34,7 +34,6 @@
     .btn-view { background: #e91e63; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
     .btn-edit { background: #ff9800; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: bold; }
 
-    /* EDIT MODAL */
     #edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
     .edit-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
@@ -78,7 +77,6 @@
 <div id="entry-view" class="container no-print">
     <input type="hidden" id="editing-receipt-no" value="">
     
-    <!-- MONTH & DATE IN THE SAME ROW -->
     <div style="margin-bottom: 12px; background: #e8eaf6; padding: 10px; border-radius: 6px; border: 1px solid var(--p);">
         <div class="grid-row" style="margin-bottom: 0;">
             <div>
@@ -97,7 +95,7 @@
     <div class="grid-row">
         <div>
             <label>Class</label>
-            <input type="text" id="Class" placeholder="e.g. Class 1st, 2nd, 3rd, 4th, ....10th" onchange="autoFetchByClassRoll()">
+            <input type="text" id="Class" placeholder="e.g. Class 1st, 2nd, 3rd..." onchange="autoFetchByClassRoll()">
         </div>
         <div>
             <label>Roll No / Student ID</label>
@@ -170,7 +168,6 @@
     </div>
     <div><label>11. Other Fee</label><input type="number" class="calc-total" id="Other Fee" oninput="calculate()"></div>
 
-    <!-- PAYMENT SUMMARY BOX -->
     <div class="total-box">
         <div class="summary-row">
             <label>Sub Total</label>
@@ -285,9 +282,18 @@
         document.getElementById('btn-nav-search').className = view === 'search' ? 'active' : '';
     }
 
+    // Advanced Robust Mobile Extraction
     function extractMobile(obj) {
-        if(!obj) return "";
-        return obj["Mobile"] || obj["mobile"] || obj["Mobile No"] || obj["mobileNo"] || obj["Phone"] || obj["phone"] || obj["Mobile Number"] || obj["MobileNo"] || "";
+        if(!obj || typeof obj !== 'object') return "";
+        let keys = Object.keys(obj);
+        for(let key of keys) {
+            if (/mobile|phone|contact|mob/i.test(key)) {
+                let val = obj[key];
+                if (val !== undefined && val !== null && val !== "") return val.toString().trim();
+            }
+        }
+        if(obj.info) return extractMobile(obj.info);
+        return "";
     }
 
     async function autoFetchByClassRoll() {
@@ -298,12 +304,13 @@
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getStudentByClassRoll&sClass=${encodeURIComponent(sClass)}&rollNo=${encodeURIComponent(rollNo)}`);
             let resData = await res.json();
-            if(resData && resData.success) {
-                document.getElementById('Student Name').value = resData.name || resData.studentName || resData["Student Name"] || "";
-                document.getElementById('Father Name').value = resData.father || resData.fatherName || resData["Father Name"] || "";
-                document.getElementById('Address').value = resData.address || resData["Address"] || "";
+            if(resData) {
+                let dataObj = resData.data || resData.student || resData.info || resData;
+                document.getElementById('Student Name').value = dataObj.name || dataObj.studentName || dataObj["Student Name"] || "";
+                document.getElementById('Father Name').value = dataObj.father || dataObj.fatherName || dataObj["Father Name"] || "";
+                document.getElementById('Address').value = dataObj.address || dataObj["Address"] || "";
                 
-                let mob = extractMobile(resData);
+                let mob = extractMobile(dataObj);
                 if(mob) document.getElementById('Mobile').value = mob;
                 
                 fetchStudentData();
@@ -319,39 +326,38 @@
             const res = await fetch(`${SCRIPT_URL}?action=getStudentDues&id=${sid}`);
             let resData = await res.json();
             if(resData) {
-                // Correct Due Balance Extraction Logic
                 let dueVal = 0;
-                if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
-                    dueVal = parseFloat(resData.outstandingDue) || 0;
-                } else if(resData.outstandingBalanceDue !== undefined && resData.outstandingBalanceDue !== null) {
-                    dueVal = parseFloat(resData.outstandingBalanceDue) || 0;
-                } else if(resData.netDue !== undefined && resData.netDue !== null) {
-                    dueVal = parseFloat(resData.netDue) || 0;
-                } else if(resData.due !== undefined && resData.due !== null) {
-                    dueVal = parseFloat(resData.due) || 0;
-                } else if(resData.totalFeeCalculated !== undefined && resData.totalAmountPaid !== undefined) {
-                    let totalCalc = parseFloat(resData.totalFeeCalculated) || 0;
-                    let totalPaid = parseFloat(resData.totalAmountPaid) || 0;
-                    let totalDisc = parseFloat(resData.totalDiscount || 0) || 0;
-                    dueVal = totalCalc - totalPaid - totalDisc;
-                } else if(typeof resData === 'number') {
+                
+                if (typeof resData === 'number') {
                     dueVal = resData;
-                } else if(resData.info) {
-                    dueVal = parseFloat(resData.info.outstandingDue || resData.info.due || resData.info.Remaining || resData.info["Prev Dues"]) || 0;
+                } else if (typeof resData === 'string' && !isNaN(resData)) {
+                    dueVal = parseFloat(resData);
+                } else {
+                    let targetObj = resData.info || resData;
+                    if(targetObj.outstandingDue !== undefined && targetObj.outstandingDue !== null) dueVal = parseFloat(targetObj.outstandingDue);
+                    else if(targetObj.outstandingBalanceDue !== undefined && targetObj.outstandingBalanceDue !== null) dueVal = parseFloat(targetObj.outstandingBalanceDue);
+                    else if(targetObj.netDue !== undefined && targetObj.netDue !== null) dueVal = parseFloat(targetObj.netDue);
+                    else if(targetObj.due !== undefined && targetObj.due !== null) dueVal = parseFloat(targetObj.due);
+                    else if(targetObj.Remaining !== undefined && targetObj.Remaining !== null) dueVal = parseFloat(targetObj.Remaining);
+                    else if(targetObj["Prev Dues"] !== undefined && targetObj["Prev Dues"] !== null) dueVal = parseFloat(targetObj["Prev Dues"]);
+                    else if(targetObj.totalFeeCalculated !== undefined && targetObj.totalAmountPaid !== undefined) {
+                        let totalCalc = parseFloat(targetObj.totalFeeCalculated) || 0;
+                        let totalPaid = parseFloat(targetObj.totalAmountPaid) || 0;
+                        let totalDisc = parseFloat(targetObj.totalDiscount || 0) || 0;
+                        dueVal = totalCalc - totalPaid - totalDisc;
+                    }
                 }
 
-                document.getElementById('Prev Dues').value = dueVal;
+                document.getElementById('Prev Dues').value = isNaN(dueVal) ? 0 : dueVal;
 
-                if(resData.info) {
-                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = resData.info.name || resData.info.studentName || resData.info["Student Name"] || "";
-                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = resData.info.father || resData.info.fatherName || resData.info["Father Name"] || "";
-                    if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || resData.info.class || resData.info["Class"] || "";
-                    if(!document.getElementById('Address').value) document.getElementById('Address').value = resData.info.address || resData.info["Address"] || "";
+                let dataObj = resData.info || resData;
+                if(dataObj && typeof dataObj === 'object') {
+                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = dataObj.name || dataObj.studentName || dataObj["Student Name"] || "";
+                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = dataObj.father || dataObj.fatherName || dataObj["Father Name"] || "";
+                    if(!document.getElementById('Class').value) document.getElementById('Class').value = dataObj.sClass || dataObj.class || dataObj["Class"] || "";
+                    if(!document.getElementById('Address').value) document.getElementById('Address').value = dataObj.address || dataObj["Address"] || "";
                     
-                    let mob = extractMobile(resData.info);
-                    if(mob) document.getElementById('Mobile').value = mob;
-                } else {
-                    let mob = extractMobile(resData);
+                    let mob = extractMobile(dataObj);
                     if(mob) document.getElementById('Mobile').value = mob;
                 }
                 
@@ -517,7 +523,7 @@
                 body: JSON.stringify(updatedData) 
             });
             
-            Swal.fire("Updated!", "Usi row ke andar record update ho gaya hai.", "success");
+            Swal.fire("Updated!", "Record update ho gaya hai.", "success");
             closeEditModal();
             doSearch();
         } catch(e) {
@@ -563,7 +569,8 @@
                   `Thank you for the payment!\n` +
                   `_Barsoi Public School Management_`;
 
-        let phoneNum = (d["Mobile"] || d["Phone"] || "").toString().replace(/[^0-9]/g, '');
+        let rawMob = extractMobile(d);
+        let phoneNum = rawMob.replace(/[^0-9]/g, '');
         
         if (phoneNum.length === 10) {
             phoneNum = "91" + phoneNum;
@@ -619,7 +626,7 @@
                 <div class="student-details">
                     <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${d["Mobile"] || d["Phone"] || ""}</div>
+                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${extractMobile(d)}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
