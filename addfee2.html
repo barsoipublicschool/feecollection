@@ -294,12 +294,12 @@
             const res = await fetch(`${SCRIPT_URL}?action=getStudentByClassRoll&sClass=${encodeURIComponent(sClass)}&rollNo=${encodeURIComponent(rollNo)}`);
             let resData = await res.json();
             if(resData && resData.success) {
-                document.getElementById('Student Name').value = resData.name || resData.studentName || "";
-                document.getElementById('Father Name').value = resData.father || resData.fatherName || "";
-                document.getElementById('Address').value = resData.address || "";
+                document.getElementById('Student Name').value = resData.name || resData.studentName || resData["Student Name"] || "";
+                document.getElementById('Father Name').value = resData.father || resData.fatherName || resData["Father Name"] || "";
+                document.getElementById('Address').value = resData.address || resData["Address"] || "";
                 
-                // 1. Mobile Number Auto Fill Fix
-                let mob = resData.mobile || resData.phone || resData.mobileNo || resData["Mobile No"] || resData["Mobile"] || resData["Phone"] || "";
+                // 1. Mobile Key Auto-Fill (Checks 'Mobile' exact Sheet Name)
+                let mob = resData.Mobile || resData.mobile || resData["Mobile No"] || resData.mobileNo || resData.phone || resData.Phone || "";
                 if(mob) document.getElementById('Mobile').value = mob;
                 
                 fetchStudentData();
@@ -309,38 +309,43 @@
 
     async function fetchStudentData() {
         let sid = document.getElementById('Student Id').value.trim();
-        let sClass = document.getElementById('Class').value.trim();
-        
         if(!sid) return;
         
         try {
             const res = await fetch(`${SCRIPT_URL}?action=getStudentDues&id=${sid}`);
             let resData = await res.json();
             if(resData) {
-                // 2. Previous Fee (Actual Outstanding Balance) Fix
+                // 2. Exact Dues Extraction Logic
                 let dueVal = 0;
-                if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
+                if(typeof resData === 'number') {
+                    dueVal = resData;
+                } else if(resData.totalDues !== undefined && resData.totalDues !== null) {
+                    dueVal = parseFloat(resData.totalDues) || 0;
+                } else if(resData.outstandingDue !== undefined && resData.outstandingDue !== null) {
                     dueVal = parseFloat(resData.outstandingDue) || 0;
                 } else if(resData.netDue !== undefined && resData.netDue !== null) {
                     dueVal = parseFloat(resData.netDue) || 0;
                 } else if(resData.due !== undefined && resData.due !== null) {
                     dueVal = parseFloat(resData.due) || 0;
-                } else if(resData.info && (resData.info.due || resData.info.Remaining)) {
-                    dueVal = parseFloat(resData.info.due || resData.info.Remaining) || 0;
+                } else if(resData.info && (resData.info.due || resData.info.Remaining || resData.info["Prev Dues"])) {
+                    dueVal = parseFloat(resData.info.due || resData.info.Remaining || resData.info["Prev Dues"]) || 0;
                 }
-                
+
                 document.getElementById('Prev Dues').value = dueVal;
 
                 if(resData.info) {
-                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = resData.info.name || resData.info.studentName || "";
-                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = resData.info.father || resData.info.fatherName || "";
-                    if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || resData.info.class || "";
-                    if(!document.getElementById('Address').value) document.getElementById('Address').value = resData.info.address || "";
+                    if(!document.getElementById('Student Name').value) document.getElementById('Student Name').value = resData.info.name || resData.info.studentName || resData.info["Student Name"] || "";
+                    if(!document.getElementById('Father Name').value) document.getElementById('Father Name').value = resData.info.father || resData.info.fatherName || resData.info["Father Name"] || "";
+                    if(!document.getElementById('Class').value) document.getElementById('Class').value = resData.info.sClass || resData.info.class || resData.info["Class"] || "";
+                    if(!document.getElementById('Address').value) document.getElementById('Address').value = resData.info.address || resData.info["Address"] || "";
                     
-                    // 1. Mobile Number Auto Fill Fix
-                    let mob = resData.info.mobile || resData.info.phone || resData.info.mobileNo || resData.info["Mobile No"] || resData.info["Mobile"] || resData.info["Phone"] || "";
+                    // 1. Mobile Key Auto-Fill
+                    let mob = resData.info.Mobile || resData.info.mobile || resData.info["Mobile No"] || resData.info.mobileNo || resData.info.phone || resData.info.Phone || "";
                     if(mob) document.getElementById('Mobile').value = mob;
+                } else if (resData.Mobile || resData.mobile) {
+                    document.getElementById('Mobile').value = resData.Mobile || resData.mobile || "";
                 }
+                
                 calculate();
             }
         } catch(e) { console.log("Error fetching dues"); }
