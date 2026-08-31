@@ -1,30 +1,101 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
+    <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BARSOI PUBLIC SCHOOL - DASHBOARD</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>Dashboard & Fees Management - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
-        :root { --p: #1a237e; --bg: #f4f7f6; --pink: #e91e63; }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 20px; color: #333; }
+        :root { 
+            --p: #1a237e; 
+            --p-light: #3f51b5;
+            --bg: #f4f7f6; 
+            --card-bg: #ffffff;
+            --text: #333;
+            --danger: #c62828;
+            --success: #2e7d32;
+            --warning: #fbc02d;
+        }
+
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 0; display: flex; min-height: 100vh; }
+
+        /* Sidebar Styling */
+        .sidebar { width: 260px; background: var(--p); color: white; display: flex; flex-direction: column; transition: all 0.3s; flex-shrink: 0; }
+        .sidebar-header { padding: 20px 15px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h3 { margin: 0; font-size: 16px; font-weight: 700; letter-spacing: 0.5px; }
+        .sidebar-header p { margin: 3px 0 0; font-size: 11px; opacity: 0.8; }
+
+        .nav-menu { list-style: none; padding: 15px 10px; margin: 0; flex-grow: 1; }
+        .nav-item { margin-bottom: 5px; }
+        .nav-link { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.85); text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; transition: 0.2s; }
+        .nav-link:hover, .nav-link.active { background: var(--p-light); color: white; font-weight: 600; }
+        .nav-link span { font-size: 16px; }
+
+        .sidebar-footer { padding: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 11px; text-align: center; opacity: 0.7; }
+
+        /* Main Content Styling */
+        .main-content { flex-grow: 1; padding: 20px; overflow-y: auto; }
         
-        .dashboard-container { max-width: 1100px; margin: 0 auto; }
-        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .card-title { font-size: 14px; font-weight: 700; color: var(--p); text-transform: uppercase; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .top-bar h2 { margin: 0; color: var(--p); font-size: 20px; }
 
-        /* TABLE STYLES */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 13px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: var(--p); font-weight: 700; }
-        .status-badge { background: #e8f5e9; color: #2e7d32; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 11px; }
-        .btn-view { background: #3f51b5; color: white; border: none; padding: 6px 14px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px; }
-        .btn-view:hover { background: #2c387e; }
+        /* Role Display Badge */
+        .user-role-badge {
+            background: #e8eaf6;
+            color: #1a237e;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            border: 1px solid #c5cae9;
+        }
 
-        /* RECEIPT MODAL STYLES (FULL SCREEN OVERLAY) */
+        .btn-refresh { background: var(--p); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 6px; }
+        .btn-refresh:hover { background: var(--p-light); }
+
+        /* Quick Action Grid */
+        .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .action-card { background: white; border-radius: 8px; padding: 12px; text-align: center; text-decoration: none; color: var(--text); box-shadow: 0 2px 6px rgba(0,0,0,0.04); border: 1px solid #e0e0e0; transition: 0.2s; }
+        .action-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); border-color: var(--p-light); }
+        .action-card .icon { font-size: 22px; margin-bottom: 4px; display: block; }
+        .action-card .title { font-size: 11px; font-weight: 600; color: var(--p); }
+
+        /* Summary Cards Grid */
+        .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: white; border-radius: 8px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-left: 5px solid var(--p); }
+        .card h4 { margin: 0; font-size: 11px; color: #666; text-transform: uppercase; }
+        .card p { margin: 6px 0 0; font-size: 20px; font-weight: 700; color: #333; }
+
+        /* Charts Layout */
+        .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .chart-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .chart-card h3 { margin-top: 0; font-size: 14px; color: var(--p); text-align: center; margin-bottom: 15px; }
+        .chart-container { position: relative; height: 260px; width: 100%; }
+
+        /* Recent Transactions Table Styling */
+        .recent-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 20px; }
+        .recent-card h3 { margin-top: 0; font-size: 15px; color: var(--p); margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        
+        .table-responsive { overflow-x: auto; }
+        .recent-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 13px; }
+        .recent-table th { background: #f8f9fa; color: var(--p); font-weight: 600; padding: 10px 12px; border-bottom: 2px solid #e0e0e0; }
+        .recent-table td { padding: 10px 12px; border-bottom: 1px solid #f0f0f0; color: #444; }
+        .recent-table tr:hover { background: #fafafa; }
+        
+        .badge-paid { background: #e8f5e9; color: var(--success); padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+        .btn-view-rec { background: var(--p-light); color: white; border: none; padding: 4px 10px; border-radius: 4px; font-size: 11px; cursor: pointer; }
+        .btn-view-rec:hover { background: var(--p); }
+
+        /* RECEIPT MODAL STYLING (MERGED FROM SEARCH.HTML) */
         #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 99999; overflow-y: auto; padding: 0; }
+        
         .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
         .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
 
@@ -49,37 +120,193 @@
             .print-wrapper { width: 297mm; height: 210mm; padding: 5mm; display: flex; transform: scale(0.98); transform-origin: top center; }
             .receipt-box { height: 190mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
+
+        @media (max-width: 850px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
 
-<div class="dashboard-container no-print">
-    <!-- RECENT TRANSACTIONS CARD -->
-    <div class="card">
-        <div class="card-title">
-            <span>📋 Recent Fee Transactions</span>
-            <a href="search.html" style="color:var(--p); text-decoration:none; font-size:12px;">View All →</a>
-        </div>
-        <table>
-            <thead>
-                <tr>
-                    <th>Receipt No</th>
-                    <th>Student Name</th>
-                    <th>Class</th>
-                    <th>Month</th>
-                    <th>Amount Paid</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="transaction-table-body">
-                <tr><td colspan="7" style="text-align:center;">Loading Transactions...</td></tr>
-            </tbody>
-        </table>
+<!-- Left Navigation Sidebar -->
+<aside class="sidebar no-print">
+    <div class="sidebar-header">
+        <h3>BARSOI PUBLIC SCHOOL</h3>
+        <p>Nehar Nagar, Block Road Barsoi (Katihar)</p>
     </div>
-</div>
+    
+    <ul class="nav-menu">
+        <li class="nav-item">
+            <a href="dashboard.html" class="nav-link active">
+                <span>📊</span> Dashboard
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="index.html" class="nav-link">
+                <span>➕</span> Add / Deposit Fee
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="search.html" class="nav-link">
+                <span>🔍</span> Search Fee Receipt
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="daily.html" class="nav-link">
+                <span>📅</span> Daily Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="monthly.html" class="nav-link">
+                <span>🗓️</span> Monthly Collection
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="duelist.html" class="nav-link">
+                <span>⚠️</span> Defaulters List
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="reminder.html" class="nav-link">
+                <span>🔔</span> Fee Reminders
+            </a>
+        </li>
+        <li class="nav-item">
+            <a href="ledger.html" class="nav-link">
+                <span>📚</span> Student Ledger & Profile History
+            </a>
+        </li>
+        <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
+            <a href="#" onclick="logoutUser()" class="nav-link" style="color: #ff8a80;">
+                <span>🚪</span> Logout
+            </a>
+        </li>
+    </ul>
 
-<!-- RECEIPT DISPLAY MODAL -->
+    <div class="sidebar-footer">
+        Fees Portal v2.0
+    </div>
+</aside>
+
+<!-- Main Dashboard Content -->
+<main class="main-content no-print" id="dashboardMain">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <div>
+            <h2>Admin Analytics Dashboard</h2>
+            <small style="color:#666;">Real-time overview of fee collections and dues</small>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+            <div class="user-role-badge">
+                <span>👤</span> <span id="userRoleText">Logged in</span>
+            </div>
+            <button class="btn-refresh" onclick="loadDashboardData()">🔄 REFRESH DATA</button>
+        </div>
+    </div>
+
+    <!-- Quick Action Shortcut Buttons -->
+    <div class="quick-actions">
+        <a href="addfee.html" class="action-card">
+            <span class="icon">➕</span>
+            <span class="title">Add Fee</span>
+        </a>
+        <a href="search.html" class="action-card">
+            <span class="icon">🔍</span>
+            <span class="title">Search Fee</span>
+        </a>
+        <a href="daily.html" class="action-card">
+            <span class="icon">📅</span>
+            <span class="title">Daily Report</span>
+        </a>
+        <a href="monthly.html" class="action-card">
+            <span class="icon">🗓️</span>
+            <span class="title">Monthly Report</span>
+        </a>
+        <a href="duelist.html" class="action-card">
+            <span class="icon">⚠️</span>
+            <span class="title">Due List</span>
+        </a>
+        <a href="reminder.html" class="action-card">
+            <span class="icon">🔔</span>
+            <span class="title">Send Reminder</span>
+        </a>
+        <a href="ledger.html" class="action-card">
+            <span class="icon">📚</span>
+            <span class="title">Student Ledger</span>
+        </a>
+    </div>
+
+    <!-- Summary Metrics -->
+    <div class="metrics-grid">
+        <div class="card" style="border-left-color: var(--p);">
+            <h4>Total Collection</h4>
+            <p id="totalPaid" style="color: var(--p);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--danger);">
+            <h4>Total Outstanding Dues</h4>
+            <p id="totalDues" style="color: var(--danger);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--warning);">
+            <h4>Total Discount</h4>
+            <p id="totalDiscount" style="color: var(--warning);">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: var(--success);">
+            <h4>Total Receipts</h4>
+            <p id="totalCount" style="color: var(--success);">0</p>
+        </div>
+    </div>
+
+    <!-- Visual Charts -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <h3>MONTH-WISE COLLECTION TREND (₹)</h3>
+            <div class="chart-container">
+                <canvas id="monthlyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="chart-card">
+            <h3>CLASS-WISE REVENUE BREAKDOWN</h3>
+            <div class="chart-container">
+                <canvas id="classChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions Section -->
+    <div class="recent-card">
+        <h3>
+            <span>📋 Recent Fee Transactions</span>
+            <a href="search.html" style="font-size: 12px; color: var(--p-light); text-decoration: none;">View All →</a>
+        </h3>
+        <div class="table-responsive">
+            <table class="recent-table">
+                <thead>
+                    <tr>
+                        <th>Receipt No</th>
+                        <th>Student Name</th>
+                        <th>Class</th>
+                        <th>Month</th>
+                        <th>Amount Paid</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="recentTransactionsBody">
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888;">Loading recent entries...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</main>
+
+<!-- RECEIPT MODAL (INSPECTABLE & PRINTABLE) -->
 <div id="receipt-modal">
     <div class="print-wrapper">
         <div class="receipt-box" id="guardian-copy"></div>
@@ -94,47 +321,126 @@
 
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    
     let allRecords = [];
     let currentActiveReceipt = null;
+    let monthlyChartInstance = null;
+    let classChartInstance = null;
 
-    window.onload = async () => {
+    window.onload = () => {
+        checkUserRole();
         loadDashboardData();
     };
 
-    async function loadDashboardData() {
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            const data = await res.json();
-            if (data && Array.isArray(data)) {
-                allRecords = data;
-                renderRecentTransactions(data.slice(-5).reverse()); // Display last 5 transactions
-            }
-        } catch(e) {
-            console.log("Failed to load transactions", e);
-            document.getElementById('transaction-table-body').innerHTML = `<tr><td colspan="7" style="text-align:center; color:red;">Failed to load data.</td></tr>`;
+    function checkUserRole() {
+        const userRole = sessionStorage.getItem('userRole');
+        const roleTextElem = document.getElementById('userRoleText');
+
+        if (userRole === 'admin') {
+            roleTextElem.innerHTML = "Logged in as <b>Administration</b>";
+        } else if (userRole === 'operator') {
+            roleTextElem.innerHTML = "Logged in as <b>Staff/Operator</b>";
+        } else {
+            roleTextElem.innerHTML = "Logged in as <b>User</b>";
         }
     }
 
-    function renderRecentTransactions(transactions) {
-        let html = "";
-        transactions.forEach((r) => {
-            // Find global index in allRecords
-            let globalIndex = allRecords.findIndex(item => item["Receipt No"] === r["Receipt No"] && item["Student Id"] === r["Student Id"]);
-            
-            html += `<tr>
-                <td><b>${r["Receipt No"] || "N/A"}</b></td>
-                <td>${r["Student Name"] || "N/A"}</td>
-                <td>${r["Class"] || "N/A"}</td>
-                <td>${r["Month"] || "N/A"}</td>
-                <td style="color:#2e7d32; font-weight:bold;">₹${r["Total Paid"] || 0}</td>
-                <td><span class="status-badge">RECEIVED</span></td>
-                <td><button class="btn-view" onclick="showReceiptByIndex(${globalIndex})">View</button></td>
-            </tr>`;
-        });
-        document.getElementById('transaction-table-body').innerHTML = html;
+    async function loadDashboardData() {
+        Swal.fire({ title: 'Loading Analytics...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Failed to fetch collection data.", "error");
+                return;
+            }
+
+            allRecords = allData;
+            processAndRenderMetrics(allData);
+            renderRecentTransactions(allData);
+
+        } catch (e) {
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
     }
 
-    function showReceiptByIndex(index) {
+    function processAndRenderMetrics(data) {
+        let grandPaid = 0, grandDues = 0, grandDisc = 0;
+        let monthMap = {};
+        let classMap = {};
+        const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        data.forEach(r => {
+            let paid = parseFloat(r["Total Paid"]) || 0;
+            let due = parseFloat(r["Remaining"]) || 0;
+            let disc = parseFloat(r["Discount"]) || 0;
+            let month = (r["Month"] || "Other").toString().trim();
+            let className = (r["Class"] || "Unassigned").toString().trim().toUpperCase();
+
+            grandPaid += paid;
+            grandDues += due;
+            grandDisc += disc;
+
+            if (!monthMap[month]) monthMap[month] = 0;
+            monthMap[month] += paid;
+
+            if (!classMap[className]) classMap[className] = 0;
+            classMap[className] += paid;
+        });
+
+        document.getElementById('totalPaid').innerText = `₹${grandPaid.toLocaleString('en-IN')}`;
+        document.getElementById('totalDues').innerText = `₹${grandDues.toLocaleString('en-IN')}`;
+        document.getElementById('totalDiscount').innerText = `₹${grandDisc.toLocaleString('en-IN')}`;
+        document.getElementById('totalCount').innerText = data.length;
+
+        let sortedMonths = Object.keys(monthMap).sort((a, b) => monthOrder.indexOf(a) - monthOrder.indexOf(b));
+        let monthlyValues = sortedMonths.map(m => monthMap[m]);
+
+        renderMonthlyChart(sortedMonths, monthlyValues);
+        renderClassChart(Object.keys(classMap), Object.values(classMap));
+    }
+
+    function renderRecentTransactions(data) {
+        const tbody = document.getElementById('recentTransactionsBody');
+        tbody.innerHTML = '';
+
+        if (!data || data.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #888;">No transactions found.</td></tr>`;
+            return;
+        }
+
+        // Top 5 Latest Entries
+        const recentFive = [...data].reverse().slice(0, 5);
+
+        recentFive.forEach(item => {
+            const recNo = item["Receipt No"] || item["ID"] || "N/A";
+            const name = item["Student Name"] || "N/A";
+            const cls = item["Class"] || "N/A";
+            const month = item["Month"] || "N/A";
+            const paid = parseFloat(item["Total Paid"] || 0).toLocaleString('en-IN');
+
+            // Find matching object index in allRecords
+            const recordIndex = allRecords.findIndex(r => r["Receipt No"] === item["Receipt No"] && r["Student Id"] === item["Student Id"]);
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><b>${recNo}</b></td>
+                <td>${name}</td>
+                <td>${cls}</td>
+                <td>${month}</td>
+                <td style="color: var(--success); font-weight: 600;">₹${paid}</td>
+                <td><span class="badge-paid">RECEIVED</span></td>
+                <td><button class="btn-view-rec" onclick="openReceiptFromIndex(${recordIndex})">View</button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    /* RECEIPT MODAL FUNCTIONS */
+    function openReceiptFromIndex(index) {
         if (index === -1 || !allRecords[index]) {
             Swal.fire("Error", "Receipt record not found", "error");
             return;
@@ -143,16 +449,19 @@
     }
 
     function showDualReceipt(d) {
+        if(!d) return;
         currentActiveReceipt = d;
         document.getElementById('guardian-copy').innerHTML = generateReceiptHTML(d, "Guardian's Copy");
         document.getElementById('office-copy').innerHTML = generateReceiptHTML(d, "Office Copy");
         document.getElementById('receipt-modal').style.display = 'block';
-        document.querySelectorAll('.dashboard-container').forEach(c => c.style.display = 'none');
+        document.getElementById('dashboardMain').style.display = 'none';
+        document.querySelector('.sidebar').style.display = 'none';
     }
 
     function closeReceipt() {
         document.getElementById('receipt-modal').style.display = 'none';
-        document.querySelectorAll('.dashboard-container').forEach(c => c.style.display = 'block');
+        document.getElementById('dashboardMain').style.display = 'block';
+        document.querySelector('.sidebar').style.display = 'flex';
     }
 
     function formatDateDDMMYYYY(dateObj) {
@@ -263,6 +572,51 @@
                 <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
             </div>`;
     }
+
+    function renderMonthlyChart(labels, values) {
+        const ctx = document.getElementById('monthlyChart').getContext('2d');
+        if (monthlyChartInstance) monthlyChartInstance.destroy();
+
+        monthlyChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{ label: 'Collection (₹)', data: values, backgroundColor: '#1a237e', borderRadius: 4 }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true } }
+            }
+        });
+    }
+
+    function renderClassChart(labels, values) {
+        const ctx = document.getElementById('classChart').getContext('2d');
+        if (classChartInstance) classChartInstance.destroy();
+
+        const colors = ['#1a237e', '#00796b', '#d32f2f', '#fbc02d', '#7b1fa2', '#388e3c', '#f57c00', '#0288d1'];
+
+        classChartInstance = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{ data: values, backgroundColor: colors.slice(0, labels.length) }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+    }
+
+    function logoutUser() {
+        sessionStorage.clear();
+        window.location.href = 'index.html';
+    }
 </script>
+
 </body>
 </html>
