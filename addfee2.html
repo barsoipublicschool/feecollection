@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barsoi Public School - Fees Management</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; --accent: #2e7d32; }
+        * { box-sizing: border-box; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        
+        .container { max-width: 800px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); }
+        
+        .nav-buttons { display: flex; gap: 10px; justify-content: center; margin-bottom: 20px; }
+        .nav-btn { background: var(--p); color: white; border: none; padding: 10px 18px; border-radius: 6px; font-weight: 600; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+        .nav-btn.active { background: #0d1259; border: 2px solid #5c6bc0; }
+        
+        .card-box { border: 1px solid #dcdfe6; border-radius: 8px; padding: 15px; background: #fafafa; margin-bottom: 15px; }
+        .section-title { font-size: 13px; font-weight: 700; color: var(--p); margin-bottom: 12px; border-bottom: 2px solid #e0e0e0; padding-bottom: 5px; }
+
+        /* Row layout for Month & Date */
+        .row-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; }
+        .row-grid-4 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 12px; }
+
+        .form-group { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .form-group label { font-size: 12px; font-weight: 600; color: #333; margin-bottom: 4px; }
+        .form-group input, .form-group select { width: 100%; padding: 8px 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 13px; outline: none; font-family: inherit; }
+        .form-group input:focus, .form-group select:focus { border-color: var(--p); }
+
+        .inline-add { display: flex; gap: 8px; }
+        .inline-add select { flex: 1; }
+        .btn-add { background: var(--p); color: white; border: none; padding: 8px 15px; border-radius: 5px; font-weight: 600; cursor: pointer; }
+
+        .summary-box { background: #fffde7; border: 1px solid #fff59d; padding: 15px; border-radius: 8px; margin-top: 15px; }
+        .due-text { color: #d32f2f; font-weight: 700; margin-top: 8px; font-size: 14px; }
+
+        .btn-save { width: 100%; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 6px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 15px; }
+        .btn-save:hover { background: #1b5e20; }
+
+        @media (max-width: 600px) {
+            .row-grid-2, .row-grid-4 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="nav-buttons">
+        <button class="nav-btn active">New Entry</button>
+        <button class="nav-btn">Search Record</button>
+        <button class="nav-btn">Reminders</button>
+    </div>
+
+    <form id="feeForm">
+        <!-- 3. Month & Date in Same Row -->
+        <div class="card-box">
+            <div class="row-grid-2">
+                <div class="form-group">
+                    <label for="selectMonth">Select Month First:</label>
+                    <select id="selectMonth" required>
+                        <option value="January">January</option>
+                        <option value="February">February</option>
+                        <option value="March">March</option>
+                        <option value="April">April</option>
+                        <option value="May">May</option>
+                        <option value="June">June</option>
+                        <option value="July">July</option>
+                        <option value="August" selected>August</option>
+                        <option value="September">September</option>
+                        <option value="October">October</option>
+                        <option value="November">November</option>
+                        <option value="December">December</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="entryDate">Select Date:</label>
+                    <input type="date" id="entryDate" required>
+                </div>
+            </div>
+
+            <!-- Student Info Fields -->
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="studentClass">Class</label>
+                    <input type="text" id="studentClass" placeholder="e.g. 8th">
+                </div>
+                <div class="form-group">
+                    <label for="studentId">Roll No / Student ID</label>
+                    <input type="text" id="studentId" placeholder="Enter Roll / ID" oninput="autoFillStudentData(this.value)">
+                </div>
+            </div>
+
+            <!-- 1. Mobile Number Auto-fill Included -->
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="studentName">Student Name</label>
+                    <input type="text" id="studentName">
+                </div>
+                <div class="form-group">
+                    <label for="fatherName">Father Name</label>
+                    <input type="text" id="fatherName">
+                </div>
+            </div>
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="address">Address</label>
+                    <input type="text" id="address">
+                </div>
+                <div class="form-group">
+                    <label for="mobileNo">Mobile No</label>
+                    <input type="text" id="mobileNo" placeholder="e.g. 9876543210">
+                </div>
+            </div>
+        </div>
+
+        <!-- Fees Section -->
+        <div class="card-box">
+            <div class="section-title">1-5. Regular Fees (Manual Input)</div>
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <!-- 2. Outstanding Due Balance Fix -->
+                    <label for="previousDue">Previous Due (Auto Calculated)</label>
+                    <input type="number" id="previousDue" value="0" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="admissionFee">Admission Fee</label>
+                    <input type="number" class="calc-fee" id="admissionFee" oninput="calculateTotal()">
+                </div>
+            </div>
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="schoolFee">School Fee</label>
+                    <input type="number" class="calc-fee" id="schoolFee" oninput="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label for="vanFee">School Van Fee</label>
+                    <input type="number" class="calc-fee" id="vanFee" oninput="calculateTotal()">
+                </div>
+            </div>
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="hostelFee">Hostel Fee</label>
+                    <input type="number" class="calc-fee" id="hostelFee" oninput="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label for="examFee">Exam Fee</label>
+                    <input type="number" class="calc-fee" id="examFee" oninput="calculateTotal()">
+                </div>
+            </div>
+
+            <!-- Item Dropdowns -->
+            <div class="section-title">6. School Uniform Fee</div>
+            <div class="form-group">
+                <div class="inline-add">
+                    <select id="uniformSelect">
+                        <option value="">Select Uniform...</option>
+                        <option value="500">Summer Uniform - ₹500</option>
+                    </select>
+                    <button type="button" class="btn-add">ADD</button>
+                </div>
+            </div>
+
+            <div class="section-title">7. School Books & Others</div>
+            <div class="form-group">
+                <div class="inline-add">
+                    <select id="booksSelect">
+                        <option value="">Select Books...</option>
+                    </select>
+                    <button type="button" class="btn-add">ADD</button>
+                </div>
+            </div>
+
+            <div class="section-title">8. Miscellaneous Fee</div>
+            <div class="form-group">
+                <div class="inline-add">
+                    <select id="miscSelect">
+                        <option value="">Select Miscellaneous...</option>
+                    </select>
+                    <button type="button" class="btn-add">ADD</button>
+                </div>
+            </div>
+
+            <div class="section-title">Additional Fees</div>
+            <div class="row-grid-4">
+                <div class="form-group">
+                    <label for="bagFee">9. School Bag</label>
+                    <input type="number" class="calc-fee" id="bagFee" oninput="calculateTotal()">
+                </div>
+                <div class="form-group">
+                    <label for="devFee">10. Development Fee</label>
+                    <input type="number" class="calc-fee" id="devFee" oninput="calculateTotal()">
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="otherFee">11. Other Fee</label>
+                <input type="number" class="calc-fee" id="otherFee" oninput="calculateTotal()">
+            </div>
+        </div>
+
+        <!-- Summary -->
+        <div class="summary-box">
+            <div class="form-group">
+                <label for="subTotal">Sub Total</label>
+                <input type="number" id="subTotal" value="0" readonly>
+            </div>
+            <div class="form-group">
+                <label for="discount">Discount (-)</label>
+                <input type="number" id="discount" value="0" oninput="calculateTotal()">
+            </div>
+            <div class="form-group">
+                <label for="netPaid" style="color: blue;">Net Paid (Deposit) ₹</label>
+                <input type="number" id="netPaid" oninput="calculateTotal()">
+            </div>
+            <div class="due-text" id="dueBalanceText">Due Balance: ₹0</div>
+        </div>
+
+        <button type="submit" class="btn-save">SAVE & PRINT DUAL RECEIPT 🖨️</button>
+    </form>
+</div>
+
+<script>
+    // Set Default Date to Today
+    document.getElementById('entryDate').valueAsDate = new Date();
+
+    // Mock Database (Replace with Google Sheet / Backend API Fetch)
+    const studentDB = {
+        "20260824": {
+            name: "MUNTASERA KHATOON",
+            father: "MD AFAK",
+            class: "8th",
+            address: "KUMEDPUR, KATIHAR",
+            mobile: "9876543210", // Mobile number added
+            totalFeeCalculated: 24800,
+            totalAmountPaid: 15800,
+            outstandingDue: 9000 // Total Fee (24800) - Total Paid (15800) = 9000
+        }
+    };
+
+    // 1. Auto Fill Functionality
+    function autoFillStudentData(id) {
+        const student = studentDB[id];
+        if (student) {
+            document.getElementById('studentName').value = student.name;
+            document.getElementById('fatherName').value = student.father;
+            document.getElementById('studentClass').value = student.class;
+            document.getElementById('address').value = student.address;
+            document.getElementById('mobileNo').value = student.mobile; // Fix 1: Mobile set here
+            
+            // Fix 2: Setting actual Net Outstanding Due instead of total fee
+            document.getElementById('previousDue').value = student.outstandingDue;
+        } else {
+            // Reset if ID not found
+            document.getElementById('studentName').value = '';
+            document.getElementById('fatherName').value = '';
+            document.getElementById('studentClass').value = '';
+            document.getElementById('address').value = '';
+            document.getElementById('mobileNo').value = '';
+            document.getElementById('previousDue').value = 0;
+        }
+        calculateTotal();
+    }
+
+    // Dynamic Total Calculation
+    function calculateTotal() {
+        const previousDue = parseFloat(document.getElementById('previousDue').value) || 0;
+        let feeInputs = document.querySelectorAll('.calc-fee');
+        let currentFeesSum = 0;
+
+        feeInputs.forEach(input => {
+            currentFeesSum += parseFloat(input.value) || 0;
+        });
+
+        const subTotal = previousDue + currentFeesSum;
+        document.getElementById('subTotal').value = subTotal;
+
+        const discount = parseFloat(document.getElementById('discount').value) || 0;
+        const netPaid = parseFloat(document.getElementById('netPaid').value) || 0;
+
+        const dueBalance = subTotal - discount - netPaid;
+        document.getElementById('dueBalanceText').innerText = `Due Balance: ₹${dueBalance < 0 ? 0 : dueBalance}`;
+    }
+</script>
+
+</body>
+</html>
