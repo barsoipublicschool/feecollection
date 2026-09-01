@@ -315,38 +315,62 @@
     }
 
     function shareWhatsApp() {
-        if(!currentActiveReceipt) return;
-        let d = currentActiveReceipt;
-        
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+    if(!currentActiveReceipt) return;
+    let d = currentActiveReceipt;
+    
+    let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
-        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-                  `-----------------------------------\n` +
-                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
-                  `📅 *Date:* ${displayDate}\n` +
-                  `👤 *Student Name:* ${d["Student Name"]}\n` +
-                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
-                  `🏫 *Class:* ${d["Class"]}\n` +
-                  `🗓️ *Month:* ${d["Month"]}\n` +
-                  `-----------------------------------\n` +
-                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
-                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-                  `-----------------------------------\n` +
-                  `Thank you for the payment!\n` +
-                  `_Barsoi Public School Management_`;
+    // Receipt View / Download Link (GitHub Pages Path)
+    let receiptNo = d["Receipt No"] || "";
+    let downloadLink = `https://barsoipublicschool.github.io/feecollection/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
 
-        let url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        window.open(url, '_blank');
+    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+              `-----------------------------------\n` +
+              `📄 *Receipt No:* ${receiptNo}\n` +
+              `📅 *Date:* ${displayDate}\n` +
+              `👤 *Student Name:* ${d["Student Name"]}\n` +
+              `🆔 *Student ID:* ${d["Student Id"]}\n` +
+              `🏫 *Class:* ${d["Class"]}\n` +
+              `🗓️ *Month:* ${d["Month"]}\n` +
+              `-----------------------------------\n` +
+              `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+              `🎯 *Discount:* ₹${d["Discount"]}\n` +
+              `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+              `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
+              `-----------------------------------\n` +
+              `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
+              `-----------------------------------\n` +
+              `Thank you for the payment!\n` +
+              `_Barsoi Public School Management_`;
+
+    let rawMob = extractMobile(d);
+    let phoneNum = rawMob.replace(/[^0-9]/g, '');
+    
+    if (phoneNum.length === 10) {
+        phoneNum = "91" + phoneNum;
     }
 
+    let url = "";
+    if (phoneNum && phoneNum.length >= 10) {
+        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+    } else {
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    
+    window.open(url, '_blank');
+}
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
+
+        // 1. Regular Fees (Always Displayed)
         const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
-        main.forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+        main.forEach(k => { 
+            let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
+            rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+        });
         
+        // Dynamic Dropdown Lists (Only Displayed if Added & > 0)
         const lists = {
             "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
             "School Books & Other": ["Books Fee", "Copies", "Cover", "Geo-Box", "Diary", "Stationary"],
@@ -355,33 +379,42 @@
 
         for (let category in lists) {
             let tempRows = ""; let cSub = 1;
-            lists[category].forEach(k => { if(d[k]>0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+            lists[category].forEach(k => { 
+                if(parseFloat(d[k]) > 0) {
+                    tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; 
+                }
+            });
             if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
         }
 
-        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+        // 2. Additional Fees (Always Displayed)
+        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { 
+            let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
+            rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+        });
 
         let logo = "https://drive.google.com/thumbnail?id=14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE&sz=w300";
         let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
+
         return `
             <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
                 <div class="r-header">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
                         <span class="copy-tag" style="width:75px;">${type}</span>
                         <span style="font-weight:bold; font-size:10px; border:1px solid #000; padding:0 8px;">CASH MEMO</span>
-                        <span style="font-size:7.5px; width:75px; text-align:right;">Mob: 9279583673</span>
+                        <span style="font-size:7.5px; width:75px; text-align:right;">Mob: +918340306604</span>
                     </div>
                     <img src="${logo}" class="school-logo">
                     <h2>BARSOI PUBLIC SCHOOL</h2>
-                    <p>QUAZITOLA, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No. __ | UDISE No.10101119902</p>
+                    <p>NRHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
+                    <p style="font-size:7px">RTE Reg No. SSA/070/14 | UDISE No.10101119902</p>
                     <p style="font-size:7px">email - barsoipublicschool125@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Month: <b>${d["Month"]}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
                     <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Month:</b> ${d["Month"]}</div>
+                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${extractMobile(d)}</div>
                 </div>
                 <table class="r-table">
                     <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
