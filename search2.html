@@ -69,7 +69,7 @@
 <div id="search-view" class="container no-print">
     <h2 style="text-align:center; color:var(--p); font-size:16px; margin-top:0;">Search Fee Records</h2>
     <div style="display:flex; gap:5px; margin-bottom:15px;">
-        <input type="text" id="search-sid" placeholder="Enter Student ID / Roll No" onkeypress="if(event.key==='Enter') doSearch()">
+        <input type="text" id="search-sid" placeholder="Enter Exact Student ID" onkeypress="if(event.key==='Enter') doSearch()">
         <button onclick="doSearch()" style="background:var(--p); color:white; border:none; padding:0 20px; border-radius:4px; cursor:pointer;">SEARCH</button>
     </div>
     <div id="resultsList"></div>
@@ -177,15 +177,16 @@
             Swal.close();
             
             if(Array.isArray(results)) {
+                // STRICT ID MATCHING: Keeps only records where Student ID exactly matches the user input
                 results = results.filter(r => {
                     let stId = String(r["Student Id"] || r["Student ID"] || "").trim().toLowerCase();
                     let query = sid.toLowerCase();
-                    return stId === query || stId.includes(query);
+                    return stId === query;
                 });
             }
 
             if(!results || !results.length) { 
-                document.getElementById('resultsList').innerHTML = "<p style='text-align:center; color:#666;'>No record found</p>"; 
+                document.getElementById('resultsList').innerHTML = "<p style='text-align:center; color:#666;'>No record found for ID: " + sid + "</p>"; 
                 return; 
             }
             
@@ -253,7 +254,7 @@
                 body: JSON.stringify(updatedData) 
             });
             
-            await Swal.fire("Updated!", "Usi row ke andar record update ho gaya hai.", "success");
+            await Swal.fire("Updated!", "Record successfully update ho gaya hai.", "success");
             closeEditModal();
             doSearch();
         } catch(e) {
@@ -347,21 +348,28 @@
                   `Thank you for the payment!\n` +
                   `_Barsoi Public School Management_`;
 
-        let rawMob = extractMobile(d);
-        let phoneNum = rawMob.replace(/[^0-9]/g, '');
+        // Clean Mobile Number
+        let rawMob = String(extractMobile(d) || "");
+        let phoneNum = rawMob.replace(/\D/g, ''); 
         
         if (phoneNum.length === 10) {
             phoneNum = "91" + phoneNum;
         }
 
+        let encodedMsg = encodeURIComponent(msg);
         let url = "";
-        if (phoneNum && phoneNum.length >= 10) {
-            url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+
+        if (phoneNum.length >= 10) {
+            url = `https://wa.me/${phoneNum}?text=${encodedMsg}`;
         } else {
-            url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+            url = `https://wa.me/?text=${encodedMsg}`;
         }
         
-        window.open(url, '_blank');
+        // Open WhatsApp App Direct / Fallback
+        let win = window.open(url, '_blank');
+        if (!win || win.closed || typeof win.closed === 'undefined') {
+            window.location.href = url;
+        }
     }
 
     function generateReceiptHTML(d, type) {
