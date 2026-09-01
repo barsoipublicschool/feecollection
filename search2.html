@@ -28,32 +28,36 @@
     #edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; }
     .edit-box { background: white; padding: 20px; border-radius: 8px; width: 90%; max-width: 400px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
 
-    /* RECEIPT MODAL */
-    #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 0; }
+    /* SINGLE RECEIPT MODAL */
+    #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f9f9f9; z-index: 9999; overflow-y: auto; padding: 20px 0; }
     
-    .print-wrapper { display: flex; justify-content: center; align-items: stretch; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; position: relative; gap: 8mm; }
-    .print-wrapper::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; border-left: 2px dotted #444; transform: translateX(-50%); }
+    .print-wrapper { width: 100%; max-width: 750px; margin: 0 auto; box-sizing: border-box; }
 
-    .receipt-box { width: 48%; background: #ffdae9; border: 1.5px solid #000; padding: 10px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; min-height: 100%; }
-    .r-header { position: relative; }
-    .r-header h2 { margin: 0; font-size: 16px; font-weight: 900; text-align: center; }
-    .r-header p { margin: 1px; font-size: 8px; font-weight: bold; text-align: center; }
-    .school-logo { width: 45px; height: 45px; position: absolute; left: 5px; top: 15px; }
-    .top-info { display: flex; justify-content: space-between; font-size: 9.5px; margin-top: 4px; border-bottom: 1px solid #000; padding-bottom: 2px; }
-    .copy-tag { background: #000; color: #fff; padding: 1px 6px; font-size: 8px; font-weight: bold; text-transform: uppercase; border-radius: 2px; }
-    .student-details { display: grid; grid-template-columns: 1.2fr 0.8fr; font-size: 9.5px; margin-top: 4px; line-height: 1.2; }
-    .r-table { width: 100%; border-collapse: collapse; margin-top: 4px; border: 1.2px solid #000; }
-    .r-table th, .r-table td { border: 1px solid #000; padding: 2px 4px; font-size: 9px; line-height: 1.1; }
-    .words-section { border-bottom: 1px dotted #000; padding: 3px 0; font-size: 9px; margin-top: 5px; font-style: italic; }
-    .footer-sigs { display: flex; justify-content: space-between; margin-top: auto; padding-top: 15px; font-size: 9.5px; font-weight: bold; }
+    .receipt-box { width: 100%; background: #ffdae9; border: 2px solid #000; padding: 20px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 4px; }
+    .r-header { position: relative; text-align: center; border-bottom: 1.5px solid #000; padding-bottom: 8px; }
+    .r-header h2 { margin: 0; font-size: 22px; font-weight: 900; letter-spacing: 0.5px; }
+    .r-header p { margin: 2px 0; font-size: 11px; font-weight: bold; }
+    .school-logo { width: 65px; height: 65px; position: absolute; left: 10px; top: 5px; }
+    
+    .top-info { display: flex; justify-content: space-between; font-size: 12px; margin-top: 8px; border-bottom: 1px solid #000; padding-bottom: 5px; font-weight: 600; }
+    .copy-tag { background: #000; color: #fff; padding: 2px 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; border-radius: 3px; }
+    
+    .student-details { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 12px; margin-top: 10px; line-height: 1.4; border-bottom: 1px solid #000; padding-bottom: 8px; }
+    
+    .r-table { width: 100%; border-collapse: collapse; margin-top: 10px; border: 1.5px solid #000; }
+    .r-table th, .r-table td { border: 1px solid #000; padding: 6px 8px; font-size: 12px; line-height: 1.2; }
+    .r-table th { background-color: rgba(0,0,0,0.05); }
+
+    .words-section { border-bottom: 1px dotted #000; padding: 8px 0; font-size: 12px; margin-top: 10px; font-style: italic; }
+    .footer-sigs { display: flex; justify-content: space-between; margin-top: 40px; padding-top: 10px; font-size: 12px; font-weight: bold; }
 
     @media print { 
-        @page { size: A4 landscape; margin: 0; } 
+        @page { size: A4 portrait; margin: 10mm; } 
         .no-print { display: none !important; } 
         body { background: none; padding: 0; margin: 0; }
-        #receipt-modal { position: absolute; top: 0; left: 0; width: 100%; display: block !important; padding: 0; }
-        .print-wrapper { width: 297mm; height: 210mm; padding: 5mm; display: flex; transform: scale(0.98); transform-origin: top center; }
-        .receipt-box { height: 190mm; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        #receipt-modal { position: absolute; top: 0; left: 0; width: 100%; display: block !important; padding: 0; background: white; }
+        .print-wrapper { width: 100%; max-width: 100%; margin: 0; }
+        .receipt-box { width: 100%; border: 1.5px solid #000; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     }
 </style>
 </head>
@@ -111,11 +115,10 @@
     </div>
 </div>
 
-<!-- RECEIPT MODAL -->
+<!-- SINGLE RECEIPT MODAL -->
 <div id="receipt-modal">
     <div class="print-wrapper">
-        <div class="receipt-box" id="guardian-copy"></div>
-        <div class="receipt-box" id="office-copy"></div>
+        <div class="receipt-box" id="single-receipt"></div>
     </div>
     <div class="no-print" style="text-align:center; margin-top:20px; padding-bottom:40px;">
         <button onclick="if(window.AndroidPrint){ AndroidPrint.triggerPrint(); } else { window.print(); }" style="padding:12px 25px; background:#2e7d32; color:white; border:none; cursor:pointer; font-weight:bold; border-radius:5px;">PRINT / SAVE PDF</button>
@@ -145,6 +148,10 @@
         let month = String(d.getMonth() + 1).padStart(2, '0');
         let year = d.getFullYear();
         return `${day}/${month}/${year}`;
+    }
+
+    function extractMobile(d) {
+        return d["Mobile No"] || d["Mobile"] || d["Contact"] || d["Phone"] || "";
     }
 
     function roman(n) { const r = ["i","ii","iii","iv","v","vi","vii","viii","ix","x"]; return r[n-1] || n; }
@@ -195,7 +202,7 @@
                     <div class="month-info"><h4>${r.Month}</h4><p>Receipt: ${r["Receipt No"] || "N/A"} | Paid: ₹${r["Total Paid"]}</p></div>
                     <div style="display:flex; gap:5px;">
                         <button class="btn-edit" onclick="openEditModal(${actualIndex})">EDIT</button>
-                        <button class="btn-view" onclick="showDualReceipt(allRecords[${actualIndex}])">VIEW</button>
+                        <button class="btn-view" onclick="showSingleReceipt(allRecords[${actualIndex}])">VIEW</button>
                         <button class="btn-delete" onclick="deleteRecord(${actualIndex})">DELETE</button>
                     </div>
                 </div>`;
@@ -274,7 +281,7 @@
 
         if (result.isConfirmed) {
             let deletePayload = Object.assign({}, targetObj);
-            deletePayload["action"] = "deleteRow"; // Google Script par delete identify karne ke liye flag
+            deletePayload["action"] = "deleteRow";
 
             Swal.fire({title:'Deleting Row...', didOpen:()=>Swal.showLoading(), allowOutsideClick: false});
 
@@ -293,7 +300,7 @@
                     confirmButtonText: "OK"
                 });
                 
-                doSearch(); // Refresh list after deletion
+                doSearch();
             } catch(e) {
                 Swal.fire("Error", "Failed to delete record.", "error");
             }
@@ -305,72 +312,71 @@
         document.querySelectorAll('.container').forEach(c => c.style.display = 'block');
     }
 
-    function showDualReceipt(d) {
+    function showSingleReceipt(d) {
         if(!d) return;
         currentActiveReceipt = d;
-        document.getElementById('guardian-copy').innerHTML = generateReceiptHTML(d, "Guardian's Copy");
-        document.getElementById('office-copy').innerHTML = generateReceiptHTML(d, "Office Copy");
+        document.getElementById('single-receipt').innerHTML = generateReceiptHTML(d, "Fee Receipt");
         document.getElementById('receipt-modal').style.display = 'block';
         document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
     }
 
     function shareWhatsApp() {
-    if(!currentActiveReceipt) return;
-    let d = currentActiveReceipt;
-    
-    let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
+        if(!currentActiveReceipt) return;
+        let d = currentActiveReceipt;
+        
+        let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
-    // Receipt View / Download Link (GitHub Pages Path)
-    let receiptNo = d["Receipt No"] || "";
-    let downloadLink = `https://barsoipublicschool.github.io/feecollection/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
+        let receiptNo = d["Receipt No"] || "";
+        let downloadLink = `https://barsoipublicschool.github.io/feecollection/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
 
-    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-              `-----------------------------------\n` +
-              `📄 *Receipt No:* ${receiptNo}\n` +
-              `📅 *Date:* ${displayDate}\n` +
-              `👤 *Student Name:* ${d["Student Name"]}\n` +
-              `🆔 *Student ID:* ${d["Student Id"]}\n` +
-              `🏫 *Class:* ${d["Class"]}\n` +
-              `🗓️ *Month:* ${d["Month"]}\n` +
-              `-----------------------------------\n` +
-              `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-              `🎯 *Discount:* ₹${d["Discount"]}\n` +
-              `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-              `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-              `-----------------------------------\n` +
-              `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
-              `-----------------------------------\n` +
-              `Thank you for the payment!\n` +
-              `_Barsoi Public School Management_`;
+        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+                  `-----------------------------------\n` +
+                  `📄 *Receipt No:* ${receiptNo}\n` +
+                  `📅 *Date:* ${displayDate}\n` +
+                  `👤 *Student Name:* ${d["Student Name"]}\n` +
+                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
+                  `🏫 *Class:* ${d["Class"]}\n` +
+                  `🗓️ *Month:* ${d["Month"]}\n` +
+                  `-----------------------------------\n` +
+                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
+                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
+                  `-----------------------------------\n` +
+                  `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
+                  `-----------------------------------\n` +
+                  `Thank you for the payment!\n` +
+                  `_Barsoi Public School Management_`;
 
-    let rawMob = extractMobile(d);
-    let phoneNum = rawMob.replace(/[^0-9]/g, '');
-    
-    if (phoneNum.length === 10) {
-        phoneNum = "91" + phoneNum;
+        let rawMob = extractMobile(d);
+        let phoneNum = rawMob.replace(/[^0-9]/g, '');
+        
+        if (phoneNum.length === 10) {
+            phoneNum = "91" + phoneNum;
+        }
+
+        let url = "";
+        if (phoneNum && phoneNum.length >= 10) {
+            url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+        } else {
+            url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        }
+        
+        window.open(url, '_blank');
     }
 
-    let url = "";
-    if (phoneNum && phoneNum.length >= 10) {
-        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
-    } else {
-        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-    }
-    
-    window.open(url, '_blank');
-}
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
 
-        // 1. Regular Fees (Always Displayed)
+        // 1. Regular Fees
         const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
         main.forEach(k => { 
             let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
             rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
         });
         
-        // Dynamic Dropdown Lists (Only Displayed if Added & > 0)
+        // Dynamic Dropdown Lists
         const lists = {
             "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
             "School Books & Other": ["Books Fee", "Copies", "Cover", "Geo-Box", "Diary", "Stationary"],
@@ -387,7 +393,7 @@
             if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
         }
 
-        // 2. Additional Fees (Always Displayed)
+        // 2. Additional Fees
         ["School Bag", "Development Fee", "Other Fee"].forEach(k => { 
             let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
             rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
@@ -397,27 +403,34 @@
         let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
         return `
-            <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
+            <div class="receipt-inner">
                 <div class="r-header">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2px;">
-                        <span class="copy-tag" style="width:75px;">${type}</span>
-                        <span style="font-weight:bold; font-size:10px; border:1px solid #000; padding:0 8px;">CASH MEMO</span>
-                        <span style="font-size:7.5px; width:75px; text-align:right;">Mob: +918340306604</span>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;">
+                        <span class="copy-tag">${type}</span>
+                        <span style="font-weight:bold; font-size:12px; border:1px solid #000; padding:2px 10px;">CASH MEMO</span>
+                        <span style="font-size:10px; font-weight:bold;">Mob: +918340306604</span>
                     </div>
                     <img src="${logo}" class="school-logo">
                     <h2>BARSOI PUBLIC SCHOOL</h2>
-                    <p>NRHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
-                    <p style="font-size:7px">RTE Reg No. SSA/070/14 | UDISE No.10101119902</p>
-                    <p style="font-size:7px">email - barsoipublicschool125@gmail.com</p>
+                    <p>NEHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
+                    <p style="font-size:9px">RTE Reg No. SSA/070/14 | UDISE No.10101119902</p>
+                    <p style="font-size:9px">Email: barsoipublicschool125@gmail.com</p>
                 </div>
-                <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Month: <b>${d["Month"]}</b></span><span>Date: ${displayDate}</span></div>
+                <div class="top-info">
+                    <span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span>
+                    <span>Month: <b>${d["Month"]}</b></span>
+                    <span>Date: <b>${displayDate}</b></span>
+                </div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
-                    <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
-                    <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${extractMobile(d)}</div>
+                    <div><b>Student Name:</b> ${d["Student Name"] || ""}</div>
+                    <div><b>Student ID:</b> ${d["Student Id"] || ""}</div>
+                    <div><b>Father's Name:</b> ${d["Father Name"] || ""}</div>
+                    <div><b>Class:</b> ${d["Class"] || ""}</div>
+                    <div><b>Address:</b> ${d["Address"] || ""}</div>
+                    <div><b>Mobile No:</b> ${extractMobile(d)}</div>
                 </div>
                 <table class="r-table">
-                    <thead><tr><th>Sl.</th><th>Description</th><th>Qty</th><th>Amount</th></tr></thead>
+                    <thead><tr><th width="40">Sl.</th><th>Description</th><th width="50">Qty</th><th width="100">Amount</th></tr></thead>
                     <tbody>${rows}</tbody>
                     <tfoot>
                         <tr><th colspan="3" align="right">Sub Total</th><td align="center">${d["Sub Total"]}</td></tr>
@@ -426,8 +439,11 @@
                         <tr><th colspan="3" align="right">Due Balance</th><td align="center" style="color:red"><b>${d["Remaining"]}</b></td></tr>
                     </tfoot>
                 </table>
-                <div class="words-section"><b>Words:</b> ${numberToWords(d["Total Paid"])} Only.</div>
-                <div class="footer-sigs"><span>Parent Signature</span><span>Authorized Signature</span></div>
+                <div class="words-section"><b>Amount in Words:</b> ${numberToWords(d["Total Paid"])} Only.</div>
+                <div class="footer-sigs">
+                    <span>Parent / Guardian Signature</span>
+                    <span>Authorized Signatory</span>
+                </div>
             </div>`;
     }
 </script>
