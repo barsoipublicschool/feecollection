@@ -282,7 +282,6 @@
         document.getElementById('btn-nav-search').className = view === 'search' ? 'active' : '';
     }
 
-    // Advanced Robust Mobile Extraction
     function extractMobile(obj) {
         if(!obj || typeof obj !== 'object') return "";
         let keys = Object.keys(obj);
@@ -588,9 +587,15 @@
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
+
+        // 1. Regular Fees (Always Displayed)
         const main = ["Prev Dues", "Admission Fee", "School Fee", "School Van Fee", "Hostel Fee", "Exam Fee"];
-        main.forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+        main.forEach(k => { 
+            let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
+            rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+        });
         
+        // Dynamic Dropdown Lists (Only Displayed if Added & > 0)
         const lists = {
             "School Uniform Fee": ["Shirts", "Pants", "T-Shirts", "ID Card", "Leggings", "Blazer", "Sweater", "Belt", "Tie", "Shoes", "Socks", "Logo"],
             "School Books & Other": ["Books Fee", "Copies", "Cover", "Geo-Box", "Diary", "Stationary"],
@@ -599,11 +604,19 @@
 
         for (let category in lists) {
             let tempRows = ""; let cSub = 1;
-            lists[category].forEach(k => { if(d[k]>0) tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+            lists[category].forEach(k => { 
+                if(parseFloat(d[k]) > 0) {
+                    tempRows += `<tr><td></td><td>(${roman(cSub++)}) ${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; 
+                }
+            });
             if(tempRows) rows += `<tr><td align="center">${sl++}.</td><td colspan="3"><b>${category}</b></td></tr>` + tempRows;
         }
 
-        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { if(d[k]>0) rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${d[k]}</td></tr>`; });
+        // 2. Additional Fees (Always Displayed)
+        ["School Bag", "Development Fee", "Other Fee"].forEach(k => { 
+            let val = (d[k] !== undefined && d[k] !== null && d[k] !== "") ? d[k] : "";
+            rows += `<tr><td align="center">${sl++}.</td><td>${k}</td><td align="center">1</td><td align="center">${val}</td></tr>`; 
+        });
 
         let logo = "https://drive.google.com/thumbnail?id=14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE&sz=w300";
         let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
