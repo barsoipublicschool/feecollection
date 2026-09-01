@@ -635,7 +635,7 @@
         });
 
         let logo = "https://drive.google.com/thumbnail?id=14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE&sz=w300";
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+        let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
         return `
             <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
