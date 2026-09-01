@@ -254,7 +254,7 @@
                 body: JSON.stringify(updatedData) 
             });
             
-            await Swal.fire("Updated!", "Record successfully update ho gaya hai.", "success");
+            await Swal.fire("Updated!", "Record successfully updated.", "success");
             closeEditModal();
             doSearch();
         } catch(e) {
@@ -268,7 +268,7 @@
 
         let result = await Swal.fire({
             title: 'Are you sure?',
-            text: `Receipt ${targetObj["Receipt No"] || ""} delete karne ke baad wapas nahi aayegi!`,
+            text: `Receipt ${targetObj["Receipt No"] || ""} wont be restored after delete!`,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#d32f2f',
@@ -292,7 +292,7 @@
                 
                 await Swal.fire({
                     title: "Deleted!",
-                    text: "Record successfully delete ho gaya hai.",
+                    text: "Record successfully deleted.",
                     icon: "success",
                     confirmButtonText: "OK"
                 });
