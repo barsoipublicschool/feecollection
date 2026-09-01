@@ -62,7 +62,7 @@
 <div class="nav no-print">
     <button onclick="window.location.href='index.html'">NEW ENTRY</button>
     <button class="active">SEARCH RECORD</button>
-    <button onclick="window.location.href='#'">REMINDERS</button>
+    <button onclick="window.location.href='https://barsoipublicschool.github.io/feecollection/reminder.html'">REMINDERS</button>
 </div>
 
 <!-- SEARCH VIEW -->
@@ -168,10 +168,23 @@
         if(!sid) return;
         Swal.fire({title:'Searching...', didOpen:()=>Swal.showLoading()});
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${sid}`);
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(sid)}`);
             let results = await res.json();
             Swal.close();
-            if(!results || !results.length) { document.getElementById('resultsList').innerHTML = "<p style='text-align:center; color:#666;'>No record found</p>"; return; }
+            
+            if(Array.isArray(results)) {
+                // Exact search match filter for accuracy
+                results = results.filter(r => {
+                    let stId = String(r["Student Id"] || r["Student ID"] || "").trim().toLowerCase();
+                    let query = sid.toLowerCase();
+                    return stId === query || stId.includes(query);
+                });
+            }
+
+            if(!results || !results.length) { 
+                document.getElementById('resultsList').innerHTML = "<p style='text-align:center; color:#666;'>No record found</p>"; 
+                return; 
+            }
             
             allRecords = results; 
 
@@ -273,7 +286,6 @@
                     body: JSON.stringify(deletePayload) 
                 });
                 
-                // OK click karne ke baad hi doSearch() chalega
                 await Swal.fire({
                     title: "Deleted!",
                     text: "Record successfully delete ho gaya hai.",
@@ -281,7 +293,7 @@
                     confirmButtonText: "OK"
                 });
                 
-                doSearch(); // OK dabane ke baad list auto refresh ho jayegi
+                doSearch(); // Refresh list after deletion
             } catch(e) {
                 Swal.fire("Error", "Failed to delete record.", "error");
             }
