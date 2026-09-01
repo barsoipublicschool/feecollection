@@ -125,7 +125,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzfYp9PWNuL6gSRaAi48C20wV-4rxQ2C_e0Y3-OzElIDHRCbAZ1XiPMEcB04JsurcQ7/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwVmr9yv3ZwbtHRkb-8E0jZ5P-c53kIRqP7XA68aY1eXXh0oOCpLJpki2UQebep7DySFA/exec";
     let allRecords = [];
     let currentActiveReceipt = null;
     let editingObject = null;
@@ -233,10 +233,11 @@
             await fetch(SCRIPT_URL, { 
                 method: "POST", 
                 mode: "no-cors", 
+                headers: { "Content-Type": "text/plain" },
                 body: JSON.stringify(updatedData) 
             });
             
-            Swal.fire("Updated!", "Usi row ke andar record update ho gaya hai.", "success");
+            await Swal.fire("Updated!", "Usi row ke andar record update ho gaya hai.", "success");
             closeEditModal();
             doSearch();
         } catch(e) {
@@ -268,11 +269,19 @@
                 await fetch(SCRIPT_URL, { 
                     method: "POST", 
                     mode: "no-cors", 
+                    headers: { "Content-Type": "text/plain" },
                     body: JSON.stringify(deletePayload) 
                 });
                 
-                Swal.fire("Deleted!", "Record successfully delete ho gaya hai.", "success");
-                doSearch(); // List refresh karne ke liye
+                // OK click karne ke baad hi doSearch() chalega
+                await Swal.fire({
+                    title: "Deleted!",
+                    text: "Record successfully delete ho gaya hai.",
+                    icon: "success",
+                    confirmButtonText: "OK"
+                });
+                
+                doSearch(); // OK dabane ke baad list auto refresh ho jayegi
             } catch(e) {
                 Swal.fire("Error", "Failed to delete record.", "error");
             }
