@@ -561,45 +561,51 @@
     }
 
     function shareWhatsApp() {
-        if(!currentActiveReceipt) return;
-        let d = currentActiveReceipt;
-        
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+    if(!currentActiveReceipt) return;
+    let d = currentActiveReceipt;
+    
+    let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
-        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-                  `-----------------------------------\n` +
-                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
-                  `📅 *Date:* ${displayDate}\n` +
-                  `👤 *Student Name:* ${d["Student Name"]}\n` +
-                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
-                  `🏫 *Class:* ${d["Class"]}\n` +
-                  `🗓️ *Month:* ${d["Month"]}\n` +
-                  `-----------------------------------\n` +
-                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
-                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-                  `-----------------------------------\n` +
-                  `Thank you for the payment!\n` +
-                  `_Barsoi Public School Management_`;
+    // Receipt View / Download Link (GitHub Pages Path)
+    let receiptNo = d["Receipt No"] || "";
+    let downloadLink = `https://barsoipublicschool.github.io/feecollection/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
 
-        let rawMob = extractMobile(d);
-        let phoneNum = rawMob.replace(/[^0-9]/g, '');
-        
-        if (phoneNum.length === 10) {
-            phoneNum = "91" + phoneNum;
-        }
+    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+              `-----------------------------------\n` +
+              `📄 *Receipt No:* ${receiptNo}\n` +
+              `📅 *Date:* ${displayDate}\n` +
+              `👤 *Student Name:* ${d["Student Name"]}\n` +
+              `🆔 *Student ID:* ${d["Student Id"]}\n` +
+              `🏫 *Class:* ${d["Class"]}\n` +
+              `🗓️ *Month:* ${d["Month"]}\n` +
+              `-----------------------------------\n` +
+              `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+              `🎯 *Discount:* ₹${d["Discount"]}\n` +
+              `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+              `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
+              `-----------------------------------\n` +
+              `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
+              `-----------------------------------\n` +
+              `Thank you for the payment!\n` +
+              `_Barsoi Public School Management_`;
 
-        let url = "";
-        if (phoneNum && phoneNum.length >= 10) {
-            url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
-        } else {
-            url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        }
-        
-        window.open(url, '_blank');
+    let rawMob = extractMobile(d);
+    let phoneNum = rawMob.replace(/[^0-9]/g, '');
+    
+    if (phoneNum.length === 10) {
+        phoneNum = "91" + phoneNum;
     }
+
+    let url = "";
+    if (phoneNum && phoneNum.length >= 10) {
+        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+    } else {
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    
+    window.open(url, '_blank');
+}
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
