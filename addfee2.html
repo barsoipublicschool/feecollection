@@ -258,6 +258,22 @@
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('EntryDate').value = today;
 
+        // Total Paid listener for copying values dynamically
+        const totalPaidInput = document.getElementById('Total Paid');
+        if (totalPaidInput) {
+            totalPaidInput.addEventListener('input', function() {
+                const val = this.value;
+                const paidAmountField = document.getElementById('Paid Amount');
+                if (paidAmountField) paidAmountField.value = val;
+
+                const selectedDateVal = document.getElementById('EntryDate').value;
+                const paidDateField = document.getElementById('Paid Date');
+                if (paidDateField) {
+                    paidDateField.value = selectedDateVal ? formatDateDDMMYYYY(new Date(selectedDateVal)) : formatDateDDMMYYYY(new Date());
+                }
+            });
+        }
+
         try {
             const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
             const data = await res.json();
