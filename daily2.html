@@ -47,16 +47,16 @@
         <h3 style="text-align:center; color:#555; margin-top:-10px;">Daily Collection Report</h3>
         
         <div class="filter-section">
-            <!-- Option 1: Single Date Selector -->
+            <!-- Single Date Selector -->
             <div class="filter-row">
-                <label><b>Single Date Filter:</b></label>
+                <label><b>Select Single Date:</b></label>
                 <input type="date" id="reportDate">
-                <button class="btn-btn" onclick="generateDailyReport('single')">SEARCH SINGLE DATE</button>
+                <button class="btn-btn" onclick="generateDailyReport('single')">GENERATE REPORT</button>
             </div>
 
             <div class="divider"></div>
 
-            <!-- Option 2: Date Range Selector -->
+            <!-- Date Range Selector -->
             <div class="filter-row">
                 <label><b>From Date:</b></label>
                 <input type="date" id="fromDate">
@@ -112,7 +112,7 @@
                 </tr>
             </thead>
             <tbody id="dailyTableBody">
-                <tr><td colspan="10" style="text-align:center; color:#666;">Please select a date filter and click Search.</td></tr>
+                <tr><td colspan="10" style="text-align:center; color:#666;">Please select a date and click Generate Report.</td></tr>
             </tbody>
         </table>
     </div>
@@ -146,13 +146,17 @@
         return s;
     }
 
-    function parseToNumberYYYYMMDD(val) {
+    function parseToComparableNumber(val) {
         if (!val) return null;
         let s = String(val).trim();
+
+        // Standard ISO Format: YYYY-MM-DD
         if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
             let p = s.substring(0, 10).split('-');
             return parseInt(p[0] + p[1] + p[2], 10);
         }
+
+        // Standard Indian Format: DD/MM/YYYY or DD-MM-YYYY
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
             let p = s.split(/[\/\-\.]/);
             let d = p[0].padStart(2, '0');
@@ -160,6 +164,8 @@
             let y = p[2];
             return parseInt(y + m + d, 10);
         }
+
+        // Generic Date Parsing
         let dt = new Date(s);
         if (!isNaN(dt.getTime())) {
             let y = dt.getFullYear();
@@ -167,12 +173,12 @@
             let d = String(dt.getDate()).padStart(2, '0');
             return parseInt(`${y}${m}${d}`, 10);
         }
+
         return null;
     }
 
-    async function generateDailyReport(mode) {
+    async function generateDailyReport(mode = 'single') {
         let filteredRecords = [];
-        let headerText = "";
 
         if (mode === 'single') {
             let inputDateVal = document.getElementById('reportDate').value;
@@ -180,11 +186,11 @@
                 Swal.fire("Warning", "Please select a valid date!", "warning");
                 return;
             }
-            let targetNum = parseToNumberYYYYMMDD(inputDateVal);
-            headerText = formatDateDDMMYYYY(inputDateVal);
-            document.getElementById('displaySelectedDate').innerText = headerText;
 
-            Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+            let targetNum = parseToComparableNumber(inputDateVal);
+            document.getElementById('displaySelectedDate').innerText = formatDateDDMMYYYY(inputDateVal);
+
+            Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
@@ -193,13 +199,13 @@
 
                 if (Array.isArray(allData)) {
                     filteredRecords = allData.filter(r => {
-                        let pNum = parseToNumberYYYYMMDD(r["Paid Date"]);
+                        let pNum = parseToComparableNumber(r["Paid Date"]);
                         return pNum === targetNum;
                     });
                 }
             } catch (e) {
                 Swal.close();
-                Swal.fire("Error", "Server Connection Failed!", "error");
+                Swal.fire("Error", "Server/Network Error", "error");
                 return;
             }
 
@@ -212,13 +218,12 @@
                 return;
             }
 
-            let fromNum = parseToNumberYYYYMMDD(fromVal);
-            let toNum = parseToNumberYYYYMMDD(toVal);
+            let fromNum = parseToComparableNumber(fromVal);
+            let toNum = parseToComparableNumber(toVal);
 
             let dispFrom = formatDateDDMMYYYY(fromVal);
             let dispTo = formatDateDDMMYYYY(toVal);
-            headerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
-            document.getElementById('displaySelectedDate').innerText = headerText;
+            document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
             Swal.fire({ title: 'Fetching Range Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
@@ -229,13 +234,13 @@
 
                 if (Array.isArray(allData)) {
                     filteredRecords = allData.filter(r => {
-                        let pNum = parseToNumberYYYYMMDD(r["Paid Date"]);
+                        let pNum = parseToComparableNumber(r["Paid Date"]);
                         return pNum && pNum >= fromNum && pNum <= toNum;
                     });
                 }
             } catch (e) {
                 Swal.close();
-                Swal.fire("Error", "Server Connection Failed!", "error");
+                Swal.fire("Error", "Server/Network Error", "error");
                 return;
             }
         }
@@ -246,7 +251,7 @@
     function renderDailyTable(records) {
         let tbody = document.getElementById('dailyTableBody');
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for selected filter.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for this selection.</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
