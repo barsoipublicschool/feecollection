@@ -1,217 +1,270 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Date-Wise Fee Collection & Search</title>
-  <style>
-    * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-    body { background-color: #f4f7f6; margin: 0; padding: 15px; }
-    .card { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.08); max-width: 1200px; margin: 0 auto; }
-    h2 { margin-top: 0; color: #1e293b; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-    
-    .filter-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .form-group { display: flex; flex-direction: column; }
-    .form-group label { font-size: 13px; font-weight: 600; color: #475569; margin-bottom: 5px; }
-    .form-group input, .form-group select { padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 14px; outline: none; }
-    
-    .btn-search { background-color: #0284c7; color: #fff; border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: pointer; transition: 0.2s; height: 38px; align-self: flex-end; }
-    .btn-search:hover { background-color: #0369a1; }
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Collection Report - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: var(--p); text-align: center; margin-top: 0; }
+        .filter-section { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
+        input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-print { background: #2e7d32; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: #f8f9fa; border-left: 4px solid var(--p); padding: 12px 15px; border-radius: 4px; }
+        .card h4 { margin: 0; font-size: 12px; color: #666; }
+        .card p { margin: 5px 0 0; font-size: 18px; font-weight: bold; color: var(--p); }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .report-table th { background: var(--p); color: white; padding: 10px; text-align: left; }
+        .report-table td { padding: 9px 10px; border-bottom: 1px solid #ddd; }
+        .report-table tr:nth-child(even) { background-color: #f9f9f9; }
 
-    .summary-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .box { background: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #0284c7; padding: 12px; border-radius: 6px; }
-    .box span { font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; }
-    .box h3 { margin: 5px 0 0 0; color: #0f172a; font-size: 18px; }
-
-    .table-responsive { overflow-x: auto; border: 1px solid #e2e8f0; border-radius: 6px; }
-    table { width: 100%; border-collapse: collapse; background: #fff; font-size: 13px; text-align: left; }
-    th { background: #f1f5f9; color: #334155; padding: 10px; font-weight: 700; border-bottom: 2px solid #cbd5e1; white-space: nowrap; }
-    td { padding: 10px; border-bottom: 1px solid #e2e8f0; color: #334155; white-space: nowrap; }
-    tr:hover { background-color: #f8fafc; }
-
-    .badge-date { background-color: #e0f2fe; color: #0369a1; padding: 3px 8px; border-radius: 4px; font-weight: 600; }
-    .text-right { text-align: right; }
-    .text-center { text-align: center; }
-    .no-data { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; }
-  </style>
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
 </head>
 <body>
 
-<div class="card">
-  <h2>Date-Wise Collection & Search Portal</h2>
+<div class="container">
+    <div class="no-print">
+        <h2>BARSOI PUBLIC SCHOOL</h2>
+        <h3 style="text-align:center; color:#555; margin-top:-10px;">Daily Collection Report</h3>
+        
+        <div class="filter-section">
+            <label><b>From Date:</b></label>
+            <input type="date" id="fromDate">
+            <label><b>To Date:</b></label>
+            <input type="date" id="toDate">
+            <button class="btn-btn" onclick="generateDailyReport()">GENERATE REPORT</button>
+            <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
+        </div>
+    </div>
 
-  <!-- Filter Section -->
-  <div class="filter-grid">
-    <div class="form-group">
-      <label for="searchId">Student ID / Reg No (Leave blank for ALL)</label>
-      <input type="text" id="searchId" placeholder="e.g. 101 or leave blank for All">
+    <div id="printHeader" style="text-align:center; margin-bottom:15px;">
+        <h2 style="margin:0;">BARSOI PUBLIC SCHOOL</h2>
+        <p style="margin:2px; font-size:12px;">NEHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
+        <h4 style="margin:5px 0; color:var(--p);">DAILY COLLECTION REPORT (<span id="displaySelectedDate">--/--/----</span>)</h4>
     </div>
-    <div class="form-group">
-      <label for="fromDate">From Paid Date</label>
-      <input type="date" id="fromDate">
-    </div>
-    <div class="form-group">
-      <label for="toDate">To Paid Date</label>
-      <input type="date" id="toDate">
-    </div>
-    <div class="form-group">
-      <button class="btn-search" onclick="fetchCollectionData()">Search Report</button>
-    </div>
-  </div>
 
-  <!-- Summary Cards -->
-  <div class="summary-boxes">
-    <div class="box">
-      <span>Total Receipts</span>
-      <h3 id="totalCount">0</h3>
+    <!-- Summary Statistics Cards -->
+    <div class="summary-grid">
+        <div class="card">
+            <h4>TOTAL TRANSACTIONS</h4>
+            <p id="totalTx">0</p>
+        </div>
+        <div class="card" style="border-left-color: #2e7d32;">
+            <h4>TOTAL COLLECTED (₹)</h4>
+            <p id="totalCollected" style="color:#2e7d32;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #fbc02d;">
+            <h4>TOTAL DISCOUNT (₹)</h4>
+            <p id="totalDiscount" style="color:#fbc02d;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #c62828;">
+            <h4>TOTAL DUES CREATED (₹)</h4>
+            <p id="totalDues" style="color:#c62828;">₹0</p>
+        </div>
     </div>
-    <div class="box" style="border-left-color: #16a34a;">
-      <span>Total Paid Balance</span>
-      <h3 id="totalPaid">₹0</h3>
-    </div>
-    <div class="box" style="border-left-color: #eab308;">
-      <span>Total Discount</span>
-      <h3 id="totalDiscount">₹0</h3>
-    </div>
-    <div class="box" style="border-left-color: #dc2626;">
-      <span>Total Remaining Due</span>
-      <h3 id="totalDue">₹0</h3>
-    </div>
-  </div>
 
-  <!-- Results Table -->
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>Paid Date</th>
-          <th>Receipt No</th>
-          <th>Student Name</th>
-          <th>Class</th>
-          <th>Fee Month</th>
-          <th class="text-right">Sub Total</th>
-          <th class="text-right">Discount</th>
-          <th class="text-right">Paid Balance</th>
-          <th class="text-right">Due</th>
-        </tr>
-      </thead>
-      <tbody id="collectionTableBody">
-        <tr>
-          <td colspan="9" class="no-data">Select date range and click Search.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
+    <!-- Detailed Transactions Table -->
+    <div style="overflow-x:auto;">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Paid Date</th>
+                    <th>Receipt No</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Month</th>
+                    <th>Sub Total</th>
+                    <th>Discount</th>
+                    <th>Paid</th>
+                    <th>Balance Due</th>
+                </tr>
+            </thead>
+            <tbody id="dailyTableBody">
+                <tr><td colspan="10" style="text-align:center; color:#666;">Please select date range and click Generate Report.</td></tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <script>
-  // YOUR APPS SCRIPT WEB APP URL HERE
-  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaXTgDU-2zWJwbsDRBGz-2-_R3CHwTMKAltNhweLV3ai6wb84XauVaqKRf0Jp1paWP4g/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzaXTgDU-2zWJwbsDRBGz-2-_R3CHwTMKAltNhweLV3ai6wb84XauVaqKRf0Jp1paWP4g/exec";
 
-  // Auto-set current date in filters
-  window.onload = function() {
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fromDate').value = today;
-    document.getElementById('toDate').value = today;
-  };
-
-  function fetchCollectionData() {
-    const studentId = document.getElementById('searchId').value.trim() || 'all';
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-
-    const tbody = document.getElementById('collectionTableBody');
-    tbody.innerHTML = '<tr><td colspan="9" class="text-center">Loading collection data...</td></tr>';
-
-    // Form JSONP request for GitHub Pages CORS Bypass
-    const callbackName = 'handleCollectionResponse_' + Math.floor(Math.random() * 100000);
-    
-    let url = `${SCRIPT_URL}?action=searchData&id=${encodeURIComponent(studentId)}&fromDate=${fromDate}&toDate=${toDate}&callback=${callbackName}`;
-
-    window[callbackName] = function(data) {
-      renderTableData(data);
-      delete window[callbackName];
-      document.body.removeChild(script);
+    window.onload = () => {
+        // Default set both inputs to today's date
+        let today = new Date().toISOString().split('T')[0];
+        document.getElementById('fromDate').value = today;
+        document.getElementById('toDate').value = today;
+        generateDailyReport();
     };
 
-    const script = document.createElement('script');
-    script.src = url;
-    document.body.appendChild(script);
-  }
-
-  function renderTableData(records) {
-    const tbody = document.getElementById('collectionTableBody');
-    tbody.innerHTML = '';
-
-    if (!records || records.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="no-data">Is date range me koi entry nahi mili.</td></tr>';
-      resetSummaries();
-      return;
+    // Safe Date Parsing without Timezone Shift
+    function parseToDateObj(dateVal) {
+        if (!dateVal) return null;
+        if (dateVal instanceof Date) return dateVal;
+        let str = String(dateVal).trim();
+        
+        // Handle ISO String with T (e.g. 2026-09-01T00:00:00)
+        if (str.includes('T')) {
+            str = str.split('T')[0];
+        }
+        
+        // YYYY-MM-DD
+        if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
+            let parts = str.split('-');
+            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+        }
+        
+        // DD/MM/YYYY or DD-MM-YYYY
+        if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
+            let parts = str.split(/[\/\-\.]/);
+            return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+        }
+        
+        let d = new Date(str);
+        return isNaN(d.getTime()) ? null : d;
     }
 
-    let grandPaid = 0;
-    let grandDiscount = 0;
-    let grandDue = 0;
-    let totalCount = 0;
+    function formatDateDDMMYYYY(dateVal) {
+        let d = parseToDateObj(dateVal);
+        if (!d) return dateVal || "";
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+    }
 
-    records.forEach(row => {
-      // Helper function for case-insensitive column keys
-      const getVal = (keys) => {
-        for (let k of keys) {
-          for (let prop in row) {
-            if (prop.toLowerCase().trim() === k.toLowerCase().trim() && row[prop] !== undefined) {
-              return row[prop];
+    // Dynamic Helper to extract values regardless of header spelling/case variations
+    function getVal(rowObj, keyList) {
+        if (!rowObj) return "";
+        for (let key of keyList) {
+            for (let prop in rowObj) {
+                if (prop.toLowerCase().replace(/[^a-z0-9]/g, '') === key.toLowerCase().replace(/[^a-z0-9]/g, '')) {
+                    if (rowObj[prop] !== undefined && rowObj[prop] !== null) {
+                        return rowObj[prop];
+                    }
+                }
             }
-          }
         }
-        return '';
-      };
+        return "";
+    }
 
-      const paidDate = getVal(["Paid Date", "PaidDate", "Date"]) || 'N/A';
-      const receiptNo = getVal(["Receipt No", "ReceiptNo", "Receipt"]) || '-';
-      const studentName = getVal(["Student Name", "Students' Name", "Name"]) || '-';
-      const sClass = getVal(["Class"]) || '-';
-      const month = getVal(["Month"]) || '-';
-      
-      const subTotal = parseFloat(getVal(["Sub Total", "SubTotal", "Total"])) || 0;
-      const discount = parseFloat(getVal(["Discount"])) || 0;
-      const paidBalance = parseFloat(getVal(["Paid Balance", "Paid", "Paid Amount", "Amount Paid"])) || 0;
-      const due = parseFloat(getVal(["Due", "Remaining", "Remaining Fee", "Prev Dues"])) || 0;
+    async function generateDailyReport() {
+        let fromVal = document.getElementById('fromDate').value;
+        let toVal = document.getElementById('toDate').value;
 
-      grandPaid += paidBalance;
-      grandDiscount += discount;
-      grandDue += due;
-      totalCount++;
+        if (!fromVal || !toVal) {
+            Swal.fire("Warning", "Please select valid From and To dates!", "warning");
+            return;
+        }
 
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><span class="badge-date">${paidDate}</span></td>
-        <td><strong>${receiptNo}</strong></td>
-        <td>${studentName}</td>
-        <td>${sClass}</td>
-        <td>${month}</td>
-        <td class="text-right">₹${subTotal.toFixed(2)}</td>
-        <td class="text-right">₹${discount.toFixed(2)}</td>
-        <td class="text-right" style="color: #16a34a; font-weight: bold;">₹${paidBalance.toFixed(2)}</td>
-        <td class="text-right" style="color: #dc2626; font-weight: bold;">₹${due.toFixed(2)}</td>
-      `;
-      tbody.appendChild(tr);
-    });
+        let fromDateObj = parseToDateObj(fromVal);
+        let toDateObj = parseToDateObj(toVal);
+        
+        if (fromDateObj) fromDateObj.setHours(0,0,0,0);
+        if (toDateObj) toDateObj.setHours(23,59,59,999);
 
-    // Update Summary Boxes
-    document.getElementById('totalCount').innerText = totalCount;
-    document.getElementById('totalPaid').innerText = '₹' + grandPaid.toLocaleString('en-IN');
-    document.getElementById('totalDiscount').innerText = '₹' + grandDiscount.toLocaleString('en-IN');
-    document.getElementById('totalDue').innerText = '₹' + grandDue.toLocaleString('en-IN');
-  }
+        let dispFrom = formatDateDDMMYYYY(fromVal);
+        let dispTo = formatDateDDMMYYYY(toVal);
+        document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
-  function resetSummaries() {
-    document.getElementById('totalCount').innerText = '0';
-    document.getElementById('totalPaid').innerText = '₹0';
-    document.getElementById('totalDiscount').innerText = '₹0';
-    document.getElementById('totalDue').innerText = '₹0';
-  }
+        Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Unable to fetch collection records.", "error");
+                return;
+            }
+
+            // Filter records matching Date Range based on "Paid Date"
+            let filtered = allData.filter(r => {
+                let pDateRaw = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
+                let pDateObj = parseToDateObj(pDateRaw);
+
+                if (!pDateObj) return false;
+                pDateObj.setHours(12,0,0,0); // normalize time for accurate comparison
+
+                let inRange = true;
+                if (fromDateObj && pDateObj < fromDateObj) inRange = false;
+                if (toDateObj && pDateObj > toDateObj) inRange = false;
+                return inRange;
+            });
+
+            renderDailyTable(filtered);
+
+        } catch (e) {
+            Swal.fire("Error", "Server/Network Error", "error");
+        }
+    }
+
+    function renderDailyTable(records) {
+        let tbody = document.getElementById('dailyTableBody');
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red;">No transactions found for selected date range.</td></tr>';
+            document.getElementById('totalTx').innerText = "0";
+            document.getElementById('totalCollected').innerText = "₹0";
+            document.getElementById('totalDiscount').innerText = "₹0";
+            document.getElementById('totalDues').innerText = "₹0";
+            return;
+        }
+
+        let totPaid = 0, totDisc = 0, totDue = 0, html = "";
+
+        records.forEach((r, idx) => {
+            let paidDate = formatDateDDMMYYYY(getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"])) || "N/A";
+            let receiptNo = getVal(r, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
+            let studentName = getVal(r, ["Student Name", "Students' Name", "Name"]) || "";
+            let studentId = getVal(r, ["Student Id", "Student ID", "Reg No", "Reg No/ Student ID"]) || "";
+            let sClass = getVal(r, ["Class"]) || "";
+            let month = getVal(r, ["Month"]) || "";
+
+            let subTotal = parseFloat(getVal(r, ["Sub Total", "SubTotal", "Total"])) || 0;
+            let discount = parseFloat(getVal(r, ["Discount"])) || 0;
+            let paid = parseFloat(getVal(r, ["Total Paid", "Paid Balance", "Paid", "Paid Amount"])) || 0;
+            let remaining = parseFloat(getVal(r, ["Remaining", "Remaining Fee", "Due", "Prev Dues"])) || 0;
+
+            totPaid += paid;
+            totDisc += discount;
+            totDue += remaining;
+
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td><b>${paidDate}</b></td>
+                <td><b>${receiptNo}</b></td>
+                <td>${studentName} ${studentId ? '(' + studentId + ')' : ''}</td>
+                <td>${sClass}</td>
+                <td>${month}</td>
+                <td>₹${subTotal}</td>
+                <td>₹${discount}</td>
+                <td style="color:#2e7d32; font-weight:bold;">₹${paid}</td>
+                <td style="color:${remaining > 0 ? 'red' : 'green'};">₹${remaining}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('totalTx').innerText = records.length;
+        document.getElementById('totalCollected').innerText = `₹${totPaid}`;
+        document.getElementById('totalDiscount').innerText = `₹${totDisc}`;
+        document.getElementById('totalDues').innerText = `₹${totDue}`;
+    }
 </script>
-
 </body>
 </html>
