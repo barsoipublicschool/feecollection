@@ -103,6 +103,12 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
 
+    // Aapke Google Sheet ke saare Month Tabs ke naam
+    const SHEET_MONTHS = [
+        "January", "February", "March", "April", "May", "June", 
+        "July", "August", "September", "October", "November", "December"
+    ];
+
     window.onload = () => {
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('fromDate').value = today;
@@ -110,28 +116,24 @@
         generateDailyReport();
     };
 
-    // Robust Date Normalizer: Har tarah ke Date Format ko YYYYMMDD integer me badalta hai
-    function normalizeToYYYYMMDD(val) {
+    function parseToYYYYMMDD(val) {
         if (!val) return null;
         let str = String(val).trim();
         if (!str) return null;
 
-        // Pattern 1: YYYY-MM-DD
         if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-            let parts = str.substring(0, 10).split('-');
-            return parseInt(parts[0] + parts[1] + parts[2], 10);
+            let p = str.substring(0, 10).split('-');
+            return parseInt(p[0] + p[1] + p[2], 10);
         }
 
-        // Pattern 2: DD/MM/YYYY or DD-MM-YYYY
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(str)) {
-            let parts = str.split(/[\/\-\.]/);
-            let day = parts[0].padStart(2, '0');
-            let month = parts[1].padStart(2, '0');
-            let year = parts[2];
+            let p = str.split(/[\/\-\.]/);
+            let day = p[0].padStart(2, '0');
+            let month = p[1].padStart(2, '0');
+            let year = p[2];
             return parseInt(year + month + day, 10);
         }
 
-        // Pattern 3: Javascript Full Date String (e.g. Wed Sep 02 2026 00:00:00 GMT...)
         let d = new Date(str);
         if (!isNaN(d.getTime())) {
             let year = d.getFullYear();
@@ -143,97 +145,83 @@
         return null;
     }
 
-    // Dynamic Key Search: Keys me space ya case mismatch ho fir bhi "Paid Date" ko khoj nikalega
-    function getValueByKey(rowObj, targetKeyName) {
+    function getValueByKey(rowObj, keyPattern) {
         if (!rowObj) return "";
         let keys = Object.keys(rowObj);
-        
-        // Exact case-insensitive + space-trimmed match
-        let matchedKey = keys.find(k => k.replace(/[^a-zA-Z0-9]/g, '').toLowerCase() === targetKeyName.replace(/[^a-zA-Z0-9]/g, '').toLowerCase());
-        return matchedKey ? rowObj[matchedKey] : "";
+        let match = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === keyPattern.toLowerCase().replace(/[^a-z0-9]/g, ''));
+        return match ? rowObj[match] : "";
     }
 
-    function formatDisplayDate(dateInput) {
-        if (!dateInput) return "N/A";
-        let str = String(dateInput).trim();
-        
-        // Agar YYYY-MM-DD hai to DD/MM/YYYY banao
+    function formatDisplayDate(val) {
+        if (!val) return "N/A";
+        let str = String(val).trim();
         if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-            let parts = str.substring(0, 10).split('-');
-            return `${parts[2]}/${parts[1]}/${parts[0]}`;
+            let p = str.substring(0, 10).split('-');
+            return `${p[2]}/${p[1]}/${p[0]}`;
         }
-        
-        // Agar pehle se DD/MM/YYYY hai
-        if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(str)) {
-            let parts = str.split(/[\/\-\.]/);
-            return `${parts[0].padStart(2, '0')}/${parts[1].padStart(2, '0')}/${parts[2]}`;
-        }
-
-        let d = new Date(str);
-        if (!isNaN(d.getTime())) {
-            let day = String(d.getDate()).padStart(2, '0');
-            let month = String(d.getMonth() + 1).padStart(2, '0');
-            let year = d.getFullYear();
-            return `${day}/${month}/${year}`;
-        }
-
         return str;
     }
 
     async function generateDailyReport() {
-        let fromVal = document.getElementById('fromDate').value; // YYYY-MM-DD
-        let toVal = document.getElementById('toDate').value;     // YYYY-MM-DD
+        let fromVal = document.getElementById('fromDate').value;
+        let toVal = document.getElementById('toDate').value;
 
         if (!fromVal || !toVal) {
-            Swal.fire("Warning", "Please select both From and To dates!", "warning");
+            Swal.fire("Warning", "Please select dates!", "warning");
             return;
         }
 
-        let fromNum = normalizeToYYYYMMDD(fromVal);
-        let toNum = normalizeToYYYYMMDD(toVal);
-
-        if (fromNum > toNum) {
-            Swal.fire("Warning", "From Date cannot be greater than To Date!", "warning");
-            return;
-        }
+        let fromNum = parseToYYYYMMDD(fromVal);
+        let toNum = parseToYYYYMMDD(toVal);
 
         let dispFrom = formatDisplayDate(fromVal);
         let dispTo = formatDisplayDate(toVal);
         document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
-        Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Scanning All Tabs...', text: 'Fetching records across all month sheets...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            // Original Action Request
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            let allData = await res.json();
-            
-            Swal.close();
+            let aggregatedData = [];
 
-            if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Unable to fetch collection records.", "error");
-                return;
+            // Method 1: Single direct fetch attempt
+            let res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            let directData = await res.json();
+
+            if (Array.isArray(directData) && directData.length > 0) {
+                aggregatedData = directData;
+            } else {
+                // Method 2: Saare Month Sheets se बारी-बारी data pull karein
+                for (let monthName of SHEET_MONTHS) {
+                    try {
+                        let mRes = await fetch(`${SCRIPT_URL}?action=searchData&sheet=${monthName}&id=all`);
+                        let mData = await mRes.json();
+                        if (Array.isArray(mData) && mData.length > 0) {
+                            aggregatedData = aggregatedData.concat(mData);
+                        }
+                    } catch (e) {
+                        // Continue to next sheet if one fails
+                    }
+                }
             }
 
-            // FILTER: Sirf "Paid Date" column par strict check
-            let filteredRecords = allData.filter(row => {
-                // Dynamic Search for "Paid Date"
-                let rawPaidDate = getValueByKey(row, "Paid Date");
-                
+            Swal.close();
+
+            // Direct filtering on Paid Date
+            let filteredRecords = aggregatedData.filter(row => {
+                let rawPaidDate = getValueByKey(row, "Paid Date") || getValueByKey(row, "PaidDate");
                 if (!rawPaidDate) return false;
 
-                let rowDateNum = normalizeToYYYYMMDD(rawPaidDate);
-                if (!rowDateNum) return false;
+                let rowNum = parseToYYYYMMDD(rawPaidDate);
+                if (!rowNum) return false;
 
-                // Numeric Comparison
-                return rowDateNum >= fromNum && rowDateNum <= toNum;
+                return rowNum >= fromNum && rowNum <= toNum;
             });
 
             renderDailyTable(filteredRecords);
 
         } catch (e) {
             Swal.close();
-            Swal.fire("Error", "Server or Connection Error!", "error");
+            Swal.fire("Error", "Server Connection Failed!", "error");
         }
     }
 
@@ -241,7 +229,7 @@
         let tbody = document.getElementById('dailyTableBody');
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range across all tabs.</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
@@ -252,8 +240,9 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((row, idx) => {
-            // Case/Space safe key mapping
-            let paidDate = formatDisplayDate(getValueByKey(row, "Paid Date"));
+            let rawPaidDate = getValueByKey(row, "Paid Date") || getValueByKey(row, "PaidDate");
+            let paidDate = formatDisplayDate(rawPaidDate);
+            
             let receiptNo = getValueByKey(row, "Receipt No") || "N/A";
             let studentName = getValueByKey(row, "Student Name") || getValueByKey(row, "Students Name");
             let sClass = getValueByKey(row, "Class");
@@ -262,7 +251,7 @@
             let subTotal = parseFloat(getValueByKey(row, "Sub Total") || getValueByKey(row, "SubTotal")) || 0;
             let discount = parseFloat(getValueByKey(row, "Discount")) || 0;
             let paid = parseFloat(getValueByKey(row, "Paid") || getValueByKey(row, "Total Paid")) || 0;
-            let balanceDue = parseFloat(getValueByKey(row, "Balance Due") || getValueByKey(row, "Remaining Fee") || getValueByKey(row, "Remaining")) || 0;
+            let balanceDue = parseFloat(getValueByKey(row, "Balance Due") || getValueByKey(row, "Remaining")) || 0;
 
             totPaid += paid;
             totDisc += discount;
