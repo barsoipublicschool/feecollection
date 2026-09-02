@@ -17,6 +17,7 @@
         input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
         .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-print { background: #2e7d32; }
+        .btn-debug { background: #d32f2f; }
         
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: #f8f9fa; border-left: 4px solid var(--p); padding: 12px 15px; border-radius: 4px; }
@@ -49,6 +50,7 @@
             <input type="date" id="toDate">
             <button class="btn-btn" onclick="generateDailyReport()">GENERATE REPORT</button>
             <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
+            <button class="btn-btn btn-debug" onclick="checkBackendResponse()">CHECK RAW DATA 🔍</button>
         </div>
     </div>
 
@@ -103,12 +105,6 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
 
-    // Aapke Google Sheet ke saare Month Tabs ke naam
-    const SHEET_MONTHS = [
-        "January", "February", "March", "April", "May", "June", 
-        "July", "August", "September", "October", "November", "December"
-    ];
-
     window.onload = () => {
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('fromDate').value = today;
@@ -116,50 +112,88 @@
         generateDailyReport();
     };
 
-    function parseToYYYYMMDD(val) {
-        if (!val) return null;
-        let str = String(val).trim();
-        if (!str) return null;
+    // Helper to find exact field value from JSON row object regardless of case or spaces
+    function getFieldValue(row, possibleNames) {
+        if (!row) return "";
+        let keys = Object.keys(row);
+        for (let p of possibleNames) {
+            let cleanP = p.toLowerCase().replace(/[^a-z0-9]/g, '');
+            let foundKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanP);
+            if (foundKey && row[foundKey] !== undefined && row[foundKey] !== null) {
+                return String(row[foundKey]).trim();
+            }
+        }
+        return "";
+    }
 
-        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-            let p = str.substring(0, 10).split('-');
+    // Converts any format date to YYYYMMDD integer for safe matching
+    function toYYYYMMDD(val) {
+        if (!val) return null;
+        let s = String(val).trim();
+        if (!s) return null;
+
+        // Matches YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+            let p = s.substring(0, 10).split('-');
             return parseInt(p[0] + p[1] + p[2], 10);
         }
 
-        if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(str)) {
-            let p = str.split(/[\/\-\.]/);
-            let day = p[0].padStart(2, '0');
-            let month = p[1].padStart(2, '0');
-            let year = p[2];
-            return parseInt(year + month + day, 10);
+        // Matches DD/MM/YYYY or D/M/YYYY
+        if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
+            let p = s.split(/[\/\-\.]/);
+            let d = p[0].padStart(2, '0');
+            let m = p[1].padStart(2, '0');
+            let y = p[2];
+            return parseInt(y + m + d, 10);
         }
 
-        let d = new Date(str);
-        if (!isNaN(d.getTime())) {
-            let year = d.getFullYear();
-            let month = String(d.getMonth() + 1).padStart(2, '0');
-            let day = String(d.getDate()).padStart(2, '0');
-            return parseInt(`${year}${month}${day}`, 10);
+        // Matches JS Date string or ISO timestamp
+        let dt = new Date(s);
+        if (!isNaN(dt.getTime())) {
+            let y = dt.getFullYear();
+            let m = String(dt.getMonth() + 1).padStart(2, '0');
+            let d = String(dt.getDate()).padStart(2, '0');
+            return parseInt(`${y}${m}${d}`, 10);
         }
 
         return null;
     }
 
-    function getValueByKey(rowObj, keyPattern) {
-        if (!rowObj) return "";
-        let keys = Object.keys(rowObj);
-        let match = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === keyPattern.toLowerCase().replace(/[^a-z0-9]/g, ''));
-        return match ? rowObj[match] : "";
-    }
-
     function formatDisplayDate(val) {
         if (!val) return "N/A";
-        let str = String(val).trim();
-        if (/^\d{4}-\d{2}-\d{2}/.test(str)) {
-            let p = str.substring(0, 10).split('-');
+        let s = String(val).trim();
+        if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
+            let p = s.substring(0, 10).split('-');
             return `${p[2]}/${p[1]}/${p[0]}`;
         }
-        return str;
+        return s;
+    }
+
+    async function checkBackendResponse() {
+        Swal.fire({ title: 'Testing Backend Data...', didOpen: () => Swal.showLoading() });
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const data = await res.json();
+            Swal.close();
+
+            if (Array.isArray(data) && data.length > 0) {
+                let sampleRow = data[0];
+                let keys = Object.keys(sampleRow).join(", ");
+                Swal.fire({
+                    title: "Backend Response Received!",
+                    html: `<div style="text-align:left; font-size:12px;">
+                        <b>Total Rows Returned:</b> ${data.length}<br><br>
+                        <b>Keys/Columns Found in JSON:</b><br><code>${keys}</code><br><br>
+                        <b>Sample First Row Data:</b><br><pre>${JSON.stringify(sampleRow, null, 2)}</pre>
+                    </div>`,
+                    width: '600px'
+                });
+            } else {
+                Swal.fire("Backend Warning", "Server returned empty array [] or invalid response.", "warning");
+            }
+        } catch (e) {
+            Swal.fire("Error", "Could not connect to backend: " + e.message, "error");
+        }
     }
 
     async function generateDailyReport() {
@@ -171,47 +205,33 @@
             return;
         }
 
-        let fromNum = parseToYYYYMMDD(fromVal);
-        let toNum = parseToYYYYMMDD(toVal);
+        let fromNum = toYYYYMMDD(fromVal);
+        let toNum = toYYYYMMDD(toVal);
 
         let dispFrom = formatDisplayDate(fromVal);
         let dispTo = formatDisplayDate(toVal);
         document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
-        Swal.fire({ title: 'Scanning All Tabs...', text: 'Fetching records across all month sheets...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            let aggregatedData = [];
-
-            // Method 1: Single direct fetch attempt
-            let res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            let directData = await res.json();
-
-            if (Array.isArray(directData) && directData.length > 0) {
-                aggregatedData = directData;
-            } else {
-                // Method 2: Saare Month Sheets se बारी-बारी data pull karein
-                for (let monthName of SHEET_MONTHS) {
-                    try {
-                        let mRes = await fetch(`${SCRIPT_URL}?action=searchData&sheet=${monthName}&id=all`);
-                        let mData = await mRes.json();
-                        if (Array.isArray(mData) && mData.length > 0) {
-                            aggregatedData = aggregatedData.concat(mData);
-                        }
-                    } catch (e) {
-                        // Continue to next sheet if one fails
-                    }
-                }
-            }
-
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            let allData = await res.json();
             Swal.close();
 
-            // Direct filtering on Paid Date
-            let filteredRecords = aggregatedData.filter(row => {
-                let rawPaidDate = getValueByKey(row, "Paid Date") || getValueByKey(row, "PaidDate");
-                if (!rawPaidDate) return false;
+            if (!allData || !Array.isArray(allData)) {
+                Swal.fire("Error", "Failed to fetch valid array data.", "error");
+                return;
+            }
 
-                let rowNum = parseToYYYYMMDD(rawPaidDate);
+            // Expanded keys array to match any possible column header name for Paid Date
+            let dateKeys = ["Paid Date", "PaidDate", "Date", "Paid_Date", "Payment Date", "Date Of Payment"];
+
+            let filteredRecords = allData.filter(row => {
+                let rawDate = getFieldValue(row, dateKeys);
+                if (!rawDate) return false;
+
+                let rowNum = toYYYYMMDD(rawDate);
                 if (!rowNum) return false;
 
                 return rowNum >= fromNum && rowNum <= toNum;
@@ -229,7 +249,7 @@
         let tbody = document.getElementById('dailyTableBody');
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range across all tabs.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range.</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
@@ -240,18 +260,16 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((row, idx) => {
-            let rawPaidDate = getValueByKey(row, "Paid Date") || getValueByKey(row, "PaidDate");
-            let paidDate = formatDisplayDate(rawPaidDate);
-            
-            let receiptNo = getValueByKey(row, "Receipt No") || "N/A";
-            let studentName = getValueByKey(row, "Student Name") || getValueByKey(row, "Students Name");
-            let sClass = getValueByKey(row, "Class");
-            let month = getValueByKey(row, "Month");
+            let paidDate = formatDisplayDate(getFieldValue(row, ["Paid Date", "PaidDate", "Date"]));
+            let receiptNo = getFieldValue(row, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
+            let studentName = getFieldValue(row, ["Student Name", "Students Name", "StudentName", "Name"]);
+            let sClass = getFieldValue(row, ["Class", "Standard"]);
+            let month = getFieldValue(row, ["Month", "Fee Month"]);
 
-            let subTotal = parseFloat(getValueByKey(row, "Sub Total") || getValueByKey(row, "SubTotal")) || 0;
-            let discount = parseFloat(getValueByKey(row, "Discount")) || 0;
-            let paid = parseFloat(getValueByKey(row, "Paid") || getValueByKey(row, "Total Paid")) || 0;
-            let balanceDue = parseFloat(getValueByKey(row, "Balance Due") || getValueByKey(row, "Remaining")) || 0;
+            let subTotal = parseFloat(getFieldValue(row, ["Sub Total", "SubTotal"])) || 0;
+            let discount = parseFloat(getFieldValue(row, ["Discount", "Disc"])) || 0;
+            let paid = parseFloat(getFieldValue(row, ["Paid", "Total Paid", "Paid Balance"])) || 0;
+            let balanceDue = parseFloat(getFieldValue(row, ["Balance Due", "Remaining Fee", "Remaining", "Due"])) || 0;
 
             totPaid += paid;
             totDisc += discount;
