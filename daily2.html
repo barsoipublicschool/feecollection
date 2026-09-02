@@ -100,7 +100,6 @@
 </div>
 
 <script>
-    // Apne current project ka SCRIPT_URL yahan rakhein
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
 
     window.onload = () => {
@@ -110,142 +109,94 @@
         generateDailyReport();
     };
 
-    // Date String to Standard ISO 'YYYY-MM-DD' String Converter
-    function toISODateString(val) {
-        if (!val) return "";
+    // Helper to standardise Date Object for pure epoch timestamp comparison
+    function makePureDate(val) {
+        if (!val) return null;
         let str = String(val).trim();
-
-        if (str.includes('T')) {
-            str = str.split('T')[0];
+        
+        // If DD/MM/YYYY
+        if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/)) {
+            let p = str.split(/[\/\-\.]/);
+            return new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10), 12, 0, 0);
+        }
+        
+        // If YYYY-MM-DD
+        if (str.match(/^\d{4}-\d{2}-\d{2}/)) {
+            let p = str.split('T')[0].split('-');
+            return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 12, 0, 0);
         }
 
-        // Standard YYYY-MM-DD
-        if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            return str;
-        }
-
-        // DD/MM/YYYY or DD-MM-YYYY format
-        if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
-            let parts = str.split(/[\/\-\.]/);
-            let day = parts[0].padStart(2, '0');
-            let month = parts[1].padStart(2, '0');
-            let year = parts[2];
-            return `${year}-${month}-${day}`;
-        }
-
-        // Try Fallback Native Parsing
         let d = new Date(str);
-        if (!isNaN(d.getTime())) {
-            let year = d.getFullYear();
-            let month = String(d.getMonth() + 1).padStart(2, '0');
-            let day = String(d.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
-        }
-
-        return "";
+        return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
     }
 
-    function formatDateDDMMYYYY(isoStr) {
-        if (!isoStr || !isoStr.includes('-')) return isoStr || "";
-        let parts = isoStr.split('-');
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
-
-    function getVal(rowObj, keyList) {
-        if (!rowObj) return "";
-        for (let key of keyList) {
-            for (let prop in rowObj) {
-                if (prop.toLowerCase().replace(/[^a-z0-9]/g, '') === key.toLowerCase().replace(/[^a-z0-9]/g, '')) {
-                    if (rowObj[prop] !== undefined && rowObj[prop] !== null) {
-                        return rowObj[prop];
-                    }
-                }
-            }
-        }
-        return "";
-    }
-
-    function fetchJSONP(url) {
-        return new Promise((resolve, reject) => {
-            const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
-            window[callbackName] = function(data) {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                resolve(data);
-            };
-
-            const script = document.createElement('script');
-            script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
-            script.onerror = function() {
-                delete window[callbackName];
-                document.body.removeChild(script);
-                reject(new Error("Network Error"));
-            };
-            document.body.appendChild(script);
-        });
+    function formatDateDDMMYYYY(dateVal) {
+        let d = makePureDate(dateVal);
+        if (!d) return dateVal || "";
+        let day = String(d.getDate()).padStart(2, '0');
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let year = d.getFullYear();
+        return `${day}/${month}/${year}`;
     }
 
     async function generateDailyReport() {
-        let fromVal = document.getElementById('fromDate').value; // Format: YYYY-MM-DD
-        let toVal = document.getElementById('toDate').value;     // Format: YYYY-MM-DD
+        let fromVal = document.getElementById('fromDate').value;
+        let toVal = document.getElementById('toDate').value;
 
         if (!fromVal || !toVal) {
             Swal.fire("Warning", "Please select both From and To dates!", "warning");
             return;
         }
 
-        if (fromVal > toVal) {
-            Swal.fire("Warning", "From Date cannot be greater than To Date!", "warning");
+        let startObj = makePureDate(fromVal);
+        let endObj = makePureDate(toVal);
+
+        if (!startObj || !endObj) {
+            Swal.fire("Warning", "Invalid Date selected", "warning");
             return;
         }
+
+        // Standardize boundaries
+        startObj.setHours(0, 0, 0, 0);
+        endObj.setHours(23, 59, 59, 999);
 
         let formattedFrom = formatDateDDMMYYYY(fromVal);
         let formattedTo = formatDateDDMMYYYY(toVal);
         document.getElementById('displaySelectedDate').innerText = (formattedFrom === formattedTo) ? formattedFrom : `${formattedFrom} to ${formattedTo}`;
 
-        Swal.fire({ title: 'Fetching Collection Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-        let allData = null;
+        Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            // First try basic parameter without action=searchData to avoid Google Script filtering bugs
-            let res = await fetch(`${SCRIPT_URL}?action=allData`);
-            allData = await res.json();
+            // Using same fetch action as working code
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
             if (!allData || !Array.isArray(allData)) {
-                // Fallback attempt
-                res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-                allData = await res.json();
-            }
-        } catch (e) {
-            try {
-                allData = await fetchJSONP(`${SCRIPT_URL}?action=searchData&id=all`);
-            } catch (err) {
-                Swal.close();
-                Swal.fire("Error", "Server Error while fetching records.", "error");
+                Swal.fire("Error", "Unable to fetch collection records.", "error");
                 return;
             }
+
+            // DEBUG CHECK: Alert first entry raw paid date to diagnose format
+            if (allData.length > 0 && !window.debuggedOnce) {
+                console.log("Sample Row Raw Paid Date:", allData[0]["Paid Date"]);
+                window.debuggedOnce = true;
+            }
+
+            // Filtering matching range
+            let filtered = allData.filter(r => {
+                let rawDate = r["Paid Date"] || r["PaidDate"] || r["Date"] || "";
+                let rowDateObj = makePureDate(rawDate);
+                if (!rowDateObj) return false;
+                return rowDateObj >= startObj && rowDateObj <= endObj;
+            });
+
+            renderDailyTable(filtered);
+
+        } catch (e) {
+            Swal.close();
+            Swal.fire("Error", "Server / Network Error", "error");
         }
-
-        Swal.close();
-
-        if (!allData || !Array.isArray(allData)) {
-            Swal.fire("Error", "Unable to fetch collection records from Sheet.", "error");
-            return;
-        }
-
-        // Direct String-based ISO Comparison (No Timezone issues!)
-        let filtered = allData.filter(r => {
-            let rawPaidDate = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
-            if (!rawPaidDate) return false;
-
-            let rowISODate = toISODateString(rawPaidDate);
-            if (!rowISODate) return false;
-
-            // Direct YYYY-MM-DD String Comparison
-            return rowISODate >= fromVal && rowISODate <= toVal;
-        });
-
-        renderDailyTable(filtered);
     }
 
     function renderDailyTable(records) {
@@ -262,20 +213,19 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((r, idx) => {
-            let rawDate = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
-            let isoDate = toISODateString(rawDate);
-            let paidDate = formatDateDDMMYYYY(isoDate) || rawDate || "N/A";
+            let rawDate = r["Paid Date"] || r["PaidDate"] || r["Date"] || "";
+            let paidDate = formatDateDDMMYYYY(rawDate) || "N/A";
             
-            let receiptNo = getVal(r, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
-            let studentName = getVal(r, ["Student Name", "Students' Name", "Name"]) || "";
-            let studentId = getVal(r, ["Student Id", "Student ID", "Reg No", "Reg No/ Student ID"]) || "";
-            let sClass = getVal(r, ["Class"]) || "";
-            let month = getVal(r, ["Month"]) || "";
+            let receiptNo = r["Receipt No"] || r["ReceiptNo"] || "N/A";
+            let studentName = r["Student Name"] || r["Students' Name"] || "";
+            let studentId = r["Student Id"] || r["Student ID"] || "";
+            let sClass = r["Class"] || "";
+            let month = r["Month"] || "";
 
-            let subTotal = parseFloat(getVal(r, ["Sub Total", "SubTotal", "Total"])) || 0;
-            let discount = parseFloat(getVal(r, ["Discount"])) || 0;
-            let paid = parseFloat(getVal(r, ["Total Paid", "Paid Balance", "Paid", "Paid Amount"])) || 0;
-            let remaining = parseFloat(getVal(r, ["Remaining", "Remaining Fee", "Due", "Prev Dues"])) || 0;
+            let subTotal = parseFloat(r["Sub Total"] || r["SubTotal"]) || 0;
+            let discount = parseFloat(r["Discount"]) || 0;
+            let paid = parseFloat(r["Total Paid"] || r["Paid"]) || 0;
+            let remaining = parseFloat(r["Remaining"] || r["Remaining Fee"]) || 0;
 
             totPaid += paid;
             totDisc += discount;
