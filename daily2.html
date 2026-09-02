@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <base target="_top">
     <meta charset="UTF-8">
@@ -12,6 +12,7 @@
         body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
         .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         h2 { color: var(--p); text-align: center; margin-top: 0; }
+        
         .filter-section { display: flex; gap: 10px; justify-content: center; align-items: center; margin-bottom: 20px; flex-wrap: wrap; }
         input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
         .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
@@ -100,7 +101,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
+    // Apne Naye Deployment URL ko yahan update karein (Ya Working single-date SCRIPT_URL rakhein)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
 
     window.onload = () => {
         let today = new Date().toISOString().split('T')[0];
@@ -109,34 +111,37 @@
         generateDailyReport();
     };
 
-    // Helper to standardise Date Object for pure epoch timestamp comparison
-    function makePureDate(val) {
-        if (!val) return null;
-        let str = String(val).trim();
-        
-        // If DD/MM/YYYY
-        if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/)) {
-            let p = str.split(/[\/\-\.]/);
-            return new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10), 12, 0, 0);
-        }
-        
-        // If YYYY-MM-DD
+    function parseDateToYMD(dateInput) {
+        if (!dateInput) return "";
+        let str = String(dateInput).trim();
+
         if (str.match(/^\d{4}-\d{2}-\d{2}/)) {
-            let p = str.split('T')[0].split('-');
-            return new Date(parseInt(p[0], 10), parseInt(p[1], 10) - 1, parseInt(p[2], 10), 12, 0, 0);
+            return str.substring(0, 10);
+        }
+
+        if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/)) {
+            let parts = str.split(/[\/\-\.]/);
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            return `${year}-${month}-${day}`;
         }
 
         let d = new Date(str);
-        return isNaN(d.getTime()) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate(), 12, 0, 0);
+        if (!isNaN(d.getTime())) {
+            let year = d.getFullYear();
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        return "";
     }
 
-    function formatDateDDMMYYYY(dateVal) {
-        let d = makePureDate(dateVal);
-        if (!d) return dateVal || "";
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
+    function formatDisplayDate(ymdStr) {
+        if (!ymdStr || ymdStr.length !== 10) return ymdStr || "N/A";
+        let parts = ymdStr.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     async function generateDailyReport() {
@@ -148,61 +153,58 @@
             return;
         }
 
-        let startObj = makePureDate(fromVal);
-        let endObj = makePureDate(toVal);
-
-        if (!startObj || !endObj) {
-            Swal.fire("Warning", "Invalid Date selected", "warning");
+        if (fromVal > toVal) {
+            Swal.fire("Warning", "From Date cannot be greater than To Date!", "warning");
             return;
         }
 
-        // Standardize boundaries
-        startObj.setHours(0, 0, 0, 0);
-        endObj.setHours(23, 59, 59, 999);
+        let dispFrom = formatDisplayDate(fromVal);
+        let dispTo = formatDisplayDate(toVal);
+        document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
-        let formattedFrom = formatDateDDMMYYYY(fromVal);
-        let formattedTo = formatDateDDMMYYYY(toVal);
-        document.getElementById('displaySelectedDate').innerText = (formattedFrom === formattedTo) ? formattedFrom : `${formattedFrom} to ${formattedTo}`;
-
-        Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Fetching All Tabs Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            // Using same fetch action as working code
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            const allData = await res.json();
+            const res = await fetch(`${SCRIPT_URL}?action=allData`);
+            let allData = await res.json();
+            
+            if (!allData || !Array.isArray(allData)) {
+                // Fallback attempt
+                const resFallback = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+                allData = await resFallback.json();
+            }
+
             Swal.close();
 
             if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Unable to fetch collection records.", "error");
+                Swal.fire("Error", "Unable to fetch records from server.", "error");
                 return;
             }
 
-            // DEBUG CHECK: Alert first entry raw paid date to diagnose format
-            if (allData.length > 0 && !window.debuggedOnce) {
-                console.log("Sample Row Raw Paid Date:", allData[0]["Paid Date"]);
-                window.debuggedOnce = true;
-            }
+            // Strictly filter using ONLY "Paid Date" column across all fetched tabs
+            let filteredRecords = allData.filter(row => {
+                let rawPaidDate = row["Paid Date"] || row["PaidDate"] || row["Paid Date "];
+                if (!rawPaidDate) return false;
 
-            // Filtering matching range
-            let filtered = allData.filter(r => {
-                let rawDate = r["Paid Date"] || r["PaidDate"] || r["Date"] || "";
-                let rowDateObj = makePureDate(rawDate);
-                if (!rowDateObj) return false;
-                return rowDateObj >= startObj && rowDateObj <= endObj;
+                let rowFormattedDate = parseDateToYMD(rawPaidDate);
+                if (!rowFormattedDate) return false;
+
+                return rowFormattedDate >= fromVal && rowFormattedDate <= toVal;
             });
 
-            renderDailyTable(filtered);
+            renderDailyTable(filteredRecords);
 
         } catch (e) {
             Swal.close();
-            Swal.fire("Error", "Server / Network Error", "error");
+            Swal.fire("Error", "Server or Connection Error!", "error");
         }
     }
 
     function renderDailyTable(records) {
         let tbody = document.getElementById('dailyTableBody');
+
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red;">No transactions found for selected date range.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range across all tabs.</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
@@ -212,36 +214,35 @@
 
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
-        records.forEach((r, idx) => {
-            let rawDate = r["Paid Date"] || r["PaidDate"] || r["Date"] || "";
-            let paidDate = formatDateDDMMYYYY(rawDate) || "N/A";
+        records.forEach((row, idx) => {
+            let rawPaidDate = row["Paid Date"] || row["PaidDate"] || row["Paid Date "];
+            let paidDate = formatDisplayDate(parseDateToYMD(rawPaidDate));
             
-            let receiptNo = r["Receipt No"] || r["ReceiptNo"] || "N/A";
-            let studentName = r["Student Name"] || r["Students' Name"] || "";
-            let studentId = r["Student Id"] || r["Student ID"] || "";
-            let sClass = r["Class"] || "";
-            let month = r["Month"] || "";
+            let receiptNo = row["Receipt No"] || row["ReceiptNo"] || "N/A";
+            let studentName = row["Student Name"] || row["Students' Name"] || "";
+            let sClass = row["Class"] || "";
+            let month = row["Month"] || "";
 
-            let subTotal = parseFloat(r["Sub Total"] || r["SubTotal"]) || 0;
-            let discount = parseFloat(r["Discount"]) || 0;
-            let paid = parseFloat(r["Total Paid"] || r["Paid"]) || 0;
-            let remaining = parseFloat(r["Remaining"] || r["Remaining Fee"]) || 0;
+            let subTotal = parseFloat(row["Sub Total"] || row["SubTotal"]) || 0;
+            let discount = parseFloat(row["Discount"]) || 0;
+            let paid = parseFloat(row["Total Paid"] || row["Paid Balance"] || row["Paid"]) || 0;
+            let balanceDue = parseFloat(row["Balance Due"] || row["Remaining"] || row["Remaining Fee"]) || 0;
 
             totPaid += paid;
             totDisc += discount;
-            totDue += remaining;
+            totDue += balanceDue;
 
             html += `<tr>
                 <td>${idx + 1}</td>
                 <td><b>${paidDate}</b></td>
                 <td><b>${receiptNo}</b></td>
-                <td>${studentName} ${studentId ? '(' + studentId + ')' : ''}</td>
+                <td>${studentName}</td>
                 <td>${sClass}</td>
                 <td>${month}</td>
                 <td>₹${subTotal}</td>
                 <td>₹${discount}</td>
                 <td style="color:#2e7d32; font-weight:bold;">₹${paid}</td>
-                <td style="color:${remaining > 0 ? 'red' : 'green'};">₹${remaining}</td>
+                <td style="color:${balanceDue > 0 ? 'red' : 'green'}; font-weight:bold;">₹${balanceDue}</td>
             </tr>`;
         });
 
@@ -252,5 +253,6 @@
         document.getElementById('totalDues').innerText = `₹${totDue}`;
     }
 </script>
+
 </body>
 </html>
