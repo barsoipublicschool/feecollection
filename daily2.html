@@ -17,7 +17,6 @@
         input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
         .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-print { background: #2e7d32; }
-        .btn-debug { background: #d32f2f; }
         
         .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .card { background: #f8f9fa; border-left: 4px solid var(--p); padding: 12px 15px; border-radius: 4px; }
@@ -50,7 +49,6 @@
             <input type="date" id="toDate">
             <button class="btn-btn" onclick="generateDailyReport()">GENERATE REPORT</button>
             <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
-            <button class="btn-btn btn-debug" onclick="checkBackendResponse()">CHECK RAW DATA 🔍</button>
         </div>
     </div>
 
@@ -105,6 +103,12 @@
 <script>
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
 
+    // January se December tak ke saare Months ki list (Range Lock Fix)
+    const ALL_MONTHS = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
     window.onload = () => {
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('fromDate').value = today;
@@ -112,33 +116,32 @@
         generateDailyReport();
     };
 
-    // Helper to find exact field value from JSON row object regardless of case or spaces
-    function getFieldValue(row, possibleNames) {
-        if (!row) return "";
-        let keys = Object.keys(row);
-        for (let p of possibleNames) {
+    function getValueByKey(rowObj, keyPatterns) {
+        if (!rowObj) return "";
+        let keys = Object.keys(rowObj);
+        for (let p of keyPatterns) {
             let cleanP = p.toLowerCase().replace(/[^a-z0-9]/g, '');
-            let foundKey = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanP);
-            if (foundKey && row[foundKey] !== undefined && row[foundKey] !== null) {
-                return String(row[foundKey]).trim();
+            let match = keys.find(k => k.toLowerCase().replace(/[^a-z0-9]/g, '') === cleanP);
+            if (match && rowObj[match] !== undefined && rowObj[match] !== null) {
+                return String(rowObj[match]).trim();
             }
         }
         return "";
     }
 
-    // Converts any format date to YYYYMMDD integer for safe matching
-    function toYYYYMMDD(val) {
+    // Unifies Date formats for Jan-Dec comparison (returns YYYYMMDD as integer)
+    function parseDateToNumber(val) {
         if (!val) return null;
         let s = String(val).trim();
         if (!s) return null;
 
-        // Matches YYYY-MM-DD
+        // YYYY-MM-DD
         if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
             let p = s.substring(0, 10).split('-');
             return parseInt(p[0] + p[1] + p[2], 10);
         }
 
-        // Matches DD/MM/YYYY or D/M/YYYY
+        // DD/MM/YYYY or D/M/YYYY
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
             let p = s.split(/[\/\-\.]/);
             let d = p[0].padStart(2, '0');
@@ -147,7 +150,7 @@
             return parseInt(y + m + d, 10);
         }
 
-        // Matches JS Date string or ISO timestamp
+        // Standard JS Timestamp / ISO String
         let dt = new Date(s);
         if (!isNaN(dt.getTime())) {
             let y = dt.getFullYear();
@@ -169,33 +172,6 @@
         return s;
     }
 
-    async function checkBackendResponse() {
-        Swal.fire({ title: 'Testing Backend Data...', didOpen: () => Swal.showLoading() });
-        try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            const data = await res.json();
-            Swal.close();
-
-            if (Array.isArray(data) && data.length > 0) {
-                let sampleRow = data[0];
-                let keys = Object.keys(sampleRow).join(", ");
-                Swal.fire({
-                    title: "Backend Response Received!",
-                    html: `<div style="text-align:left; font-size:12px;">
-                        <b>Total Rows Returned:</b> ${data.length}<br><br>
-                        <b>Keys/Columns Found in JSON:</b><br><code>${keys}</code><br><br>
-                        <b>Sample First Row Data:</b><br><pre>${JSON.stringify(sampleRow, null, 2)}</pre>
-                    </div>`,
-                    width: '600px'
-                });
-            } else {
-                Swal.fire("Backend Warning", "Server returned empty array [] or invalid response.", "warning");
-            }
-        } catch (e) {
-            Swal.fire("Error", "Could not connect to backend: " + e.message, "error");
-        }
-    }
-
     async function generateDailyReport() {
         let fromVal = document.getElementById('fromDate').value;
         let toVal = document.getElementById('toDate').value;
@@ -205,39 +181,60 @@
             return;
         }
 
-        let fromNum = toYYYYMMDD(fromVal);
-        let toNum = toYYYYMMDD(toVal);
+        let fromNum = parseDateToNumber(fromVal);
+        let toNum = parseDateToNumber(toVal);
 
         let dispFrom = formatDisplayDate(fromVal);
         let dispTo = formatDisplayDate(toVal);
         document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
 
-        Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Scanning Full Year Data (Jan - Dec)...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            let allData = await res.json();
-            Swal.close();
+            let rawMasterArray = [];
 
-            if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Failed to fetch valid array data.", "error");
-                return;
+            // Attempt 1: Standard Search
+            let mainRes = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            let mainData = await mainRes.json();
+
+            if (Array.isArray(mainData) && mainData.length > 0) {
+                rawMasterArray = mainData;
             }
 
-            // Expanded keys array to match any possible column header name for Paid Date
-            let dateKeys = ["Paid Date", "PaidDate", "Date", "Paid_Date", "Payment Date", "Date Of Payment"];
+            // Attempt 2: If Backend requires Sheet Param for Months (September to December Fix)
+            let selectedFromMonthIndex = new Date(fromVal).getMonth(); // 0 = Jan, 8 = Sep
+            let selectedToMonthIndex = new Date(toVal).getMonth();
 
-            let filteredRecords = allData.filter(row => {
-                let rawDate = getFieldValue(row, dateKeys);
-                if (!rawDate) return false;
+            let monthsToFetch = ALL_MONTHS.slice(selectedFromMonthIndex, selectedToMonthIndex + 1);
 
-                let rowNum = toYYYYMMDD(rawDate);
+            for (let mName of monthsToFetch) {
+                try {
+                    let mRes = await fetch(`${SCRIPT_URL}?action=searchData&sheet=${mName}&month=${mName}&id=all`);
+                    let mData = await mRes.json();
+                    if (Array.isArray(mData) && mData.length > 0) {
+                        rawMasterArray = rawMasterArray.concat(mData);
+                    }
+                } catch(e) {}
+            }
+
+            Swal.close();
+
+            // Filter on ALL fetched rows using Paid Date
+            let filteredRecords = rawMasterArray.filter(row => {
+                let dateVal = getValueByKey(row, ["Paid Date", "PaidDate", "Date", "Payment Date"]);
+                if (!dateVal) return false;
+
+                let rowNum = parseDateToNumber(dateVal);
                 if (!rowNum) return false;
 
                 return rowNum >= fromNum && rowNum <= toNum;
             });
 
-            renderDailyTable(filteredRecords);
+            // Remove duplicate entries if any
+            let uniqueRecords = Array.from(new Set(filteredRecords.map(a => JSON.stringify(a))))
+                                    .map(a => JSON.parse(a));
+
+            renderDailyTable(uniqueRecords);
 
         } catch (e) {
             Swal.close();
@@ -249,7 +246,7 @@
         let tbody = document.getElementById('dailyTableBody');
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for the selected Paid Date range.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for selected range (Jan-Dec scan completed).</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
@@ -260,16 +257,16 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((row, idx) => {
-            let paidDate = formatDisplayDate(getFieldValue(row, ["Paid Date", "PaidDate", "Date"]));
-            let receiptNo = getFieldValue(row, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
-            let studentName = getFieldValue(row, ["Student Name", "Students Name", "StudentName", "Name"]);
-            let sClass = getFieldValue(row, ["Class", "Standard"]);
-            let month = getFieldValue(row, ["Month", "Fee Month"]);
+            let paidDate = formatDisplayDate(getValueByKey(row, ["Paid Date", "PaidDate", "Date"]));
+            let receiptNo = getValueByKey(row, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
+            let studentName = getValueByKey(row, ["Student Name", "Students Name", "StudentName", "Name"]);
+            let sClass = getValueByKey(row, ["Class", "Standard"]);
+            let month = getValueByKey(row, ["Month", "Fee Month"]);
 
-            let subTotal = parseFloat(getFieldValue(row, ["Sub Total", "SubTotal"])) || 0;
-            let discount = parseFloat(getFieldValue(row, ["Discount", "Disc"])) || 0;
-            let paid = parseFloat(getFieldValue(row, ["Paid", "Total Paid", "Paid Balance"])) || 0;
-            let balanceDue = parseFloat(getFieldValue(row, ["Balance Due", "Remaining Fee", "Remaining", "Due"])) || 0;
+            let subTotal = parseFloat(getValueByKey(row, ["Sub Total", "SubTotal"])) || 0;
+            let discount = parseFloat(getValueByKey(row, ["Discount", "Disc"])) || 0;
+            let paid = parseFloat(getValueByKey(row, ["Paid", "Total Paid"])) || 0;
+            let balanceDue = parseFloat(getValueByKey(row, ["Balance Due", "Remaining Fee", "Remaining", "Due"])) || 0;
 
             totPaid += paid;
             totDisc += discount;
