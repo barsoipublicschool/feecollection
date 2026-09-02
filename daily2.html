@@ -176,28 +176,49 @@
         });
     }
 
-    async function generateReport() {
-    let fromVal = document.getElementById('fromDate').value;
-    let toVal = document.getElementById('toDate').value;
+    async function generateDailyReport() {
+        let fromVal = document.getElementById('fromDate').value;
+        let toVal = document.getElementById('toDate').value;
 
-    if (!fromVal || !toVal) {
-        Swal.fire("Warning", "Please select both From and To dates!", "warning");
-        return;
-    }
+        if (!fromVal || !toVal) {
+            Swal.fire("Warning", "Please select both From and To dates!", "warning");
+            return;
+        }
 
-    // Convert inputs to Date objects for precise numeric comparison
-    let startDate = new Date(fromVal);
-    startDate.setHours(0, 0, 0, 0);
+        let startDate = parseToDateObj(fromVal);
+        let endDate = parseToDateObj(toVal);
 
-    let endDate = new Date(toVal);
-    endDate.setHours(23, 59, 59, 999);
+        if (!startDate || !endDate) {
+            Swal.fire("Warning", "Invalid date selection!", "warning");
+            return;
+        }
 
-    Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        startDate.setHours(0, 0, 0, 0);
+        endDate.setHours(23, 59, 59, 999);
 
-    try {
-        // Fetch ALL data once just like Single Date code
-        const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-        const allData = await res.json();
+        let formattedFrom = formatDateDDMMYYYY(fromVal);
+        let formattedTo = formatDateDDMMYYYY(toVal);
+        document.getElementById('displaySelectedDate').innerText = (formattedFrom === formattedTo) ? formattedFrom : `${formattedFrom} to ${formattedTo}`;
+
+        Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        let allData = null;
+
+        try {
+            // Try standard fetch first
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            allData = await res.json();
+        } catch (e) {
+            try {
+                // Fallback to JSONP if CORS fails
+                allData = await fetchJSONP(`${SCRIPT_URL}?action=searchData&id=all`);
+            } catch (err) {
+                Swal.close();
+                Swal.fire("Error", "Server/Network Error while fetching records.", "error");
+                return;
+            }
+        }
+
         Swal.close();
 
         if (!allData || !Array.isArray(allData)) {
@@ -205,27 +226,21 @@
             return;
         }
 
-        // Precise Frontend Range Filtering
+        // Robust Frontend Range Filtering using parseToDateObj and getVal
         let filtered = allData.filter(r => {
-            if (!r["Paid Date"]) return false;
-            
-            // Parse Sheet Date (DD/MM/YYYY)
-            let parts = String(r["Paid Date"]).split(/[\/\-\.]/);
-            if (parts.length < 3) return false;
-            
-            // Create JavaScript Date Object (Year, MonthIndex, Day)
-            let rowDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-            rowDate.setHours(12, 0, 0, 0); // avoid boundary bugs
+            let rawPaidDate = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
+            if (!rawPaidDate) return false;
+
+            let rowDate = parseToDateObj(rawPaidDate);
+            if (!rowDate) return false;
+
+            rowDate.setHours(12, 0, 0, 0); // Avoid timezone shift issues
 
             return rowDate >= startDate && rowDate <= endDate;
         });
 
-        renderTable(filtered);
-
-    } catch (e) {
-        Swal.fire("Error", "Server/Network Error", "error");
+        renderDailyTable(filtered);
     }
-}
 
     function renderDailyTable(records) {
         let tbody = document.getElementById('dailyTableBody');
