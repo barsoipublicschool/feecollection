@@ -4,7 +4,7 @@
     <base target="_top">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Collection Report - Barsoi Public School</title>
+    <title>Month-wise Collection Report - Barsoi Public School</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
@@ -14,11 +14,9 @@
         h2 { color: var(--p); text-align: center; margin-top: 0; }
         
         .filter-section { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
-        .filter-row { display: flex; gap: 10px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
-        .filter-row:last-child { margin-bottom: 0; }
-        .divider { border-top: 1px dashed #ccc; margin: 10px 0; }
+        .filter-row { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
-        input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; }
+        select, input[type="number"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; background: white; }
         .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
         .btn-print { background: #2e7d32; }
         
@@ -44,25 +42,30 @@
 <div class="container">
     <div class="no-print">
         <h2>BARSOI PUBLIC SCHOOL</h2>
-        <h3 style="text-align:center; color:#555; margin-top:-10px;">Daily Collection Report</h3>
+        <h3 style="text-align:center; color:#555; margin-top:-10px;">Month-wise Collection Report</h3>
         
         <div class="filter-section">
-            <!-- Single Date Selector -->
             <div class="filter-row">
-                <label><b>Select Single Date:</b></label>
-                <input type="date" id="reportDate">
-                <button class="btn-btn" onclick="generateDailyReport('single')">GENERATE REPORT</button>
-            </div>
+                <label><b>Select Collection Month:</b></label>
+                <select id="selectMonth">
+                    <option value="01">January</option>
+                    <option value="02">February</option>
+                    <option value="03">March</option>
+                    <option value="04">April</option>
+                    <option value="05">May</option>
+                    <option value="06">June</option>
+                    <option value="07">July</option>
+                    <option value="08">August</option>
+                    <option value="09">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
 
-            <div class="divider"></div>
+                <label><b>Year:</b></label>
+                <input type="number" id="selectYear" style="width: 80px;">
 
-            <!-- Date Range Selector -->
-            <div class="filter-row">
-                <label><b>From Date:</b></label>
-                <input type="date" id="fromDate">
-                <label><b>To Date:</b></label>
-                <input type="date" id="toDate">
-                <button class="btn-btn" onclick="generateDailyReport('range')">SEARCH RANGE</button>
+                <button class="btn-btn" onclick="generateMonthlyReport()">GENERATE REPORT</button>
                 <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
             </div>
         </div>
@@ -71,7 +74,7 @@
     <div id="printHeader" style="text-align:center; margin-bottom:15px;">
         <h2 style="margin:0;">BARSOI PUBLIC SCHOOL</h2>
         <p style="margin:2px; font-size:12px;">NEHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
-        <h4 style="margin:5px 0; color:var(--p);">DAILY COLLECTION REPORT - <span id="displaySelectedDate">--/--/----</span></h4>
+        <h4 style="margin:5px 0; color:var(--p);">MONTHLY COLLECTION REPORT - <span id="displaySelectedMonth">--/----</span></h4>
     </div>
 
     <!-- Summary Statistics Cards -->
@@ -111,8 +114,8 @@
                     <th>Balance Due</th>
                 </tr>
             </thead>
-            <tbody id="dailyTableBody">
-                <tr><td colspan="10" style="text-align:center; color:#666;">Please select a date and click Generate Report.</td></tr>
+            <tbody id="monthlyTableBody">
+                <tr><td colspan="10" style="text-align:center; color:#666;">Please select a Month and Year to generate report.</td></tr>
             </tbody>
         </table>
     </div>
@@ -122,11 +125,14 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
 
     window.onload = () => {
-        let today = new Date().toISOString().split('T')[0];
-        document.getElementById('reportDate').value = today;
-        document.getElementById('fromDate').value = today;
-        document.getElementById('toDate').value = today;
-        generateDailyReport('single');
+        let today = new Date();
+        let curMonth = String(today.getMonth() + 1).padStart(2, '0');
+        let curYear = today.getFullYear();
+        
+        document.getElementById('selectMonth').value = curMonth;
+        document.getElementById('selectYear').value = curYear;
+        
+        generateMonthlyReport();
     };
 
     function formatDateDDMMYYYY(dateVal) {
@@ -146,112 +152,81 @@
         return s;
     }
 
-    function parseToComparableNumber(val) {
-        if (!val) return null;
-        let s = String(val).trim();
+    // Function to extract Year and Month string (YYYY-MM) from Paid Date
+    function extractYearMonthFromPaidDate(dateVal) {
+        if (!dateVal) return null;
+        let s = String(dateVal).trim();
 
-        // Standard ISO Format: YYYY-MM-DD
+        // ISO Date YYYY-MM-DD
         if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-            let p = s.substring(0, 10).split('-');
-            return parseInt(p[0] + p[1] + p[2], 10);
+            return s.substring(0, 7); // Returns "YYYY-MM"
         }
 
-        // Standard Indian Format: DD/MM/YYYY or DD-MM-YYYY
+        // Indian Format DD/MM/YYYY or DD-MM-YYYY
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
             let p = s.split(/[\/\-\.]/);
-            let d = p[0].padStart(2, '0');
             let m = p[1].padStart(2, '0');
             let y = p[2];
-            return parseInt(y + m + d, 10);
+            return `${y}-${m}`;
         }
 
-        // Generic Date Parsing
+        // Fallback Date Parsing
         let dt = new Date(s);
         if (!isNaN(dt.getTime())) {
             let y = dt.getFullYear();
             let m = String(dt.getMonth() + 1).padStart(2, '0');
-            let d = String(dt.getDate()).padStart(2, '0');
-            return parseInt(`${y}${m}${d}`, 10);
+            return `${y}-${m}`;
         }
 
         return null;
     }
 
-    async function generateDailyReport(mode = 'single') {
-        let filteredRecords = [];
+    async function generateMonthlyReport() {
+        let selectedMonth = document.getElementById('selectMonth').value;
+        let selectedYear = document.getElementById('selectYear').value;
 
-        if (mode === 'single') {
-            let inputDateVal = document.getElementById('reportDate').value;
-            if (!inputDateVal) {
-                Swal.fire("Warning", "Please select a valid date!", "warning");
-                return;
-            }
-
-            let targetNum = parseToComparableNumber(inputDateVal);
-            document.getElementById('displaySelectedDate').innerText = formatDateDDMMYYYY(inputDateVal);
-
-            Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-                const allData = await res.json();
-                Swal.close();
-
-                if (Array.isArray(allData)) {
-                    filteredRecords = allData.filter(r => {
-                        let pNum = parseToComparableNumber(r["Paid Date"]);
-                        return pNum === targetNum;
-                    });
-                }
-            } catch (e) {
-                Swal.close();
-                Swal.fire("Error", "Server/Network Error", "error");
-                return;
-            }
-
-        } else if (mode === 'range') {
-            let fromVal = document.getElementById('fromDate').value;
-            let toVal = document.getElementById('toDate').value;
-
-            if (!fromVal || !toVal) {
-                Swal.fire("Warning", "Please select From and To dates!", "warning");
-                return;
-            }
-
-            let fromNum = parseToComparableNumber(fromVal);
-            let toNum = parseToComparableNumber(toVal);
-
-            let dispFrom = formatDateDDMMYYYY(fromVal);
-            let dispTo = formatDateDDMMYYYY(toVal);
-            document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
-
-            Swal.fire({ title: 'Fetching Range Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
-
-            try {
-                const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-                const allData = await res.json();
-                Swal.close();
-
-                if (Array.isArray(allData)) {
-                    filteredRecords = allData.filter(r => {
-                        let pNum = parseToComparableNumber(r["Paid Date"]);
-                        return pNum && pNum >= fromNum && pNum <= toNum;
-                    });
-                }
-            } catch (e) {
-                Swal.close();
-                Swal.fire("Error", "Server/Network Error", "error");
-                return;
-            }
+        if (!selectedMonth || !selectedYear) {
+            Swal.fire("Warning", "Please select valid Month and Year!", "warning");
+            return;
         }
 
-        renderDailyTable(filteredRecords);
+        let targetYearMonth = `${selectedYear}-${selectedMonth}`;
+        
+        // Month Display Text for Header
+        let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        let monthNameText = monthNames[parseInt(selectedMonth, 10) - 1];
+        document.getElementById('displaySelectedMonth').innerText = `${monthNameText} ${selectedYear}`;
+
+        Swal.fire({ title: 'Fetching Monthly Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            const allData = await res.json();
+            Swal.close();
+
+            if (!Array.isArray(allData)) {
+                Swal.fire("Error", "Unable to fetch data from server.", "error");
+                return;
+            }
+
+            // Filter data matching Paid Date's Month and Year across all sheets
+            let filtered = allData.filter(r => {
+                let paidDateYM = extractYearMonthFromPaidDate(r["Paid Date"]);
+                return paidDateYM === targetYearMonth;
+            });
+
+            renderMonthlyTable(filtered);
+
+        } catch (e) {
+            Swal.close();
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
     }
 
-    function renderDailyTable(records) {
-        let tbody = document.getElementById('dailyTableBody');
+    function renderMonthlyTable(records) {
+        let tbody = document.getElementById('monthlyTableBody');
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No transactions found for this selection.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No payment collection found for this selected Month.</td></tr>';
             document.getElementById('totalTx').innerText = "0";
             document.getElementById('totalCollected').innerText = "₹0";
             document.getElementById('totalDiscount').innerText = "₹0";
