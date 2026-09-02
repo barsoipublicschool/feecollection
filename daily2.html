@@ -176,59 +176,56 @@
         });
     }
 
-    async function generateDailyReport() {
-        let fromVal = document.getElementById('fromDate').value;
-        let toVal = document.getElementById('toDate').value;
+    async function generateReport() {
+    let fromVal = document.getElementById('fromDate').value;
+    let toVal = document.getElementById('toDate').value;
 
-        if (!fromVal || !toVal) {
-            Swal.fire("Warning", "Please select valid From and To dates!", "warning");
+    if (!fromVal || !toVal) {
+        Swal.fire("Warning", "Please select both From and To dates!", "warning");
+        return;
+    }
+
+    // Convert inputs to Date objects for precise numeric comparison
+    let startDate = new Date(fromVal);
+    startDate.setHours(0, 0, 0, 0);
+
+    let endDate = new Date(toVal);
+    endDate.setHours(23, 59, 59, 999);
+
+    Swal.fire({ title: 'Fetching Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+    try {
+        // Fetch ALL data once just like Single Date code
+        const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+        const allData = await res.json();
+        Swal.close();
+
+        if (!allData || !Array.isArray(allData)) {
+            Swal.fire("Error", "Unable to fetch collection records.", "error");
             return;
         }
 
-        let fromDateObj = parseToDateObj(fromVal);
-        let toDateObj = parseToDateObj(toVal);
-        
-        if (fromDateObj) fromDateObj.setHours(0,0,0,0);
-        if (toDateObj) toDateObj.setHours(23,59,59,999);
+        // Precise Frontend Range Filtering
+        let filtered = allData.filter(r => {
+            if (!r["Paid Date"]) return false;
+            
+            // Parse Sheet Date (DD/MM/YYYY)
+            let parts = String(r["Paid Date"]).split(/[\/\-\.]/);
+            if (parts.length < 3) return false;
+            
+            // Create JavaScript Date Object (Year, MonthIndex, Day)
+            let rowDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+            rowDate.setHours(12, 0, 0, 0); // avoid boundary bugs
 
-        let dispFrom = formatDateDDMMYYYY(fromVal);
-        let dispTo = formatDateDDMMYYYY(toVal);
-        document.getElementById('displaySelectedDate').innerText = (dispFrom === dispTo) ? dispFrom : `${dispFrom} to ${dispTo}`;
+            return rowDate >= startDate && rowDate <= endDate;
+        });
 
-        Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        renderTable(filtered);
 
-        try {
-            // Passing parameters correctly without modifying Code.gs
-            const requestUrl = `${SCRIPT_URL}?action=searchData&id=all&fromDate=${encodeURIComponent(fromVal)}&toDate=${encodeURIComponent(toVal)}`;
-            const allData = await fetchJSONP(requestUrl);
-            Swal.close();
-
-            if (!allData || !Array.isArray(allData)) {
-                Swal.fire("Error", "Unable to fetch collection records.", "error");
-                return;
-            }
-
-            // Accurate Date Comparison Logic on Client Side
-            let filtered = allData.filter(r => {
-                let pDateRaw = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
-                let pDateObj = parseToDateObj(pDateRaw);
-
-                if (!pDateObj) return false;
-                
-                // Pure Date matching ignoring timezone boundaries
-                let recordTimestamp = new Date(pDateObj.getFullYear(), pDateObj.getMonth(), pDateObj.getDate()).getTime();
-                let fromTimestamp = new Date(fromDateObj.getFullYear(), fromDateObj.getMonth(), fromDateObj.getDate()).getTime();
-                let toTimestamp = new Date(toDateObj.getFullYear(), toDateObj.getMonth(), toDateObj.getDate()).getTime();
-
-                return recordTimestamp >= fromTimestamp && recordTimestamp <= toTimestamp;
-            });
-
-            renderDailyTable(filtered);
-
-        } catch (e) {
-            Swal.fire("Error", "Server/Network Error", "error");
-        }
+    } catch (e) {
+        Swal.fire("Error", "Server/Network Error", "error");
     }
+}
 
     function renderDailyTable(records) {
         let tbody = document.getElementById('dailyTableBody');
