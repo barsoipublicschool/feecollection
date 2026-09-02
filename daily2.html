@@ -100,7 +100,8 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxB4xQ4XzWfCHkoLOCtRtNHE9lXDMY8v4z1pxPhZlDZN7O5e0WdxRYR_MwMCNPC2xIbHQ/exec";
+    // Apne current project ka SCRIPT_URL yahan rakhein
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzOMms6nGiQiIU04zWVsr9ugtTcegsUZpmyYTrcFLVU6nEqX3F6ba_LQzZafk3xPtxNYw/exec";
 
     window.onload = () => {
         let today = new Date().toISOString().split('T')[0];
@@ -109,36 +110,45 @@
         generateDailyReport();
     };
 
-    function parseToDateObj(dateVal) {
-        if (!dateVal) return null;
-        if (dateVal instanceof Date) return dateVal;
-        let str = String(dateVal).trim();
-        
+    // Date String to Standard ISO 'YYYY-MM-DD' String Converter
+    function toISODateString(val) {
+        if (!val) return "";
+        let str = String(val).trim();
+
         if (str.includes('T')) {
             str = str.split('T')[0];
         }
-        
+
+        // Standard YYYY-MM-DD
         if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
-            let parts = str.split('-');
-            return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            return str;
         }
-        
+
+        // DD/MM/YYYY or DD-MM-YYYY format
         if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
             let parts = str.split(/[\/\-\.]/);
-            return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+            let day = parts[0].padStart(2, '0');
+            let month = parts[1].padStart(2, '0');
+            let year = parts[2];
+            return `${year}-${month}-${day}`;
         }
-        
+
+        // Try Fallback Native Parsing
         let d = new Date(str);
-        return isNaN(d.getTime()) ? null : d;
+        if (!isNaN(d.getTime())) {
+            let year = d.getFullYear();
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        return "";
     }
 
-    function formatDateDDMMYYYY(dateVal) {
-        let d = parseToDateObj(dateVal);
-        if (!d) return dateVal || "";
-        let day = String(d.getDate()).padStart(2, '0');
-        let month = String(d.getMonth() + 1).padStart(2, '0');
-        let year = d.getFullYear();
-        return `${day}/${month}/${year}`;
+    function formatDateDDMMYYYY(isoStr) {
+        if (!isoStr || !isoStr.includes('-')) return isoStr || "";
+        let parts = isoStr.split('-');
+        return `${parts[2]}/${parts[1]}/${parts[0]}`;
     }
 
     function getVal(rowObj, keyList) {
@@ -155,7 +165,6 @@
         return "";
     }
 
-    // JSONP Request to ensure cross-origin data loading
     function fetchJSONP(url) {
         return new Promise((resolve, reject) => {
             const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
@@ -170,51 +179,49 @@
             script.onerror = function() {
                 delete window[callbackName];
                 document.body.removeChild(script);
-                reject(new Error("Network / CORS Error"));
+                reject(new Error("Network Error"));
             };
             document.body.appendChild(script);
         });
     }
 
     async function generateDailyReport() {
-        let fromVal = document.getElementById('fromDate').value;
-        let toVal = document.getElementById('toDate').value;
+        let fromVal = document.getElementById('fromDate').value; // Format: YYYY-MM-DD
+        let toVal = document.getElementById('toDate').value;     // Format: YYYY-MM-DD
 
         if (!fromVal || !toVal) {
             Swal.fire("Warning", "Please select both From and To dates!", "warning");
             return;
         }
 
-        let startDate = parseToDateObj(fromVal);
-        let endDate = parseToDateObj(toVal);
-
-        if (!startDate || !endDate) {
-            Swal.fire("Warning", "Invalid date selection!", "warning");
+        if (fromVal > toVal) {
+            Swal.fire("Warning", "From Date cannot be greater than To Date!", "warning");
             return;
         }
-
-        startDate.setHours(0, 0, 0, 0);
-        endDate.setHours(23, 59, 59, 999);
 
         let formattedFrom = formatDateDDMMYYYY(fromVal);
         let formattedTo = formatDateDDMMYYYY(toVal);
         document.getElementById('displaySelectedDate').innerText = (formattedFrom === formattedTo) ? formattedFrom : `${formattedFrom} to ${formattedTo}`;
 
-        Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+        Swal.fire({ title: 'Fetching Collection Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         let allData = null;
 
         try {
-            // Try standard fetch first
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+            // First try basic parameter without action=searchData to avoid Google Script filtering bugs
+            let res = await fetch(`${SCRIPT_URL}?action=allData`);
             allData = await res.json();
+            if (!allData || !Array.isArray(allData)) {
+                // Fallback attempt
+                res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
+                allData = await res.json();
+            }
         } catch (e) {
             try {
-                // Fallback to JSONP if CORS fails
                 allData = await fetchJSONP(`${SCRIPT_URL}?action=searchData&id=all`);
             } catch (err) {
                 Swal.close();
-                Swal.fire("Error", "Server/Network Error while fetching records.", "error");
+                Swal.fire("Error", "Server Error while fetching records.", "error");
                 return;
             }
         }
@@ -222,21 +229,20 @@
         Swal.close();
 
         if (!allData || !Array.isArray(allData)) {
-            Swal.fire("Error", "Unable to fetch collection records.", "error");
+            Swal.fire("Error", "Unable to fetch collection records from Sheet.", "error");
             return;
         }
 
-        // Robust Frontend Range Filtering using parseToDateObj and getVal
+        // Direct String-based ISO Comparison (No Timezone issues!)
         let filtered = allData.filter(r => {
             let rawPaidDate = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
             if (!rawPaidDate) return false;
 
-            let rowDate = parseToDateObj(rawPaidDate);
-            if (!rowDate) return false;
+            let rowISODate = toISODateString(rawPaidDate);
+            if (!rowISODate) return false;
 
-            rowDate.setHours(12, 0, 0, 0); // Avoid timezone shift issues
-
-            return rowDate >= startDate && rowDate <= endDate;
+            // Direct YYYY-MM-DD String Comparison
+            return rowISODate >= fromVal && rowISODate <= toVal;
         });
 
         renderDailyTable(filtered);
@@ -256,7 +262,10 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((r, idx) => {
-            let paidDate = formatDateDDMMYYYY(getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"])) || "N/A";
+            let rawDate = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
+            let isoDate = toISODateString(rawDate);
+            let paidDate = formatDateDDMMYYYY(isoDate) || rawDate || "N/A";
+            
             let receiptNo = getVal(r, ["Receipt No", "ReceiptNo", "Receipt"]) || "N/A";
             let studentName = getVal(r, ["Student Name", "Students' Name", "Name"]) || "";
             let studentId = getVal(r, ["Student Id", "Student ID", "Reg No", "Reg No/ Student ID"]) || "";
