@@ -57,7 +57,6 @@
         <h4 style="margin:5px 0; color:var(--p);">DAILY COLLECTION REPORT (<span id="displaySelectedDate">--/--/----</span>)</h4>
     </div>
 
-    <!-- Summary Statistics Cards -->
     <div class="summary-grid">
         <div class="card">
             <h4>TOTAL TRANSACTIONS</h4>
@@ -77,7 +76,6 @@
         </div>
     </div>
 
-    <!-- Detailed Transactions Table -->
     <div style="overflow-x:auto;">
         <table class="report-table">
             <thead>
@@ -105,31 +103,26 @@
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwtL9-Vp0zAZoK_mRbwPpICoA_BbDp1LoxuGNX8Vo8Rc2kYXl6wX0C8qIuWVtRUIBh4nw/exec";
 
     window.onload = () => {
-        // Default set both inputs to today's date
         let today = new Date().toISOString().split('T')[0];
         document.getElementById('fromDate').value = today;
         document.getElementById('toDate').value = today;
         generateDailyReport();
     };
 
-    // Safe Date Parsing without Timezone Shift
     function parseToDateObj(dateVal) {
         if (!dateVal) return null;
         if (dateVal instanceof Date) return dateVal;
         let str = String(dateVal).trim();
         
-        // Handle ISO String with T (e.g. 2026-09-01T00:00:00)
         if (str.includes('T')) {
             str = str.split('T')[0];
         }
         
-        // YYYY-MM-DD
         if (str.match(/^\d{4}-\d{2}-\d{2}$/)) {
             let parts = str.split('-');
             return new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
         }
         
-        // DD/MM/YYYY or DD-MM-YYYY
         if (str.match(/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}$/)) {
             let parts = str.split(/[\/\-\.]/);
             return new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
@@ -148,7 +141,6 @@
         return `${day}/${month}/${year}`;
     }
 
-    // Dynamic Helper to extract values regardless of header spelling/case variations
     function getVal(rowObj, keyList) {
         if (!rowObj) return "";
         for (let key of keyList) {
@@ -161,6 +153,27 @@
             }
         }
         return "";
+    }
+
+    // JSONP Helper to bypass CORS Network Error
+    function fetchJSONP(url) {
+        return new Promise((resolve, reject) => {
+            const callbackName = 'jsonp_cb_' + Math.round(100000 * Math.random());
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                resolve(data);
+            };
+
+            const script = document.createElement('script');
+            script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'callback=' + callbackName;
+            script.onerror = function() {
+                delete window[callbackName];
+                document.body.removeChild(script);
+                reject(new Error("Network / CORS Error"));
+            };
+            document.body.appendChild(script);
+        });
     }
 
     async function generateDailyReport() {
@@ -185,8 +198,9 @@
         Swal.fire({ title: 'Fetching Daily Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
-            const res = await fetch(`${SCRIPT_URL}?action=searchData&id=all`);
-            const allData = await res.json();
+            // Using JSONP request to prevent Server Network Error
+            const requestUrl = `${SCRIPT_URL}?action=searchData&id=all&fromDate=${fromVal}&toDate=${toVal}`;
+            const allData = await fetchJSONP(requestUrl);
             Swal.close();
 
             if (!allData || !Array.isArray(allData)) {
@@ -194,13 +208,13 @@
                 return;
             }
 
-            // Filter records matching Date Range based on "Paid Date"
+            // Filter records matching Date Range
             let filtered = allData.filter(r => {
                 let pDateRaw = getVal(r, ["Paid Date", "PaidDate", "Date", "Entry Date"]);
                 let pDateObj = parseToDateObj(pDateRaw);
 
                 if (!pDateObj) return false;
-                pDateObj.setHours(12,0,0,0); // normalize time for accurate comparison
+                pDateObj.setHours(12,0,0,0);
 
                 let inRange = true;
                 if (fromDateObj && pDateObj < fromDateObj) inRange = false;
@@ -211,7 +225,7 @@
             renderDailyTable(filtered);
 
         } catch (e) {
-            Swal.fire("Error", "Server/Network Error", "error");
+            Swal.fire("Error", "Server/Network Error. Apps Script Web App me access 'Anyone' hai ya nahi check karein.", "error");
         }
     }
 
