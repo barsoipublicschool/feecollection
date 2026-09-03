@@ -608,38 +608,66 @@
         return str.trim();
     }
 
-    function shareWhatsApp() {
-        if(!currentActiveReceipt) return;
-        let d = currentActiveReceipt;
-        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
+    // Mobile Number Extract Helper Function
+function extractMobile(d) {
+    if (!d) return "";
+    return (d["Mobile"] || d["Phone"] || d["Contact"] || d["Mobile No"] || "").toString();
+}
 
-        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-                  `-----------------------------------\n` +
-                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
-                  `📅 *Date:* ${displayDate}\n` +
-                  `👤 *Student Name:* ${d["Student Name"]}\n` +
-                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
-                  `🏫 *Class:* ${d["Class"]}\n` +
-                  `🗓️ *Month:* ${d["Month"]}\n` +
-                  `-----------------------------------\n` +
-                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
-                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-                  `-----------------------------------\n` +
-                  `Thank you for the payment!\n` +
-                  `_Barsoi Public School Management_`;
-
-        let phoneNum = (d["Mobile"] || d["Phone"] || "").toString().replace(/[^0-9]/g, '');
-        if (phoneNum.length === 10) phoneNum = "91" + phoneNum;
-
-        let url = (phoneNum && phoneNum.length >= 10) 
-            ? `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`
-            : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-        
-        window.open(url, '_blank');
+// Updated WhatsApp Sharing Function
+function shareWhatsApp() {
+    if(!currentActiveReceipt) return;
+    let d = currentActiveReceipt;
+    
+    // Date formatting with fallbacks
+    let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
+    if (typeof displayDate === 'object') {
+        displayDate = formatDateDDMMYYYY(displayDate);
     }
+
+    // Receipt View / Download Link
+    let receiptNo = d["Receipt No"] || "";
+    let downloadLink = `https://barsoipublicschool-fees.onrender.com/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"] || "")}`;
+
+    // WhatsApp Message Body
+    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+              `-----------------------------------\n` +
+              `📄 *Receipt No:* ${receiptNo}\n` +
+              `📅 *Date:* ${displayDate}\n` +
+              `👤 *Student Name:* ${d["Student Name"] || "N/A"}\n` +
+              `🆔 *Student ID:* ${d["Student Id"] || "N/A"}\n` +
+              `🏫 *Class:* ${d["Class"] || "N/A"}\n` +
+              `🗓️ *Month:* ${d["Month"] || "N/A"}\n` +
+              `-----------------------------------\n` +
+              `💵 *Total Amount:* ₹${d["Sub Total"] || 0}\n` +
+              `🎯 *Discount:* ₹${d["Discount"] || 0}\n` +
+              `✅ *Paid Amount:* ₹${d["Total Paid"] || 0}\n` +
+              `🔻 *Due Balance:* ₹${d["Remaining"] || 0}\n` +
+              `-----------------------------------\n` +
+              `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
+              `-----------------------------------\n` +
+              `Thank you for the payment!\n` +
+              `_Barsoi Public School Management_`;
+
+    // Phone Number Extraction & Clean-up
+    let rawMob = extractMobile(d);
+    let phoneNum = rawMob.replace(/[^0-9]/g, '');
+    
+    if (phoneNum.length === 10) {
+        phoneNum = "91" + phoneNum;
+    }
+
+    // Generate WhatsApp API URL
+    let url = "";
+    if (phoneNum && phoneNum.length >= 10) {
+        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
+    } else {
+        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+    }
+    
+    window.open(url, '_blank');
+}
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
