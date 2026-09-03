@@ -135,11 +135,12 @@
         generateMonthlyReport();
     };
 
-    function formatDateDDMMYYYY(dateVal) {
+    // Strictly parse and format date object/string as DD/MM/YYYY
+    function getCleanDDMMYYYY(dateVal) {
         if (!dateVal) return "";
         let s = String(dateVal).trim();
-        
-        // Strict DD/MM/YYYY or DD-MM-YYYY format
+
+        // Standard Indian Format DD/MM/YYYY or DD-MM-YYYY
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
             let p = s.split(/[\/\-\.]/);
             let d = p[0].padStart(2, '0');
@@ -147,22 +148,23 @@
             let y = p[2];
             return `${d}/${m}/${y}`;
         }
-        
-        // ISO YYYY-MM-DD format
+
+        // If Google Sheet sends YYYY-MM-DD ISO String
         if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
             let p = s.substring(0, 10).split('-');
+            // Forced mapping: p[0]=YYYY, p[1]=MM, p[2]=DD -> DD/MM/YYYY
             return `${p[2]}/${p[1]}/${p[0]}`;
         }
-        
+
         return s;
     }
 
-    // Extract Year and Month string (YYYY-MM) assuming DD/MM/YYYY
-    function extractYearMonthFromPaidDate(dateVal) {
+    // Extract Year and Month strictly from DD/MM/YYYY or YYYY-MM-DD
+    function extractYearMonthStrict(dateVal) {
         if (!dateVal) return null;
         let s = String(dateVal).trim();
 
-        // Standard Indian Format DD/MM/YYYY or DD-MM-YYYY (p[0]=Day, p[1]=Month, p[2]=Year)
+        // Standard Indian Format DD/MM/YYYY or DD-MM-YYYY (p[0]=DD, p[1]=MM, p[2]=YYYY)
         if (/^\d{1,2}[\/\-\.]\d{1,2}[\/\-\.]\d{4}/.test(s)) {
             let p = s.split(/[\/\-\.]/);
             let m = p[1].padStart(2, '0');
@@ -170,9 +172,10 @@
             return `${y}-${m}`;
         }
 
-        // ISO Format YYYY-MM-DD
+        // ISO Format YYYY-MM-DD (p[0]=YYYY, p[1]=MM, p[2]=DD)
         if (/^\d{4}-\d{2}-\d{2}/.test(s)) {
-            return s.substring(0, 7);
+            let p = s.substring(0, 10).split('-');
+            return `${p[0]}-${p[1]}`;
         }
 
         return null;
@@ -205,8 +208,9 @@
                 return;
             }
 
+            // Filter entries matching the chosen Month and Year
             let filtered = allData.filter(r => {
-                let paidDateYM = extractYearMonthFromPaidDate(r["Paid Date"]);
+                let paidDateYM = extractYearMonthStrict(r["Paid Date"]);
                 return paidDateYM === targetYearMonth;
             });
 
@@ -232,7 +236,7 @@
         let totPaid = 0, totDisc = 0, totDue = 0, html = "";
 
         records.forEach((r, idx) => {
-            let paidDate = formatDateDDMMYYYY(r["Paid Date"]) || "N/A";
+            let paidDateFormatted = getCleanDDMMYYYY(r["Paid Date"]) || "N/A";
             let subTotal = parseFloat(r["Sub Total"]) || 0;
             let discount = parseFloat(r["Discount"]) || 0;
             let paid = parseFloat(r["Total Paid"]) || 0;
@@ -244,7 +248,7 @@
 
             html += `<tr>
                 <td>${idx + 1}</td>
-                <td><b>${paidDate}</b></td>
+                <td><b>${paidDateFormatted}</b></td>
                 <td><b>${r["Receipt No"] || "N/A"}</b></td>
                 <td>${r["Student Name"] || ""} (${r["Student Id"] || ""})</td>
                 <td>${r["Class"] || ""}</td>
