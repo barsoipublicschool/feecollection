@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <base target="_top">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Date Range Collection Report - Barsoi Public School</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        :root { --p: #1a237e; --bg: #f4f7f6; }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg); margin: 0; padding: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h2 { color: var(--p); text-align: center; margin-top: 0; }
+        
+        .filter-section { background: #f8f9fa; border: 1px solid #e0e0e0; padding: 15px; border-radius: 6px; margin-bottom: 20px; }
+        .filter-row { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
+
+        input[type="date"] { padding: 8px 12px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; font-family: inherit; background: white; }
+        .btn-btn { background: var(--p); color: white; border: none; padding: 8px 18px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 13px; }
+        .btn-print { background: #2e7d32; }
+        .btn-today { background: #0288d1; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .card { background: #f8f9fa; border-left: 4px solid var(--p); padding: 12px 15px; border-radius: 4px; }
+        .card h4 { margin: 0; font-size: 12px; color: #666; }
+        .card p { margin: 5px 0 0; font-size: 18px; font-weight: bold; color: var(--p); }
+        
+        .report-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+        .report-table th { background: var(--p); color: white; padding: 10px; text-align: left; }
+        .report-table td { padding: 9px 10px; border-bottom: 1px solid #ddd; }
+        .report-table tr:nth-child(even) { background-color: #f9f9f9; }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { box-shadow: none; max-width: 100%; width: 100%; margin: 0; padding: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="no-print">
+        <h2>BARSOI PUBLIC SCHOOL</h2>
+        <h3 style="text-align:center; color:#555; margin-top:-10px;">Date-wise / Daily Collection Report</h3>
+        
+        <div class="filter-section">
+            <div class="filter-row">
+                <label><b>From Date:</b></label>
+                <input type="date" id="fromDate">
+
+                <label><b>To Date:</b></label>
+                <input type="date" id="toDate">
+
+                <button class="btn-btn" onclick="generateDateRangeReport()">GENERATE REPORT</button>
+                <button class="btn-btn btn-today" onclick="setTodayAndSearch()">TODAY'S REPORT</button>
+                <button class="btn-btn btn-print" onclick="window.print()">PRINT REPORT 🖨️</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="printHeader" style="text-align:center; margin-bottom:15px;">
+        <h2 style="margin:0;">BARSOI PUBLIC SCHOOL</h2>
+        <p style="margin:2px; font-size:12px;">NEHAR NAGAR, BLOCK ROAD, BARSOI (KATIHAR)</p>
+        <h4 style="margin:5px 0; color:var(--p);">COLLECTION REPORT - <span id="displaySelectedRange">--/--/---- to --/--/----</span></h4>
+    </div>
+
+    <!-- Summary Statistics Cards -->
+    <div class="summary-grid">
+        <div class="card">
+            <h4>TOTAL TRANSACTIONS</h4>
+            <p id="totalTx">0</p>
+        </div>
+        <div class="card" style="border-left-color: #2e7d32;">
+            <h4>TOTAL COLLECTED (₹)</h4>
+            <p id="totalCollected" style="color:#2e7d32;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #fbc02d;">
+            <h4>TOTAL DISCOUNT (₹)</h4>
+            <p id="totalDiscount" style="color:#fbc02d;">₹0</p>
+        </div>
+        <div class="card" style="border-left-color: #c62828;">
+            <h4>TOTAL DUES CREATED (₹)</h4>
+            <p id="totalDues" style="color:#c62828;">₹0</p>
+        </div>
+    </div>
+
+    <!-- Detailed Transactions Table -->
+    <div style="overflow-x:auto;">
+        <table class="report-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Paid Date</th>
+                    <th>Receipt No</th>
+                    <th>Student Name</th>
+                    <th>Class</th>
+                    <th>Fee Month</th>
+                    <th>Sub Total</th>
+                    <th>Discount</th>
+                    <th>Paid</th>
+                    <th>Balance Due</th>
+                </tr>
+            </thead>
+            <tbody id="dateRangeTableBody">
+                <tr><td colspan="10" style="text-align:center; color:#666;">Please select Date Range to generate report.</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgInUry6aOVsKq0ZEPO_dXWKOm_4MI0ZbqmbXJ5xuWYrmriod3dL34bQtU1YzbpLDPjw/exec";
+
+    window.onload = () => {
+        setTodayAndSearch();
+    };
+
+    function setTodayAndSearch() {
+        let today = new Date();
+        let yyyy = today.getFullYear();
+        let mm = String(today.getMonth() + 1).padStart(2, '0');
+        let dd = String(today.getDate()).padStart(2, '0');
+        let todayStr = `${yyyy}-${mm}-${dd}`;
+
+        document.getElementById('fromDate').value = todayStr;
+        document.getElementById('toDate').value = todayStr;
+        
+        generateDateRangeReport();
+    }
+
+    // Convert YYYY-MM-DD input to DD/MM/YYYY string for display
+    function formatDisplayDate(dateStr) {
+        if (!dateStr) return "";
+        let p = dateStr.split('-');
+        if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+        return dateStr;
+    }
+
+    async function generateDateRangeReport() {
+        let fromDateVal = document.getElementById('fromDate').value;
+        let toDateVal = document.getElementById('toDate').value;
+
+        if (!fromDateVal || !toDateVal) {
+            Swal.fire("Warning", "Please select both From Date and To Date!", "warning");
+            return;
+        }
+
+        let fromDisplay = formatDisplayDate(fromDateVal);
+        let toDisplay = formatDisplayDate(toDateVal);
+
+        document.getElementById('displaySelectedRange').innerText = (fromDisplay === toDisplay) ? fromDisplay : `${fromDisplay} to ${toDisplay}`;
+
+        Swal.fire({ title: 'Fetching Collection Data...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
+
+        try {
+            // Backend Apps Script searchData method called with date range directly
+            const url = `${SCRIPT_URL}?action=searchData&id=all&fromDate=${fromDateVal}&toDate=${toDateVal}`;
+            const res = await fetch(url);
+            const data = await res.json();
+            Swal.close();
+
+            if (!Array.isArray(data)) {
+                Swal.fire("Error", "Unable to fetch data from server.", "error");
+                return;
+            }
+
+            renderReportTable(data);
+
+        } catch (e) {
+            Swal.close();
+            Swal.fire("Error", "Server/Network Connection Error", "error");
+        }
+    }
+
+    function renderReportTable(records) {
+        let tbody = document.getElementById('dateRangeTableBody');
+        if (records.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:red; font-weight:bold;">No payment collection found for the selected date range.</td></tr>';
+            document.getElementById('totalTx').innerText = "0";
+            document.getElementById('totalCollected').innerText = "₹0";
+            document.getElementById('totalDiscount').innerText = "₹0";
+            document.getElementById('totalDues').innerText = "₹0";
+            return;
+        }
+
+        let totPaid = 0, totDisc = 0, totDue = 0, html = "";
+
+        records.forEach((r, idx) => {
+            let paidDateFormatted = r["Paid Date"] || "N/A";
+            let subTotal = parseFloat(r["Sub Total"]) || 0;
+            let discount = parseFloat(r["Discount"]) || 0;
+            let paid = parseFloat(r["Total Paid"]) || 0;
+            let remaining = parseFloat(r["Remaining"]) || 0;
+
+            totPaid += paid;
+            totDisc += discount;
+            totDue += remaining;
+
+            html += `<tr>
+                <td>${idx + 1}</td>
+                <td><b>${paidDateFormatted}</b></td>
+                <td><b>${r["Receipt No"] || "N/A"}</b></td>
+                <td>${r["Student Name"] || ""} (${r["Student Id"] || ""})</td>
+                <td>${r["Class"] || ""}</td>
+                <td>${r["Month"] || ""}</td>
+                <td>₹${subTotal}</td>
+                <td>₹${discount}</td>
+                <td style="color:#2e7d32; font-weight:bold;">₹${paid}</td>
+                <td style="color:${remaining > 0 ? 'red' : 'green'}; font-weight:bold;">₹${remaining}</td>
+            </tr>`;
+        });
+
+        tbody.innerHTML = html;
+        document.getElementById('totalTx').innerText = records.length;
+        document.getElementById('totalCollected').innerText = `₹${totPaid}`;
+        document.getElementById('totalDiscount').innerText = `₹${totDisc}`;
+        document.getElementById('totalDues').innerText = `₹${totDue}`;
+    }
+</script>
+</body>
+</html>
