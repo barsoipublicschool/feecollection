@@ -403,31 +403,46 @@
     }
 
     function handleLogin(e) {
-        e.preventDefault();
-        const selectedRole = document.getElementById('userRole').value;
-        const user = document.getElementById('username').value.trim().toLowerCase();
-        const pass = document.getElementById('password').value;
+    e.preventDefault();
+    const selectedRole = document.getElementById('userRole').value;
+    const user = document.getElementById('username').value.trim().toLowerCase();
+    const pass = document.getElementById('password').value;
 
-        if (selectedRole === 'admin' && user === 'admin' && pass === 'admin123') {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userRole', 'admin');
-            sessionStorage.setItem('userName', 'Administrator');
-            
-            Swal.fire({ icon: 'success', title: 'Welcome Admin!', timer: 1000, showConfirmButton: false })
-            .then(() => showDashboard());
-        } 
-        else if (selectedRole === 'operator' && user === 'staff' && pass === 'staff123') {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            sessionStorage.setItem('userRole', 'operator');
-            sessionStorage.setItem('userName', 'Counter Staff');
-            
-            Swal.fire({ icon: 'success', title: 'Welcome Staff!', timer: 1000, showConfirmButton: false })
-            .then(() => showDashboard());
-        } 
-        else {
-            Swal.fire('Login Failed', 'Wrong Username, Password or Selected Role!', 'error');
-        }
+    if (selectedRole === 'admin' && user === 'admin' && pass === 'admin123') {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', 'admin');
+        sessionStorage.setItem('userName', 'Administrator');
+        
+        Swal.fire({ icon: 'success', title: 'Welcome Admin!', timer: 1000, showConfirmButton: false })
+        .then(() => {
+            showDashboard();
+        });
+    } 
+    else if (selectedRole === 'operator' && user === 'staff' && pass === 'staff123') {
+        sessionStorage.setItem('isLoggedIn', 'true');
+        sessionStorage.setItem('userRole', 'operator');
+        sessionStorage.setItem('userName', 'Counter Staff');
+        
+        Swal.fire({ icon: 'success', title: 'Welcome Staff!', timer: 1000, showConfirmButton: false })
+        .then(() => {
+            showDashboard();
+        });
+    } 
+    else {
+        Swal.fire('Login Failed', 'Wrong Username, Password or Selected Role!', 'error');
     }
+}
+
+function showDashboard() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('dashboardView').style.display = 'block';
+    
+    // Smooth delay to avoid Chart rendering break
+    setTimeout(() => {
+        checkUserRole();
+        loadDashboardData();
+    }, 100);
+}
 
     function logoutUser() {
         sessionStorage.clear();
