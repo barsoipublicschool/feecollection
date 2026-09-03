@@ -403,46 +403,31 @@
     }
 
     function handleLogin(e) {
-    e.preventDefault();
-    const selectedRole = document.getElementById('userRole').value;
-    const user = document.getElementById('username').value.trim().toLowerCase();
-    const pass = document.getElementById('password').value;
+        e.preventDefault();
+        const selectedRole = document.getElementById('userRole').value;
+        const user = document.getElementById('username').value.trim().toLowerCase();
+        const pass = document.getElementById('password').value;
 
-    if (selectedRole === 'admin' && user === 'admin' && pass === 'admin123') {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userRole', 'admin');
-        sessionStorage.setItem('userName', 'Administrator');
-        
-        Swal.fire({ icon: 'success', title: 'Welcome Admin!', timer: 1000, showConfirmButton: false })
-        .then(() => {
-            showDashboard();
-        });
-    } 
-    else if (selectedRole === 'operator' && user === 'staff' && pass === 'staff123') {
-        sessionStorage.setItem('isLoggedIn', 'true');
-        sessionStorage.setItem('userRole', 'operator');
-        sessionStorage.setItem('userName', 'Counter Staff');
-        
-        Swal.fire({ icon: 'success', title: 'Welcome Staff!', timer: 1000, showConfirmButton: false })
-        .then(() => {
-            showDashboard();
-        });
-    } 
-    else {
-        Swal.fire('Login Failed', 'Wrong Username, Password or Selected Role!', 'error');
+        if (selectedRole === 'admin' && user === 'admin' && pass === 'admin123') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userRole', 'admin');
+            sessionStorage.setItem('userName', 'Administrator');
+            
+            Swal.fire({ icon: 'success', title: 'Welcome Admin!', timer: 1000, showConfirmButton: false })
+            .then(() => showDashboard());
+        } 
+        else if (selectedRole === 'operator' && user === 'staff' && pass === 'staff123') {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('userRole', 'operator');
+            sessionStorage.setItem('userName', 'Counter Staff');
+            
+            Swal.fire({ icon: 'success', title: 'Welcome Staff!', timer: 1000, showConfirmButton: false })
+            .then(() => showDashboard());
+        } 
+        else {
+            Swal.fire('Login Failed', 'Wrong Username, Password or Selected Role!', 'error');
+        }
     }
-}
-
-function showDashboard() {
-    document.getElementById('loginView').style.display = 'none';
-    document.getElementById('dashboardView').style.display = 'block';
-    
-    // Smooth delay to avoid Chart rendering break
-    setTimeout(() => {
-        checkUserRole();
-        loadDashboardData();
-    }, 100);
-}
 
     function logoutUser() {
         sessionStorage.clear();
@@ -623,51 +608,38 @@ function showDashboard() {
         return str.trim();
     }
 
-    if(!currentActiveReceipt) return;
-    let d = currentActiveReceipt;
-    
-    let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
+    function shareWhatsApp() {
+        if(!currentActiveReceipt) return;
+        let d = currentActiveReceipt;
+        let displayDate = d["Paid Date"] ? formatDateDDMMYYYY(d["Paid Date"]) : formatDateDDMMYYYY(new Date());
 
-    // Receipt View / Download Link (GitHub Pages Path)
-    let receiptNo = d["Receipt No"] || "";
-    let downloadLink = `https://barsoipublicschool-fees.onrender.com/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
+        let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
+                  `📍 Nehar Nagar, Barsoi (Katihar)\n` +
+                  `-----------------------------------\n` +
+                  `📄 *Receipt No:* ${d["Receipt No"] || "N/A"}\n` +
+                  `📅 *Date:* ${displayDate}\n` +
+                  `👤 *Student Name:* ${d["Student Name"]}\n` +
+                  `🆔 *Student ID:* ${d["Student Id"]}\n` +
+                  `🏫 *Class:* ${d["Class"]}\n` +
+                  `🗓️ *Month:* ${d["Month"]}\n` +
+                  `-----------------------------------\n` +
+                  `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
+                  `🎯 *Discount:* ₹${d["Discount"]}\n` +
+                  `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
+                  `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
+                  `-----------------------------------\n` +
+                  `Thank you for the payment!\n` +
+                  `_Barsoi Public School Management_`;
 
-    let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
-              `📍 Nehar Nagar, Barsoi (Katihar)\n` +
-              `-----------------------------------\n` +
-              `📄 *Receipt No:* ${receiptNo}\n` +
-              `📅 *Date:* ${displayDate}\n` +
-              `👤 *Student Name:* ${d["Student Name"]}\n` +
-              `🆔 *Student ID:* ${d["Student Id"]}\n` +
-              `🏫 *Class:* ${d["Class"]}\n` +
-              `🗓️ *Month:* ${d["Month"]}\n` +
-              `-----------------------------------\n` +
-              `💵 *Total Amount:* ₹${d["Sub Total"]}\n` +
-              `🎯 *Discount:* ₹${d["Discount"]}\n` +
-              `✅ *Paid Amount:* ₹${d["Total Paid"]}\n` +
-              `🔻 *Due Balance:* ₹${d["Remaining"]}\n` +
-              `-----------------------------------\n` +
-              `📥 *Download/Print Receipt:* \n${downloadLink}\n` +
-              `-----------------------------------\n` +
-              `Thank you for the payment!\n` +
-              `_Barsoi Public School Management_`;
+        let phoneNum = (d["Mobile"] || d["Phone"] || "").toString().replace(/[^0-9]/g, '');
+        if (phoneNum.length === 10) phoneNum = "91" + phoneNum;
 
-    let rawMob = extractMobile(d);
-    let phoneNum = rawMob.replace(/[^0-9]/g, '');
-    
-    if (phoneNum.length === 10) {
-        phoneNum = "91" + phoneNum;
+        let url = (phoneNum && phoneNum.length >= 10) 
+            ? `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`
+            : `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
+        
+        window.open(url, '_blank');
     }
-
-    let url = "";
-    if (phoneNum && phoneNum.length >= 10) {
-        url = `https://api.whatsapp.com/send?phone=${phoneNum}&text=${encodeURIComponent(msg)}`;
-    } else {
-        url = `https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`;
-    }
-    
-    window.open(url, '_blank');
-}
 
     function generateReceiptHTML(d, type) {
         let sl = 1; let rows = "";
