@@ -227,9 +227,32 @@
         document.getElementById('totalDueAmount').innerText = `₹${totDueSum}`;
     }
 
-    // Helper: WhatsApp Text Template
+        // Helper: WhatsApp Text Template with UPI Direct Link & Dynamic QR Code
     function buildWhatsAppText(name, due, month) {
-        return `Dear Parent,\n\nThis is a polite reminder from *BARSOI PUBLIC SCHOOL* regarding the pending fee of your child *${name}*.\n\n📌 *Pending Due:* ₹${due}\n📌 *Month:* ${month}\n\nKindly submit the fee at the school office at the earliest.\n\nThank you,\n*Barsoi Public School Management*`;
+        // UPI Details setup
+        let upiId = "riyazahmad5@okaxis";
+        let payeeName = encodeURIComponent("Barsoi Public School");
+        let amount = due;
+
+        // Direct UPI Deep Link (Click to Pay)
+        let upiLink = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR`;
+
+        // Dynamic QR Code Link (Auto-generated according to due amount)
+        let qrCodeLink = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+
+        return `Dear Parent,\n\n` +
+               `This is a polite reminder from *BARSOI PUBLIC SCHOOL* regarding the pending fee of your child *${name}*.\n\n` +
+               `📌 *Pending Due:* ₹${due}\n` +
+               `📌 *Month:* ${month}\n\n` +
+               `-----------------------------------\n` +
+               `🚀 *[ CLICK HERE TO PAY ]*\n` +
+               `${upiLink}\n\n` +
+               `📷 *[ PAYMENT BY QR CODE ]*\n` +
+               `${qrCodeLink}\n` +
+               `-----------------------------------\n\n` +
+               `Kindly submit the fee online or at the school office at the earliest.\n\n` +
+               `Thank you,\n` +
+               `*Barsoi Public School Management*`;
     }
 
     // Helper: Format Mobile Number with 91 Prefix
