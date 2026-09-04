@@ -238,7 +238,7 @@
         let upiLink = `upi://pay?pa=${upiId}&pn=${payeeName}&am=${amount}&cu=INR`;
 
         // Dynamic QR Code Link (Auto-generated according to due amount)
-        let qrCodeLink = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upiLink)}`;
+        let qrCodeLink = `https://api.qrserver.com/v1/create-qr-code/?size=750x750&data=${encodeURIComponent(upiLink)}`;
 
         return `Dear Parent,\n\n` +
                `This is a polite reminder from *BARSOI PUBLIC SCHOOL* regarding the pending fee of your child *${name}*.\n\n` +
