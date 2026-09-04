@@ -322,8 +322,7 @@
         if(!currentActiveReceipt) return;
         let d = currentActiveReceipt;
         
-        let displayDate = formatDateDDMMYYYY(d["Paid Date"] || d["Entry Date"]);
-
+        let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
         // Receipt View / Download Link (GitHub Pages Path)
         let receiptNo = d["Receipt No"] || "";
         let downloadLink = `https://barsoipublicschool-fees.onrender.com/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"])}`;
@@ -406,7 +405,7 @@
         });
 
         let logo = "https://drive.google.com/thumbnail?id=14JG21SYtSpghaukrY6_QTB-LCYPZ8gkE&sz=w300";
-        let displayDate = formatDateDDMMYYYY(d["Paid Date"] || d["Entry Date"]);
+        let displayDate = d["Paid Date"] || d["Entry Date"] || formatDateDDMMYYYY(new Date());
 
         return `
             <div class="receipt-inner" style="display:flex; flex-direction:column; height:100%;">
