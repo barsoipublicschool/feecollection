@@ -7,6 +7,9 @@
     
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- SweetAlert2 CSS & JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
@@ -624,12 +627,20 @@
         }
     }
 
+    // --- SWEETALERT INTEGRATED LOGIN FUNCTION (OPTION 2 FIX) ---
     async function loginStudent() {
         let sid = document.getElementById('login-sid').value.trim();
         let mobile = document.getElementById('login-mobile').value.trim();
 
         if(!sid || !mobile) {
-            alert("Kripya Student ID aur Mobile Number dono bharein");
+            Swal.fire({
+                icon: 'warning',
+                title: 'Missing Fields',
+                text: 'Kripya Student ID aur Mobile Number dono bharein.',
+                background: '#0d2f2b',
+                color: '#f0fdfa',
+                confirmButtonColor: '#0d9488'
+            });
             return;
         }
 
@@ -638,7 +649,14 @@
             const result = await res.json();
 
             if(result.status === "error") {
-                alert(result.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Access Denied!',
+                    text: result.message || 'Invalid Student ID or Mobile Number.',
+                    background: '#0d2f2b',
+                    color: '#f0fdfa',
+                    confirmButtonColor: '#0d9488'
+                });
                 return;
             }
 
@@ -663,11 +681,32 @@
 
             renderDashboard(studentRecords);
 
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard-screen').style.display = 'block';
+            // SweetAlert Popup trigger
+            Swal.fire({
+                icon: 'success',
+                title: 'Welcome Back!',
+                text: 'Student login successful.',
+                background: '#0d2f2b',
+                color: '#f0fdfa',
+                timer: 1000,
+                showConfirmButton: false
+            });
+
+            // Parallel execution to avoid WebView freezing
+            setTimeout(function() {
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard-screen').style.display = 'block';
+            }, 1000);
 
         } catch(e) {
-            alert("Could not connect server : " + e.message);
+            Swal.fire({
+                icon: 'error',
+                title: 'Connection Error',
+                text: 'Could not connect to server: ' + e.message,
+                background: '#0d2f2b',
+                color: '#f0fdfa',
+                confirmButtonColor: '#0d9488'
+            });
         }
     }
 
@@ -716,16 +755,31 @@
     }
 
     function logout() {
-        document.getElementById('dashboard-screen').style.display = 'none';
-        document.getElementById('login-screen').style.display = 'flex';
-        document.getElementById('login-sid').value = '';
-        document.getElementById('login-mobile').value = '';
-        
-        document.getElementById('iframe-admit').src = 'about:blank';
-        document.getElementById('iframe-icard').src = 'about:blank';
-        document.getElementById('iframe-result').src = 'about:blank';
-        document.getElementById('iframe-homework').src = 'about:blank';
-        document.getElementById('iframe-progress').src = 'about:blank';
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You will be logged out of the portal.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#0d9488',
+            cancelButtonColor: '#ef4444',
+            confirmButtonText: 'Yes, Logout',
+            cancelButtonText: 'Cancel',
+            background: '#0d2f2b',
+            color: '#f0fdfa'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('dashboard-screen').style.display = 'none';
+                document.getElementById('login-screen').style.display = 'flex';
+                document.getElementById('login-sid').value = '';
+                document.getElementById('login-mobile').value = '';
+                
+                document.getElementById('iframe-admit').src = 'about:blank';
+                document.getElementById('iframe-icard').src = 'about:blank';
+                document.getElementById('iframe-result').src = 'about:blank';
+                document.getElementById('iframe-homework').src = 'about:blank';
+                document.getElementById('iframe-progress').src = 'about:blank';
+            }
+        });
     }
 
     function generateReceiptHTML(d, type) {
