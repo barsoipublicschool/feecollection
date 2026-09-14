@@ -2,1094 +2,342 @@
 <html lang="hi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BARSOI PUBLIC SCHOOL - PARENT PORTAL</title>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root {
-            --p: #4c46e5;
-            --p-dark: #3730a3;
+        :root { 
+            --p: #4c46e5; 
+            --p-dark: #3730a3; 
             --bg: #f3f4f6;
+            --bg-dark: #061e1b;
+            --card-dark: #0d2f2b;
+            --card-border: rgba(20, 184, 166, 0.2);
+            --accent-gradient: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%);
+            --accent-hover: linear-gradient(135deg, #0f766e 0%, #0891b2 100%);
+            --text-main: #f0fdfa;
+            --text-muted: #99f6e4;
         }
 
         * {
             box-sizing: border-box;
-        }
-
-        html,
-        body {
             margin: 0;
             padding: 0;
-            width: 100%;
-            min-height: 100%;
+            font-family: 'Poppins', sans-serif;
         }
 
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: var(--bg);
-            color: #1e293b;
-            -webkit-text-size-adjust: 100%;
+        body { 
+            background: var(--bg); 
+            margin: 0; 
+            padding: 0; 
         }
 
-        button,
-        input {
-            font-family: Arial, Helvetica, sans-serif;
-        }
-
-        .top-bar {
-            background: #1e293b;
-            color: white;
-            padding: 10px;
-            text-align: center;
-            font-weight: 600;
-            font-size: 13px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-
-        /* ================= LOGIN ================= */
-
-        #login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 90vh;
-            padding: 15px;
-        }
-
-        .login-card {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            width: 100%;
-            max-width: 360px;
-            overflow: hidden;
-            text-align: center;
-        }
-
-        .login-header {
-            background: linear-gradient(135deg, #5145cd, #4338ca);
-            color: white;
-            padding: 25px 15px;
-        }
-
-        .login-icon {
-            background: rgba(255,255,255,0.2);
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-size: 20px;
-        }
-
-        .login-header h2 {
-            margin: 0;
-            font-size: 15px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .login-header p {
-            margin: 3px 0 0;
-            font-size: 10px;
-            opacity: 0.8;
-        }
-
-        .login-body {
-            padding: 20px;
-        }
-
-        .login-body h3 {
-            margin: 0 0 4px;
-            font-size: 14px;
-            color: #1e293b;
-        }
-
-        .login-sub {
-            font-size: 10px;
-            color: #64748b;
-            margin-bottom: 18px;
-        }
-
-        .input-box {
-            margin-bottom: 12px;
-            text-align: left;
-        }
-
-        .input-box label {
-            font-size: 10px;
-            font-weight: 600;
-            color: #475569;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .input-field {
-            display: flex;
-            align-items: center;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px 12px;
-        }
-
-        .input-field span {
-            font-size: 14px;
-            margin-right: 8px;
-            color: #94a3b8;
-        }
-
-        .input-field input {
-            border: none;
-            background: transparent;
-            outline: none;
-            width: 100%;
-            font-size: 12px;
-            font-weight: 500;
-            color: #1e293b;
-            min-width: 0;
-        }
-
-        .btn-portal {
-            width: 100%;
-            padding: 10px;
-            background: #4f46e5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .btn-portal:active {
-            background: #3730a3;
-        }
-
-        .login-footer {
-            font-size: 9px;
-            color: #94a3b8;
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-
-        /* ================= DASHBOARD ================= */
-
-        #dashboard-screen {
-            display: none;
-            max-width: 1100px;
-            margin: 15px auto;
-            padding: 0 10px;
-        }
-
-        .dashboard-container {
-            display: flex;
-            gap: 15px;
-            align-items: flex-start;
-        }
-
-        .sidebar {
-            width: 240px;
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-            flex-shrink: 0;
-        }
-
-        .sidebar-toggle-btn {
-            display: none;
-            width: 100%;
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-
-        .sidebar h3 {
-            font-size: 12px;
-            color: #64748b;
-            margin-top: 0;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .nav-btn {
-            width: 100%;
-            text-align: left;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            padding: 10px 12px;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            color: #334155;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .nav-btn:active,
-        .nav-btn.active {
-            background: #4f46e5;
-            color: white;
-            border-color: #4f46e5;
-        }
-
-        .nav-btn.direct-link {
-            background: #059669;
-            color: white;
-            border-color: #059669;
-        }
-
-        .nav-btn.leave-link {
-            background: #d97706;
-            color: white;
-            border-color: #d97706;
-        }
-
-        .main-content {
-            flex-grow: 1;
-            min-width: 0;
-        }
-
-        .due-banner {
-            background: #fef2f2;
-            border: 1.5px solid #fca5a5;
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .due-banner-text {
-            color: #991b1b;
-            font-size: 13px;
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .due-banner-amount {
-            color: #dc2626;
-            font-size: 20px;
-            font-weight: 900;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            border-bottom: 1px solid #f1f5f9;
-            padding-bottom: 8px;
-            gap: 8px;
-        }
-
-        .card-title {
-            color: #2563eb;
-            font-size: 13px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .btn-logout {
-            background: #fef2f2;
-            color: #ef4444;
-            border: 1px solid #fca5a5;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: 600;
-            white-space: nowrap;
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: 85px 1fr;
-            gap: 15px;
-            align-items: center;
-        }
-
-        .avatar {
-            width: 75px;
-            height: 90px;
-            border-radius: 8px;
-            background: #f1f5f9;
-            border: 2px solid #cbd5e1;
-            object-fit: cover;
-            display: block;
-            margin: 0 auto;
-        }
-
-        .student-id-badge {
-            background: #2563eb;
-            color: white;
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-            margin-top: 6px;
-            display: inline-block;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 4px;
-            font-size: 11px;
-            color: #64748b;
-        }
-
-        .info-grid div span {
-            color: #1e293b;
-            font-weight: 600;
-        }
-
-        /* ================= TABLE ================= */
-
-        .table-responsive {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        .dash-table {
-            width: 100%;
-            min-width: 650px;
-            border-collapse: collapse;
-            margin-top: 5px;
-            font-size: 11px;
-            text-align: center;
-        }
-
-        .dash-table th {
-            background: #0f172a;
-            color: white;
-            padding: 8px 4px;
-            font-weight: 500;
-            font-size: 10px;
-        }
-
-        .dash-table td {
-            padding: 8px 4px;
-            border-bottom: 1px solid #f1f5f9;
-            font-size: 10px;
-        }
-
-        .btn-view-rec {
-            background: #eff6ff;
-            color: #2563eb;
-            border: 1px solid #bfdbfe;
-            padding: 3px 6px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        /* ================= TABS ================= */
-
-        .tab-section {
-            display: none;
-        }
-
-        .tab-section.active {
-            display: block;
-        }
-
-        .portal-iframe {
-            width: 100%;
-            height: 650px;
-            border: none;
-            border-radius: 8px;
-            background: #ffffff;
-            display: block;
-        }
-
-        /* ================= LOADER ================= */
-
-        #custom-loader {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 99999;
-            justify-content: center;
-            align-items: center;
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-        }
-
-        .loader-box {
-            background: #fff;
-            color: #000;
-            padding: 18px 25px;
-            border-radius: 8px;
-            text-align: center;
-            max-width: 85%;
-        }
-
-        /* ================= ERROR ================= */
-
-        #webview-error {
-            display: none;
-            position: fixed;
-            left: 10px;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 100000;
-            text-align: center;
-        }
-
-        #webview-error h3 {
-            margin: 0 0 10px;
-            color: #dc2626;
-        }
-
-        #webview-error p {
-            font-size: 12px;
-            color: #475569;
-            word-break: break-word;
-        }
-
-        #webview-error button {
-            background: #4f46e5;
-            color: white;
-            border: none;
-            padding: 9px 20px;
-            border-radius: 7px;
-            font-weight: bold;
-        }
-
-        /* ================= RECEIPT ================= */
-
-        #receipt-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: white;
-            z-index: 9999;
-            overflow-y: auto;
-            padding: 10px;
-        }
-
-        .print-wrapper {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            margin: 0 auto;
-            padding: 5mm;
-        }
-
-        .receipt-box {
-            width: 100%;
-            max-width: 480px;
-            background: #ffdae9;
-            border: 1.5px solid #000;
-            padding: 12px;
-            color: #000;
-            font-family: Arial, sans-serif;
+        /* --- LOGIN SCREEN STYLE --- */
+        #login-screen { 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh; 
+            padding: 1.5rem 1rem; 
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(13, 148, 136, 0.25) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(6, 182, 212, 0.2) 0px, transparent 50%);
         }
 
-        .r-header {
+        .login-card { 
+            background: #ffffff; 
+            border-radius: 24px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6); 
+            width: 100%; 
+            max-width: 420px; 
+            overflow: hidden; 
+            color: #1e293b;
+            transition: all 0.3s ease;
+        }
+
+        .login-card-header { 
+            background: linear-gradient(135deg, #0f766e 0%, #0e7490 100%); 
+            padding: 2rem 1.5rem; 
+            text-align: center; 
+            color: #ffffff;
             position: relative;
         }
 
-        .r-header h2 {
+        .header-icon-circle { 
+            width: 70px; 
+            height: 70px; 
+            background: rgba(255, 255, 255, 0.15); 
+            border-radius: 50%; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto 1rem auto; 
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fbbf24;
+            font-size: 1.8rem;
+        }
+
+        .login-card-header h2 { 
+            font-size: 1.5rem; 
+            font-weight: 700; 
+            letter-spacing: 0.5px; 
             margin: 0;
-            font-size: 16px;
-            font-weight: 900;
-            text-align: center;
-            color: #000;
+            color: #ffffff;
         }
 
-        .r-header p {
-            margin: 1px;
-            font-size: 8px;
-            font-weight: bold;
-            text-align: center;
-            color: #000;
+        .login-card-header p { 
+            font-size: 0.75rem; 
+            color: #ccfbf1; 
+            margin-top: 0.25rem; 
+        }
+        
+        .login-form { 
+            padding: 1.8rem 1.5rem; 
+        }
+        
+        .input-group { 
+            margin-bottom: 1.25rem; 
+            text-align: left; 
         }
 
-        .school-logo {
-            width: 45px;
-            height: 45px;
-            position: absolute;
-            left: 5px;
-            top: 15px;
+        .input-group label { 
+            display: block; 
+            margin-bottom: 0.4rem; 
+            font-size: 0.75rem; 
+            color: #475569; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 0.5px; 
         }
 
-        .top-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 9.5px;
-            margin-top: 4px;
-            border-bottom: 1px solid #000;
-            padding-bottom: 2px;
+        .input-wrapper { 
+            position: relative; 
+            display: flex; 
+            align-items: center; 
         }
 
-        .copy-tag {
-            background: #000;
-            color: #fff;
-            padding: 1px 6px;
-            font-size: 8px;
-            font-weight: bold;
-            text-transform: uppercase;
-            border-radius: 2px;
+        .input-wrapper i { 
+            position: absolute; 
+            left: 1rem; 
+            color: #94a3b8; 
+            font-size: 0.95rem; 
         }
 
-        .student-details {
-            display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            font-size: 9.5px;
-            margin-top: 4px;
-            line-height: 1.2;
+        .input-wrapper input { 
+            width: 100%; 
+            padding: 0.85rem 1rem 0.85rem 2.6rem; 
+            background: #f8fafc; 
+            border: 1px solid #cbd5e1; 
+            border-radius: 12px; 
+            font-size: 0.9rem; 
+            color: #0f172a; 
+            outline: none; 
+            transition: all 0.2s ease; 
+            font-weight: 500; 
         }
 
-        .r-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 4px;
-            border: 1.2px solid #000;
-            background: transparent;
+        .input-wrapper input:focus { 
+            border-color: #0d9488; 
+            background: #ffffff; 
+            box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15); 
         }
 
-        .r-table th {
-            background: transparent !important;
-            color: #000 !important;
-            border: 1px solid #000;
-            padding: 2px 4px;
-            font-size: 9px;
-            font-weight: bold;
-            line-height: 1.1;
+        .btn-login { 
+            width: 100%; 
+            padding: 0.9rem; 
+            background: linear-gradient(135deg, #0d9488 0%, #06b6d4 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 12px; 
+            font-size: 0.95rem; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 10px 20px -5px rgba(13, 148, 136, 0.4); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            margin-top: 1.5rem; 
         }
 
-        .r-table td {
-            background: transparent !important;
-            color: #000 !important;
-            border: 1px solid #000;
-            padding: 2px 4px;
-            font-size: 9px;
-            line-height: 1.1;
+        .btn-login:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
         }
 
-        .r-table tfoot th,
-        .r-table tfoot td {
-            background: transparent !important;
+        .form-footer-tag { 
+            background: #f8fafc; 
+            padding: 0.75rem; 
+            text-align: center; 
+            border-top: 1px solid #f1f5f9; 
+            font-size: 0.75rem; 
+            color: #64748b; 
         }
 
-        .words-section {
-            border-bottom: 1px dotted #000;
-            padding: 3px 0;
-            font-size: 9px;
-            margin-top: 5px;
-            font-style: italic;
-        }
+        /* --- DASHBOARD STYLES --- */
+        #dashboard-screen { display: none; max-width: 1100px; margin: 15px auto; padding: 0 10px; }
+        .dashboard-container { display: flex; gap: 15px; align-items: flex-start; }
+        
+        .sidebar { width: 240px; background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); flex-shrink: 0; }
+        .sidebar-toggle-btn { display: none; width: 100%; background: #4f46e5; color: white; border: none; padding: 10px 15px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        
+        .sidebar h3 { font-size: 12px; color: #64748b; margin-top: 0; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .nav-btn { width: 100%; text-align: left; background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; color: #334155; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .nav-btn:hover, .nav-btn.active { background: #4f46e5; color: white; border-color: #4f46e5; }
+        .nav-btn.direct-link { background: #059669; color: white; border-color: #059669; }
+        .nav-btn.leave-link { background: #d97706; color: white; border-color: #d97706; }
 
-        .footer-sigs {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 20px;
-            padding-top: 15px;
-            font-size: 9.5px;
-            font-weight: bold;
-        }
+        .main-content { flex-grow: 1; min-width: 0; }
+        .due-banner { background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px; padding: 12px 16px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .due-banner-text { color: #991b1b; font-size: 13px; font-weight: 700; text-transform: uppercase; }
+        .due-banner-amount { color: #dc2626; font-size: 20px; font-weight: 900; }
 
-        /* ================= MOBILE ================= */
+        .card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid #f1f5f9; padding-bottom: 8px; }
+        .card-title { color: #2563eb; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+        .btn-logout { background: #fef2f2; color: #ef4444; border: 1px solid #fca5a5; padding: 3px 8px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 600; }
+
+        .profile-grid { display: grid; grid-template-columns: 85px 1fr; gap: 15px; align-items: center; }
+        .avatar { width: 75px; height: 90px; border-radius: 8px; background: #f1f5f9; border: 2px solid #cbd5e1; object-fit: cover; display: block; margin: 0 auto; }
+        .student-id-badge { background: #2563eb; color: white; font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: bold; margin-top: 6px; display: inline-block; }
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; font-size: 11px; color: #64748b; }
+        .info-grid div span { color: #1e293b; font-weight: 600; }
+
+        .table-responsive { overflow-x: auto; }
+        .dash-table { width: 100%; border-collapse: collapse; margin-top: 5px; font-size: 11px; text-align: center; }
+        .dash-table th { background: #0f172a; color: white; padding: 8px 4px; font-weight: 500; font-size: 10px; }
+        .dash-table td { padding: 8px 4px; border-bottom: 1px solid #f1f5f9; font-size: 10px; }
+        .btn-view-rec { background: #eff6ff; color: #2563eb; border: 1px solid #bfdbfe; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: bold; }
+
+        .tab-section { display: none; }
+        .tab-section.active { display: block; }
+
+        .portal-iframe { width: 100%; height: 650px; border: none; border-radius: 8px; background: #ffffff; }
+
+        #receipt-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; z-index: 9999; overflow-y: auto; padding: 10px; box-sizing: border-box; }
+        .print-wrapper { display: flex; justify-content: center; width: 100%; margin: 0 auto; padding: 5mm; box-sizing: border-box; }
+        .receipt-box { width: 100%; max-width: 480px; background: #ffdae9; border: 1.5px solid #000; padding: 12px; color: #000; font-family: Arial, sans-serif; box-sizing: border-box; display: flex; flex-direction: column; }
 
         @media (max-width: 768px) {
-
-            #dashboard-screen {
-                margin: 10px auto;
-                padding: 0 8px;
-            }
-
-            .dashboard-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                padding: 10px;
-            }
-
-            .sidebar-toggle-btn {
-                display: flex;
-            }
-
-            .sidebar-menu-content {
-                display: none;
-            }
-
-            .sidebar-menu-content.open {
-                display: block;
-            }
-
-            .portal-iframe {
-                height: 500px;
-            }
-
-            .profile-grid {
-                grid-template-columns: 80px 1fr;
-                gap: 10px;
-            }
-
-            .info-grid {
-                grid-template-columns: 1fr;
-                font-size: 10px;
-            }
-
-            .info-grid div[style*="grid-column"] {
-                grid-column: span 1 !important;
-            }
-
-            .due-banner {
-                padding: 10px;
-            }
-
-            .due-banner-text {
-                font-size: 11px;
-            }
-
-            .due-banner-amount {
-                font-size: 18px;
-            }
-        }
-
-        /* ================= PRINT ================= */
-
-        @media print {
-
-            @page {
-                size: A4 portrait;
-                margin: 0;
-            }
-
-            body > *:not(#receipt-modal) {
-                display: none !important;
-            }
-
-            #receipt-modal {
-                display: block !important;
-                position: absolute !important;
-                left: 0 !important;
-                top: 0 !important;
-                width: 100% !important;
-                height: auto !important;
-                background: #ffffff !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
-
-            .no-print {
-                display: none !important;
-            }
-
-            .print-wrapper {
-                width: 100% !important;
-                padding: 5mm !important;
-                display: flex !important;
-                justify-content: center !important;
-                box-sizing: border-box !important;
-            }
-
-            .receipt-box {
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
-                width: 100% !important;
-                max-width: 100% !important;
-            }
+            .dashboard-container { flex-direction: column; }
+            .sidebar { width: 100%; box-sizing: border-box; padding: 10px; }
+            .sidebar-toggle-btn { display: flex; }
+            .sidebar-menu-content { display: none; }
+            .sidebar-menu-content.open { display: block; }
+            .portal-iframe { height: 500px; }
         }
     </style>
 </head>
-
 <body>
 
-<!-- ================= LOADER ================= -->
-
-<div id="custom-loader">
-    <div class="loader-box">
-        Authenticating... Please Wait.
-    </div>
-</div>
-
-<!-- ================= ERROR BOX ================= -->
-
-<div id="webview-error">
-    <h3>⚠️ Connection Error</h3>
-    <p id="webview-error-text">
-        Server से connection नहीं हो पाया।
-    </p>
-    <button onclick="hideWebviewError()">RETRY</button>
-</div>
-
-<!-- ================= TOP BAR ================= -->
-
-<div class="top-bar no-print">
-    🎓 BARSOI PUBLIC SCHOOL - PARENT PORTAL
-</div>
-
-<!-- ================= LOGIN ================= -->
-
+<!-- LOGIN SCREEN -->
 <div id="login-screen" class="no-print">
-
     <div class="login-card">
-
-        <div class="login-header">
-
-            <div class="login-icon">
-                🎓
+        <div class="login-card-header">
+            <div class="header-icon-circle">
+                <i class="fas fa-user-graduate"></i>
             </div>
-
-            <h2>BARSOI PUBLIC SCHOOL</h2>
-
-            <p>
-                Student Fee & Profile Portal
-            </p>
-
+            <h2>Student Portal</h2>
+            <p>Login with ID/Roll No & Registered Mobile</p>
         </div>
-
-        <div class="login-body">
-
-            <h3>
-                Student Login
-            </h3>
-
-            <div class="login-sub">
-                Login with ID/Roll No & Registered Mobile
-            </div>
-
-            <div class="input-box">
-
-                <label>
-                    Student ID / Roll No
-                </label>
-
-                <div class="input-field">
-
-                    <span>💳</span>
-
-                    <input
-                        type="text"
-                        id="login-sid"
-                        placeholder="e.g. 77"
-                        autocomplete="off"
-                    >
-
+        
+        <div class="login-form">
+            <div class="input-group">
+                <label for="login-sid">Student ID / Roll No</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-id-card"></i>
+                    <input type="text" id="login-sid" placeholder="e.g. 77" required>
                 </div>
-
             </div>
-
-            <div class="input-box">
-
-                <label>
-                    Mobile Number
-                </label>
-
-                <div class="input-field">
-
-                    <span>📞</span>
-
-                    <input
-                        type="tel"
-                        id="login-mobile"
-                        placeholder="e.g. 9471685668"
-                        maxlength="10"
-                        autocomplete="off"
-                    >
-
+            <div class="input-group">
+                <label for="login-mobile">Mobile Number</label>
+                <div class="input-wrapper">
+                    <i class="fas fa-phone"></i>
+                    <input type="text" id="login-mobile" placeholder="e.g. 9471685668" required>
                 </div>
-
             </div>
-
-            <button
-                class="btn-portal"
-                id="login-button"
-                onclick="loginStudent()"
-            >
-                Login to Portal ➔
+            <button type="button" id="submitBtn" class="btn-login" onclick="loginStudent()">
+                <span id="btnText">Login to Portal</span>
+                <i class="fas fa-arrow-right" id="btnIcon"></i>
             </button>
-
-            <div class="login-footer">
-                Powered by Barsoi Public School Digital Systems
-            </div>
-
         </div>
 
+        <div class="form-footer-tag">
+            Powered by Barsoi Public School Digital Systems
+        </div>
     </div>
-
 </div>
 
-<!-- ================= DASHBOARD ================= -->
-
+<!-- DASHBOARD SCREEN -->
 <div id="dashboard-screen" class="no-print">
-
     <div class="dashboard-container">
-
-        <!-- SIDEBAR -->
-
+        
         <div class="sidebar">
-
-            <button
-                class="sidebar-toggle-btn"
-                onclick="toggleSidebarMenu()"
-            >
-
-                <span>
-                    ☰ Menu / Options
-                </span>
-
-                <span id="toggle-arrow">
-                    ▼
-                </span>
-
+            <button class="sidebar-toggle-btn" onclick="toggleSidebarMenu()">
+                <span>☰ Menu / Options</span>
+                <span id="toggle-arrow">▼</span>
             </button>
-
-            <div
-                class="sidebar-menu-content"
-                id="sidebar-menu"
-            >
-
-                <h3>
-                    Dashboard Menu
-                </h3>
-
-                <button
-                    class="nav-btn active"
-                    onclick="switchTab(event, 'fees-section')"
-                >
-                    💳 Fees
-                </button>
-
-                <button
-                    class="nav-btn"
-                    onclick="switchTab(event, 'admit-section')"
-                >
-                    🎫 Admit Card
-                </button>
-
-                <button
-                    class="nav-btn"
-                    onclick="switchTab(event, 'icard-section')"
-                >
-                    🪪 Identity Card
-                </button>
-
-                <button
-                    class="nav-btn"
-                    onclick="switchTab(event, 'result-section')"
-                >
-                    📊 Result
-                </button>
-
-                <button
-                    class="nav-btn"
-                    onclick="switchTab(event, 'homework-section')"
-                >
-                    📚 Homework
-                </button>
-
-                <button
-                    class="nav-btn"
-                    onclick="switchTab(event, 'progress-section')"
-                >
-                    📈 Progress
-                </button>
-
-                <button
-                    class="nav-btn direct-link"
-                    onclick="openStudyMaterials()"
-                >
-                    📚 Study Materials ➔
-                </button>
-
-                <button
-                    class="nav-btn leave-link"
-                    onclick="openLeaveApplication()"
-                >
-                    📝 Application for Leave ➔
-                </button>
-
+            <div class="sidebar-menu-content" id="sidebar-menu">
+                <h3>Dashboard Menu</h3>
+                <button class="nav-btn active" onclick="switchTab(event, 'fees-section')">💳 Fees</button>
+                <button class="nav-btn" onclick="switchTab(event, 'admit-section')">🎫 Admit Card</button>
+                <button class="nav-btn" onclick="switchTab(event, 'icard-section')">🪪 Identity Card</button>
+                <button class="nav-btn" onclick="switchTab(event, 'result-section')">📊 Result</button>
+                <button class="nav-btn" onclick="switchTab(event, 'homework-section')">📚 Homework</button>
+                <button class="nav-btn" onclick="switchTab(event, 'progress-section')">📈 Progress</button>
+                <button class="nav-btn direct-link" onclick="openStudyMaterials()">📚 Study Materials ➔</button>
+                <button class="nav-btn leave-link" onclick="openLeaveApplication()">📝 Application for Leave ➔</button>
             </div>
-
         </div>
-
-        <!-- MAIN CONTENT -->
 
         <div class="main-content">
-
-            <!-- STUDENT DETAILS -->
-
+            
             <div class="card">
-
                 <div class="card-header">
-
-                    <div class="card-title">
-                        👤 Student Details
-                    </div>
-
-                    <button
-                        class="btn-logout"
-                        onclick="logout()"
-                    >
-                        [→ Logout
-                    </button>
-
+                    <div class="card-title">👤 Student Details</div>
+                    <button class="btn-logout" onclick="logout()">[→ Logout</button>
                 </div>
-
                 <div class="profile-grid">
-
                     <div style="text-align:center;">
-
-                        <img
-                            id="st-photo"
-                            class="avatar"
-                            src="https://via.placeholder.com/75x90?text=No+Photo"
-                            alt="Photo"
-                        >
-
-                        <div
-                            id="st-name"
-                            style="font-weight:bold;font-size:12px;margin-top:4px;color:#1e293b;"
-                        >
-                            -
-                        </div>
-
-                        <div
-                            class="student-id-badge"
-                            id="st-badge"
-                        >
-                            ID: -
-                        </div>
-
+                        <img id="st-photo" class="avatar" src="https://via.placeholder.com/75x90?text=No+Photo" alt="Photo" onerror="this.src='https://via.placeholder.com/75x90?text=No+Photo'">
+                        <div id="st-name" style="font-weight:bold; font-size:12px; margin-top:4px; color:#1e293b;">-</div>
+                        <div class="student-id-badge" id="st-badge">ID: -</div>
                     </div>
-
                     <div class="info-grid">
-
-                        <div>
-                            Class:
-                            <span id="st-class">-</span>
-                        </div>
-
-                        <div>
-                            Roll No:
-                            <span id="st-roll">-</span>
-                        </div>
-
-                        <div>
-                            Father's Name:
-                            <span id="st-father">-</span>
-                        </div>
-
-                        <div>
-                            Mother's Name:
-                            <span id="st-mother">-</span>
-                        </div>
-
-                        <div>
-                            Date of Birth:
-                            <span id="st-dob">-</span>
-                        </div>
-
-                        <div>
-                            Mobile No:
-                            <span id="st-mobile">-</span>
-                        </div>
-
-                        <div style="grid-column: span 2;">
-                            Address:
-                            <span id="st-address">-</span>
-                        </div>
-
+                        <div>Class: <span id="st-class">-</span></div>
+                        <div>Roll No: <span id="st-roll">-</span></div>
+                        <div>Father's Name: <span id="st-father">-</span></div>
+                        <div>Mother's Name: <span id="st-mother">-</span></div>
+                        <div>Date of Birth: <span id="st-dob">-</span></div>
+                        <div>Mobile No: <span id="st-mobile">-</span></div>
+                        <div style="grid-column: span 2;">Address: <span id="st-address">-</span></div>
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- ================= FEES ================= -->
-
-            <div
-                id="fees-section"
-                class="tab-section active"
-            >
-
+            <!-- 1. FEES TAB SECTION -->
+            <div id="fees-section" class="tab-section active">
                 <div class="due-banner">
-
-                    <div class="due-banner-text">
-                        ⚠️ Total Remaining Dues:
-                    </div>
-
-                    <div
-                        class="due-banner-amount"
-                        id="total-due-val"
-                    >
-                        ₹0
-                    </div>
-
+                    <div class="due-banner-text">⚠️ Total Remaining Dues:</div>
+                    <div class="due-banner-amount" id="total-due-val">₹0</div>
                 </div>
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <div class="card-title">
-                            💳 Fee Payment History & Receipts
-                        </div>
-
+                        <div class="card-title">💳 Fee Payment History & Receipts</div>
                     </div>
-
                     <div class="table-responsive">
-
                         <table class="dash-table">
-
                             <thead>
-
                                 <tr>
                                     <th>Month</th>
                                     <th>Receipt No</th>
@@ -1100,1399 +348,287 @@
                                     <th>Remaining</th>
                                     <th>Receipt</th>
                                 </tr>
-
                             </thead>
-
                             <tbody id="history-rows">
-
-                                <tr>
-                                    <td colspan="8">
-                                        Searching records...
-                                    </td>
-                                </tr>
-
+                                <tr><td colspan='8'>Searching records...</td></tr>
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
-
             </div>
 
-            <!-- ================= ADMIT ================= -->
-
-            <div
-                id="admit-section"
-                class="tab-section"
-            >
-
-                <div
-                    class="card"
-                    style="padding:10px;"
-                >
-
+            <!-- 2. ADMIT CARD TAB SECTION -->
+            <div id="admit-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
                     <div class="card-header">
-
-                        <div class="card-title">
-                            🎫 Examination Admit Card
-                        </div>
-
+                        <div class="card-title">🎫 Examination Admit Card</div>
                     </div>
-
-                    <iframe
-                        id="iframe-admit"
-                        class="portal-iframe"
-                        src="about:blank"
-                        loading="lazy"
-                    ></iframe>
-
+                    <iframe id="iframe-admit" class="portal-iframe" src="about:blank"></iframe>
                 </div>
-
             </div>
 
-            <!-- ================= ID CARD ================= -->
-
-            <div
-                id="icard-section"
-                class="tab-section"
-            >
-
-                <div
-                    class="card"
-                    style="padding:10px;"
-                >
-
+            <!-- 3. IDENTITY CARD TAB SECTION -->
+            <div id="icard-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
                     <div class="card-header">
-
-                        <div class="card-title">
-                            🪪 Student Identity Card
-                        </div>
-
+                        <div class="card-title">🪪 Student Identity Card</div>
                     </div>
-
-                    <iframe
-                        id="iframe-icard"
-                        class="portal-iframe"
-                        src="about:blank"
-                        loading="lazy"
-                    ></iframe>
-
+                    <iframe id="iframe-icard" class="portal-iframe" src="about:blank"></iframe>
                 </div>
-
             </div>
 
-            <!-- ================= RESULT ================= -->
-
-            <div
-                id="result-section"
-                class="tab-section"
-            >
-
-                <div
-                    class="card"
-                    style="padding:10px;"
-                >
-
+            <!-- 4. RESULT TAB SECTION -->
+            <div id="result-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
                     <div class="card-header">
-
-                        <div class="card-title">
-                            📊 Annual / Term Exam Result Card
-                        </div>
-
+                        <div class="card-title">📊 Annual / Term Exam Result Card</div>
                     </div>
-
-                    <iframe
-                        id="iframe-result"
-                        class="portal-iframe"
-                        src="about:blank"
-                        loading="lazy"
-                    ></iframe>
-
+                    <iframe id="iframe-result" class="portal-iframe" src="about:blank"></iframe>
                 </div>
-
             </div>
 
-            <!-- ================= HOMEWORK ================= -->
-
-            <div
-                id="homework-section"
-                class="tab-section"
-            >
-
-                <div
-                    class="card"
-                    style="padding:10px;"
-                >
-
+            <!-- 5. HOMEWORK TAB SECTION -->
+            <div id="homework-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
                     <div class="card-header">
-
-                        <div class="card-title">
-                            📚 Daily Homework & Assignment
-                        </div>
-
+                        <div class="card-title">📚 Daily Homework & Assignment</div>
                     </div>
-
-                    <iframe
-                        id="iframe-homework"
-                        class="portal-iframe"
-                        src="about:blank"
-                        loading="lazy"
-                    ></iframe>
-
+                    <iframe id="iframe-homework" class="portal-iframe" src="about:blank"></iframe>
                 </div>
-
             </div>
 
-            <!-- ================= PROGRESS ================= -->
-
-            <div
-                id="progress-section"
-                class="tab-section"
-            >
-
-                <div
-                    class="card"
-                    style="padding:10px;"
-                >
-
+            <!-- 6. PROGRESS TAB SECTION -->
+            <div id="progress-section" class="tab-section">
+                <div class="card" style="padding: 10px;">
                     <div class="card-header">
-
-                        <div class="card-title">
-                            📈 Student Performance & Attendance
-                        </div>
-
+                        <div class="card-title">📈 Student Performance & Attendance</div>
                     </div>
-
-                    <iframe
-                        id="iframe-progress"
-                        class="portal-iframe"
-                        src="about:blank"
-                        loading="lazy"
-                    ></iframe>
-
+                    <iframe id="iframe-progress" class="portal-iframe" src="about:blank"></iframe>
                 </div>
-
             </div>
 
         </div>
-
     </div>
-
-</div>
-
-<!-- ================= RECEIPT ================= -->
-
-<div id="receipt-modal">
-
-    <div class="print-wrapper">
-
-        <div
-            class="receipt-box"
-            id="guardian-copy"
-        ></div>
-
-    </div>
-
-    <div
-        class="no-print"
-        style="text-align:center;margin-top:15px;padding-bottom:30px;display:flex;justify-content:center;gap:10px;"
-    >
-
-        <button
-            onclick="triggerReceiptPrint()"
-            style="padding:8px 20px;background:#16a34a;color:white;border:none;cursor:pointer;font-weight:bold;border-radius:5px;font-size:11px;"
-        >
-            PRINT / SAVE PDF 🖨️
-        </button>
-
-        <button
-            onclick="closeReceipt()"
-            style="padding:8px 20px;background:#475569;color:white;border:none;border-radius:5px;cursor:pointer;font-size:11px;"
-        >
-            CLOSE ✖
-        </button>
-
-    </div>
-
 </div>
 
 <script>
-
-"use strict";
-
-/* ============================================================
-   CONFIGURATION
-   ============================================================ */
-
-const SCRIPT_URL =
-"https://script.google.com/macros/s/AKfycbwgInUry6aOVsKq0ZEPO_dXWKOm_4MI0ZbqmbXJ5xuWYrmriod3dL34bQtU1YzbpLDPjw/exec";
-
-const BASE_URLS = {
-
-    admit:
-    "https://barsoipublicschool.github.io/admitcard",
-
-    icard:
-    "https://barsoipublicschool.github.io/icard",
-
-    result:
-    "https://barsoipublicschool.github.io/result",
-
-    homework:
-    "",
-
-    progress:
-    "",
-
-    studymaterials:
-    "https://barsoipublicschool.github.io/aaa",
-
-    leave:
-    "https://barsoipublicschool.github.io/leave"
-
-};
-
-
-/* ============================================================
-   GLOBAL VARIABLES
-   ============================================================ */
-
-let studentRecords = [];
-
-let currentStudentClass = "";
-
-let currentStudentRoll = "";
-
-let loginInProgress = false;
-
-
-/* ============================================================
-   SAFE URL OPEN
-   ============================================================ */
-
-function openUrlInWebView(url) {
-
-    if (!url) {
-        return;
-    }
-
-    try {
-
-        window.location.href = url;
-
-    } catch (e) {
-
-        window.open(url, "_self");
-
-    }
-
-}
-
-
-/* ============================================================
-   STUDY MATERIALS
-   ============================================================ */
-
-function openStudyMaterials() {
-
-    let targetUrl = BASE_URLS.studymaterials;
-
-    if (!targetUrl) {
-        return;
-    }
-
-    let params = [];
-
-    if (currentStudentClass) {
-
-        params.push(
-            "class=" +
-            encodeURIComponent(currentStudentClass)
-        );
-
-    }
-
-    if (currentStudentRoll) {
-
-        params.push(
-            "roll=" +
-            encodeURIComponent(currentStudentRoll)
-        );
-
-    }
-
-    if (params.length > 0) {
-
-        targetUrl += "?" + params.join("&");
-
-    }
-
-    openUrlInWebView(targetUrl);
-
-}
-
-
-/* ============================================================
-   LEAVE APPLICATION
-   ============================================================ */
-
-function openLeaveApplication() {
-
-    let targetUrl = BASE_URLS.leave;
-
-    if (!targetUrl) {
-        return;
-    }
-
-    let params = [];
-
-    if (currentStudentClass) {
-
-        params.push(
-            "class=" +
-            encodeURIComponent(currentStudentClass)
-        );
-
-    }
-
-    if (currentStudentRoll) {
-
-        params.push(
-            "roll=" +
-            encodeURIComponent(currentStudentRoll)
-        );
-
-    }
-
-    if (params.length > 0) {
-
-        targetUrl += "?" + params.join("&");
-
-    }
-
-    openUrlInWebView(targetUrl);
-
-}
-
-
-/* ============================================================
-   SIDEBAR
-   ============================================================ */
-
-function toggleSidebarMenu() {
-
-    let menu =
-        document.getElementById("sidebar-menu");
-
-    let arrow =
-        document.getElementById("toggle-arrow");
-
-    if (!menu || !arrow) {
-        return;
-    }
-
-    if (
-        menu.style.display === "block"
-    ) {
-
-        menu.style.display = "none";
-
-        arrow.innerText = "▼";
-
-    } else {
-
-        menu.style.display = "block";
-
-        arrow.innerText = "▲";
-
-    }
-
-}
-
-
-/* ============================================================
-   ERROR BOX
-   ============================================================ */
-
-function showWebviewError(message) {
-
-    let box =
-        document.getElementById("webview-error");
-
-    let text =
-        document.getElementById("webview-error-text");
-
-    if (text) {
-        text.innerText = message;
-    }
-
-    if (box) {
-        box.style.display = "block";
-    }
-
-}
-
-
-function hideWebviewError() {
-
-    let box =
-        document.getElementById("webview-error");
-
-    if (box) {
-        box.style.display = "none";
-    }
-
-}
-
-
-/* ============================================================
-   PROPERTY FINDER
-   ============================================================ */
-
-function fetchAnyProp(obj, possibleKeys) {
-
-    if (!obj) {
-        return "";
-    }
-
-    for (
-        let key of possibleKeys
-    ) {
-
-        let targetKey =
-            String(key)
-            .toLowerCase()
-            .replace(/[\s_:'"()\-.]/g, "");
-
-        for (
-            let objKey in obj
-        ) {
-
-            let cleanObjKey =
-                String(objKey)
-                .toLowerCase()
-                .replace(/[\s_:'"()\-.]/g, "");
-
-            if (
-                cleanObjKey === targetKey &&
-                obj[objKey] !== "" &&
-                obj[objKey] !== null &&
-                typeof obj[objKey] !== "undefined"
-            ) {
-
-                return obj[objKey];
-
-            }
-
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwgInUry6aOVsKq0ZEPO_dXWKOm_4MI0ZbqmbXJ5xuWYrmriod3dL34bQtU1YzbpLDPjw/exec";
+    
+    const BASE_URLS = {
+        admit:          "https://barsoipublicschool.github.io/admitcard",
+        icard:          "https://barsoipublicschool.github.io/icard",
+        result:         "https://barsoipublicschool.github.io/result",
+        homework:       "",
+        progress:       "",
+        studymaterials: "https://barsoipublicschool.github.io/aaa", 
+        leave:          "https://barsoipublicschool.github.io/leave" 
+    };
+
+    let studentRecords = [];
+    let currentStudentClass = "";
+    let currentStudentRoll = "";
+
+    function openStudyMaterials() {
+        let targetUrl = BASE_URLS.studymaterials;
+        if (currentStudentClass || currentStudentRoll) {
+            targetUrl += `?class=${encodeURIComponent(currentStudentClass)}&roll=${encodeURIComponent(currentStudentRoll)}`;
         }
-
+        window.location.href = targetUrl;
     }
 
-    return "";
-
-}
-
-
-function getProp(obj, fieldName) {
-
-    return fetchAnyProp(
-        obj,
-        [fieldName]
-    );
-
-}
-
-
-/* ============================================================
-   IMAGE URL
-   ============================================================ */
-
-function getDirectImageUrl(url) {
-
-    if (
-        !url ||
-        url === "" ||
-        url === "N/A" ||
-        typeof url !== "string"
-    ) {
-
-        return "https://via.placeholder.com/75x90?text=No+Photo";
-
-    }
-
-    let match =
-        url.match(/[-\w]{25,}/);
-
-    if (match) {
-
-        return (
-            "https://lh3.googleusercontent.com/d/" +
-            match[0] +
-            "=s300"
-        );
-
-    }
-
-    return url;
-
-}
-
-
-/* ============================================================
-   DATE FORMAT
-   ============================================================ */
-
-function formatDateDDMMYYYY(val) {
-
-    if (
-        !val ||
-        val === "" ||
-        val === "N/A"
-    ) {
-
-        return "N/A";
-
-    }
-
-    let d =
-        new Date(val);
-
-    if (!isNaN(d.getTime())) {
-
-        let day =
-            String(d.getDate())
-            .padStart(2, "0");
-
-        let month =
-            String(d.getMonth() + 1)
-            .padStart(2, "0");
-
-        let year =
-            d.getFullYear();
-
-        return (
-            day +
-            "/" +
-            month +
-            "/" +
-            year
-        );
-
-    }
-
-    if (
-        typeof val === "string" &&
-        (val.includes("/") ||
-        val.includes("-"))
-    ) {
-
-        let parts =
-            val.split(/[/\-]/);
-
-        if (parts.length === 3) {
-
-            if (parts[0].length === 4) {
-
-                let day =
-                    parts[2].padStart(2, "0");
-
-                let month =
-                    parts[1].padStart(2, "0");
-
-                return (
-                    day +
-                    "/" +
-                    month +
-                    "/" +
-                    parts[0]
-                );
-
-            } else {
-
-                let day =
-                    parts[0].padStart(2, "0");
-
-                let month =
-                    parts[1].padStart(2, "0");
-
-                return (
-                    day +
-                    "/" +
-                    month +
-                    "/" +
-                    parts[2]
-                );
-
-            }
-
+    function openLeaveApplication() {
+        let targetUrl = BASE_URLS.leave;
+        if (currentStudentClass || currentStudentRoll) {
+            targetUrl += `?class=${encodeURIComponent(currentStudentClass)}&roll=${encodeURIComponent(currentStudentRoll)}`;
         }
-
+        window.location.href = targetUrl;
     }
 
-    return val;
-
-}
-
-
-/* ============================================================
-   ROMAN NUMBERS
-   ============================================================ */
-
-function roman(n) {
-
-    const r = [
-        "i",
-        "ii",
-        "iii",
-        "iv",
-        "v",
-        "vi",
-        "vii",
-        "viii",
-        "ix",
-        "x"
-    ];
-
-    return r[n - 1] || n;
-
-}
-
-
-/* ============================================================
-   NUMBER TO WORDS
-   ============================================================ */
-
-function numberToWords(num) {
-
-    var a = [
-        "",
-        "One ",
-        "Two ",
-        "Three ",
-        "Four ",
-        "Five ",
-        "Six ",
-        "Seven ",
-        "Eight ",
-        "Nine ",
-        "Ten ",
-        "Eleven ",
-        "Twelve ",
-        "Thirteen ",
-        "Fourteen ",
-        "Fifteen ",
-        "Sixteen ",
-        "Seventeen ",
-        "Eighteen ",
-        "Nineteen "
-    ];
-
-    var b = [
-        "",
-        "",
-        "Twenty",
-        "Thirty",
-        "Forty",
-        "Fifty",
-        "Sixty",
-        "Seventy",
-        "Eighty",
-        "Ninety"
-    ];
-
-    if (num == 0) {
-        return "Zero";
-    }
-
-    var n =
-        ("000000000" + num)
-        .substr(-9)
-        .match(
-            /^(\d{2})(\d{2})(\d{2})(\d{1})(\d{2})$/
-        );
-
-    if (!n) {
-        return "";
-    }
-
-    var str = "";
-
-    str +=
-        (n[1] != 0)
-        ?
-        (
-            a[Number(n[1])] ||
-            b[n[1][0]] +
-            " " +
-            a[n[1][1]]
-        ) +
-        "Crore "
-        :
-        "";
-
-    str +=
-        (n[2] != 0)
-        ?
-        (
-            a[Number(n[2])] ||
-            b[n[2][0]] +
-            " " +
-            a[n[2][1]]
-        ) +
-        "Lakh "
-        :
-        "";
-
-    str +=
-        (n[3] != 0)
-        ?
-        (
-            a[Number(n[3])] ||
-            b[n[3][0]] +
-            " " +
-            a[n[3][1]]
-        ) +
-        "Thousand "
-        :
-        "";
-
-    str +=
-        (n[4] != 0)
-        ?
-        (
-            a[Number(n[4])] ||
-            b[n[4][0]] +
-            " " +
-            a[n[4][1]]
-        ) +
-        "Hundred "
-        :
-        "";
-
-    str +=
-        (n[5] != 0)
-        ?
-        (
-            (str != "")
-            ?
-            "and "
-            :
-            ""
-        ) +
-        (
-            a[Number(n[5])] ||
-            b[n[5][0]] +
-            " " +
-            a[n[5][1]]
-        )
-        :
-        "";
-
-    return str.trim();
-
-}
-
-
-/* ============================================================
-   SWITCH TAB
-   ============================================================ */
-
-function switchTab(e, tabId) {
-
-    document
-        .querySelectorAll(".tab-section")
-        .forEach(function(sec) {
-
-            sec.classList.remove("active");
-
-        });
-
-
-    document
-        .querySelectorAll(".nav-btn")
-        .forEach(function(btn) {
-
-            btn.classList.remove("active");
-
-        });
-
-
-    let target =
-        document.getElementById(tabId);
-
-    if (!target) {
-        return;
-    }
-
-    target.classList.add("active");
-
-
-    if (
-        e &&
-        e.currentTarget
-    ) {
-
-        e.currentTarget.classList.add("active");
-
-    }
-
-
-    let queryParams =
-        "?roll=" +
-        encodeURIComponent(currentStudentRoll) +
-        "&class=" +
-        encodeURIComponent(currentStudentClass);
-
-
-    /* ================= ADMIT ================= */
-
-    if (
-        tabId === "admit-section" &&
-        BASE_URLS.admit
-    ) {
-
-        let frame =
-            document.getElementById("iframe-admit");
-
-        if (
-            frame &&
-            (
-                !frame.src ||
-                frame.src.indexOf("about:blank") !== -1
-            )
-        ) {
-
-            frame.src =
-                BASE_URLS.admit +
-                queryParams;
-
+    function toggleSidebarMenu() {
+        let menu = document.getElementById('sidebar-menu');
+        let arrow = document.getElementById('toggle-arrow');
+        if(menu.style.display === 'block') {
+            menu.style.display = 'none';
+            arrow.innerText = '▼';
+        } else {
+            menu.style.display = 'block';
+            arrow.innerText = '▲';
         }
-
     }
 
-
-    /* ================= ID CARD ================= */
-
-    else if (
-        tabId === "icard-section" &&
-        BASE_URLS.icard
-    ) {
-
-        let frame =
-            document.getElementById("iframe-icard");
-
-        if (
-            frame &&
-            (
-                !frame.src ||
-                frame.src.indexOf("about:blank") !== -1
-            )
-        ) {
-
-            frame.src =
-                BASE_URLS.icard +
-                queryParams;
-
-        }
-
-    }
-
-
-    /* ================= RESULT ================= */
-
-    else if (
-        tabId === "result-section" &&
-        BASE_URLS.result
-    ) {
-
-        let frame =
-            document.getElementById("iframe-result");
-
-        if (
-            frame &&
-            (
-                !frame.src ||
-                frame.src.indexOf("about:blank") !== -1
-            )
-        ) {
-
-            frame.src =
-                BASE_URLS.result +
-                queryParams;
-
-        }
-
-    }
-
-
-    /* ================= HOMEWORK ================= */
-
-    else if (
-        tabId === "homework-section" &&
-        BASE_URLS.homework
-    ) {
-
-        let frame =
-            document.getElementById("iframe-homework");
-
-        if (
-            frame &&
-            (
-                !frame.src ||
-                frame.src.indexOf("about:blank") !== -1
-            )
-        ) {
-
-            frame.src =
-                BASE_URLS.homework +
-                queryParams;
-
-        }
-
-    }
-
-
-    /* ================= PROGRESS ================= */
-
-    else if (
-        tabId === "progress-section" &&
-        BASE_URLS.progress
-    ) {
-
-        let frame =
-            document.getElementById("iframe-progress");
-
-        if (
-            frame &&
-            (
-                !frame.src ||
-                frame.src.indexOf("about:blank") !== -1
-            )
-        ) {
-
-            frame.src =
-                BASE_URLS.progress +
-                queryParams;
-
-        }
-
-    }
-
-
-    /* ================= MOBILE SIDEBAR ================= */
-
-    if (
-        window.innerWidth <= 768
-    ) {
-
-        let menu =
-            document.getElementById("sidebar-menu");
-
-        let arrow =
-            document.getElementById("toggle-arrow");
-
-        if (menu) {
-            menu.style.display = "none";
-        }
-
-        if (arrow) {
-            arrow.innerText = "▼";
-        }
-
-    }
-
-}
-
-
-/* ============================================================
-   LOGIN
-   ============================================================ */
-
-async function loginStudent() {
-
-    if (loginInProgress) {
-        return;
-    }
-
-    let sidElement =
-        document.getElementById("login-sid");
-
-    let mobileElement =
-        document.getElementById("login-mobile");
-
-    let sid =
-        sidElement.value.trim();
-
-    let mobile =
-        mobileElement.value.trim();
-
-
-    if (!sid || !mobile) {
-
-        alert(
-            "Kripya Student ID aur Mobile Number dono bharein"
-        );
-
-        return;
-
-    }
-
-
-    loginInProgress = true;
-
-
-    let loginButton =
-        document.getElementById("login-button");
-
-    if (loginButton) {
-
-        loginButton.disabled = true;
-
-        loginButton.innerText =
-            "Please Wait...";
-
-    }
-
-
-    document
-        .getElementById("custom-loader")
-        .style.display = "flex";
-
-
-    hideWebviewError();
-
-
-    try {
-
-        let apiUrl =
-            SCRIPT_URL +
-            "?action=verifyLogin" +
-            "&id=" +
-            encodeURIComponent(sid) +
-            "&mobile=" +
-            encodeURIComponent(mobile);
-
-
-        /*
-         * IMPORTANT:
-         * पहले text() लिया जा रहा है।
-         * सीधे response.json() नहीं।
-         */
-
-        let response =
-            await fetch(
-                apiUrl,
-                {
-                    method: "GET",
-                    cache: "no-store",
-                    redirect: "follow"
+    function fetchAnyProp(obj, possibleKeys) {
+        if(!obj) return "";
+        for (let key of possibleKeys) {
+            let targetKey = key.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
+            for (let objKey in obj) {
+                let cleanObjKey = objKey.toLowerCase().replace(/[\s_:'"()\-.]/g, '');
+                if (cleanObjKey === targetKey && obj[objKey] !== "" && obj[objKey] !== null) {
+                    return obj[objKey];
                 }
-            );
+            }
+        }
+        return "";
+    }
 
+    function getDirectImageUrl(url) {
+        if (!url || url === "" || url === "N/A" || typeof url !== 'string') {
+            return "https://via.placeholder.com/75x90?text=No+Photo";
+        }
+        let match = url.match(/[-\w]{25,}/);
+        if (match) {
+            return `https://lh3.googleusercontent.com/d/${match[0]}=s300`;
+        }
+        return url;
+    }
 
-        if (!response.ok) {
+    function formatDateDDMMYYYY(val) {
+        if (!val || val === "" || val === "N/A") return "N/A";
+        let d = new Date(val);
+        if (!isNaN(d.getTime())) {
+            let day = String(d.getDate()).padStart(2, '0');
+            let month = String(d.getMonth() + 1).padStart(2, '0');
+            let year = d.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+        return val;
+    }
 
-            throw new Error(
-                "Server HTTP Error: " +
-                response.status
-            );
-
+    function switchTab(e, tabId) {
+        document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+        document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+        
+        document.getElementById(tabId).classList.add('active');
+        if(e && e.currentTarget) {
+            e.currentTarget.classList.add('active');
         }
 
+        let queryParams = `?roll=${encodeURIComponent(currentStudentRoll)}&class=${encodeURIComponent(currentStudentClass)}`;
 
-        let responseText =
-            await response.text();
-
-
-        if (
-            !responseText ||
-            responseText.trim() === ""
-        ) {
-
-            throw new Error(
-                "Server ने खाली response दिया।"
-            );
-
+        if(tabId === 'admit-section' && BASE_URLS.admit) {
+            let frame = document.getElementById('iframe-admit');
+            if(frame.src.includes('about:blank')) frame.src = BASE_URLS.admit + queryParams;
+        } else if(tabId === 'icard-section' && BASE_URLS.icard) {
+            let frame = document.getElementById('iframe-icard');
+            if(frame.src.includes('about:blank')) frame.src = BASE_URLS.icard + queryParams;
+        } else if(tabId === 'result-section' && BASE_URLS.result) {
+            let frame = document.getElementById('iframe-result');
+            if(frame.src.includes('about:blank')) frame.src = BASE_URLS.result + queryParams;
         }
 
+        if(window.innerWidth <= 768) {
+            document.getElementById('sidebar-menu').style.display = 'none';
+            document.getElementById('toggle-arrow').innerText = '▼';
+        }
+    }
 
-        let result;
+    // --- REFACTORED SECURE LOGIN FUNCTION ---
+    async function loginStudent() {
+        let sid = document.getElementById('login-sid').value.trim();
+        let mobile = document.getElementById('login-mobile').value.trim();
+
+        if(!sid || !mobile) {
+            alert("Kripya Student ID aur Mobile Number dono bharein.");
+            return;
+        }
+
+        let submitBtn = document.getElementById('submitBtn');
+        let btnText = document.getElementById('btnText');
+        let btnIcon = document.getElementById('btnIcon');
+
+        submitBtn.disabled = true;
+        btnText.innerText = "Verifying...";
+        btnIcon.className = "fas fa-spinner fa-spin";
 
         try {
+            const reqUrl = `${SCRIPT_URL}?action=verifyLogin&id=${encodeURIComponent(sid)}&mobile=${encodeURIComponent(mobile)}`;
+            const res = await fetch(reqUrl, { method: 'GET', redirect: 'follow' });
+            const result = await res.json();
 
-            result =
-                JSON.parse(
-                    responseText
-                );
+            if(result.status === "error") {
+                alert(result.message || "Invalid ID or Mobile Number!");
+                submitBtn.disabled = false;
+                btnText.innerText = "Login to Portal";
+                btnIcon.className = "fas fa-arrow-right";
+                return;
+            }
 
-        } catch (jsonError) {
+            let st = result.student || {};
+            studentRecords = result.fees || [];
 
-            console.log(
-                "Server response:",
-                responseText
-            );
+            document.getElementById('st-name').innerText = st["Student Name"] || "Student";
+            document.getElementById('st-badge').innerText = "ID: " + (st["Reg No"] || st["Student ID"] || sid);
+            document.getElementById('st-class').innerText = st["Class"] || "-";
+            document.getElementById('st-roll').innerText = st["Roll No"] || "-";
+            document.getElementById('st-father').innerText = fetchAnyProp(st, ["Father Name", "Father's Name", "Father"]) || "N/A";
+            document.getElementById('st-mother').innerText = fetchAnyProp(st, ["Mother Name", "Mother's Name", "Mother"]) || "N/A";
+            document.getElementById('st-dob').innerText = formatDateDDMMYYYY(st["DOB"]);
+            document.getElementById('st-address').innerText = st["Address"] || "N/A";
+            document.getElementById('st-mobile').innerText = st["Mobile No"] || mobile;
 
-            throw new Error(
-                "Server से valid JSON response नहीं मिला।"
-            );
+            let photoRaw = st["Photo url"] || st["Photo"] || "";
+            document.getElementById('st-photo').src = getDirectImageUrl(photoRaw);
 
+            currentStudentRoll  = st["Roll No"] || st["Roll"] || sid;
+            currentStudentClass = st["Class"] || "";
+
+            renderDashboard(studentRecords);
+
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard-screen').style.display = 'block';
+
+        } catch(e) {
+            alert("Network/Server Connection Error: " + e.message);
+            submitBtn.disabled = false;
+            btnText.innerText = "Login to Portal";
+            btnIcon.className = "fas fa-arrow-right";
         }
+    }
 
-
-        document
-            .getElementById("custom-loader")
-            .style.display = "none";
-
-
-        if (
-            !result ||
-            result.status === "error"
-        ) {
-
-            alert(
-                result &&
-                result.message
-                ?
-                result.message
-                :
-                "Invalid Student ID या Mobile Number."
-            );
-
+    function renderDashboard(records) {
+        if(!records || records.length === 0) {
+            document.getElementById('total-due-val').innerText = "₹0";
+            document.getElementById('history-rows').innerHTML = "<tr><td colspan='8'>Koi fee record nahi mila.</td></tr>";
             return;
-
         }
 
+        let latestRecord = records[records.length - 1];
+        let totalRemainingDues = fetchAnyProp(latestRecord, ["Remaining", "Due Balance", "Dues"]) || 0;
+        document.getElementById('total-due-val').innerText = "₹" + totalRemainingDues;
 
-        let st =
-            result.student || {};
+        let rowsHtml = "";
+        records.forEach((r) => {
+            let mFee = fetchAnyProp(r, ["School Fee", "Fee"]) || 0;
+            let pDues = fetchAnyProp(r, ["Prev Dues", "Previous Dues"]) || 0;
+            let pAmt = fetchAnyProp(r, ["Total Paid", "Paid Amount", "Paid"]) || 0;
+            let rem = fetchAnyProp(r, ["Remaining", "Due Balance"]) || 0;
 
-        studentRecords =
-            Array.isArray(result.fees)
-            ?
-            result.fees
-            :
-            [];
-
-
-        /* ================= STUDENT DETAILS ================= */
-
-        document
-            .getElementById("st-name")
-            .innerText =
-            st["Student Name"] ||
-            "Student";
-
-
-        document
-            .getElementById("st-badge")
-            .innerText =
-            "ID: " +
-            (
-                st["Reg No"] ||
-                st["Student ID"] ||
-                sid
-            );
-
-
-        document
-            .getElementById("st-class")
-            .innerText =
-            st["Class"] ||
-            "-";
-
-
-        document
-            .getElementById("st-roll")
-            .innerText =
-            st["Roll No"] ||
-            "-";
-
-
-        document
-            .getElementById("st-father")
-            .innerText =
-            fetchAnyProp(
-                st,
-                [
-                    "Father Name",
-                    "Father's Name",
-                    "Father"
-                ]
-            ) ||
-            "N/A";
-
-
-        document
-            .getElementById("st-mother")
-            .innerText =
-            fetchAnyProp(
-                st,
-                [
-                    "Mother Name",
-                    "Mother's Name",
-                    "Mother"
-                ]
-            ) ||
-            "N/A";
-
-
-        document
-            .getElementById("st-dob")
-            .innerText =
-            formatDateDDMMYYYY(
-                st["DOB"]
-            );
-
-
-        document
-            .getElementById("st-address")
-            .innerText =
-            st["Address"] ||
-            "N/A";
-
-
-        document
-            .getElementById("st-mobile")
-            .innerText =
-            st["Mobile No"] ||
-            mobile;
-
-
-        let photoRaw =
-            st["Photo url"] ||
-            st["Photo"] ||
-            "";
-
-
-        let photoElement =
-            document.getElementById("st-photo");
-
-
-        if (photoElement) {
-
-            photoElement.src =
-                getDirectImageUrl(
-                    photoRaw
-                );
-
-            photoElement.onerror =
-                function() {
-
-                    this.src =
-                    "https://via.placeholder.com/75x90?text=No+Photo";
-
-                };
-
-        }
-
-
-        currentStudentRoll =
-            st["Roll No"] ||
-            st["Roll"] ||
-            sid;
-
-
-        currentStudentClass =
-            st["Class"] ||
-            "";
-
-
-        renderDashboard(
-            studentRecords
-        );
-
-
-        document
-            .getElementById("login-screen")
-            .style.display = "none";
-
-
-        document
-            .getElementById("dashboard-screen")
-            .style.display = "block";
-
-
-    } catch (error) {
-
-        console.log(
-            "LOGIN ERROR:",
-            error
-        );
-
-
-        document
-            .getElementById("custom-loader")
-            .style.display = "none";
-
-
-        showWebviewError(
-            "Server से connection नहीं हो पाया। " +
-            (error.message || "")
-        );
-
-
-    } finally {
-
-        loginInProgress = false;
-
-
-        if (loginButton) {
-
-            loginButton.disabled = false;
-
-            loginButton.innerText =
-                "Login to Portal ➔";
-
-        }
-
+            rowsHtml += `
+                <tr>
+                    <td><b>${fetchAnyProp(r, ["Month"]) || "-"}</b></td>
+                    <td>${fetchAnyProp(r, ["Receipt No", "Receipt"]) || "-"}</td>
+                    <td>${formatDateDDMMYYYY(fetchAnyProp(r, ["Paid Date", "Date"]))}</td>
+                    <td>₹${mFee}</td>
+                    <td>₹${pDues}</td>
+                    <td style="color:#16a34a; font-weight:bold;">₹${pAmt}</td>
+                    <td style="color:#dc2626; font-weight:bold;">₹${rem}</td>
+                    <td>-</td>
+                </tr>
+            `;
+        });
+        document.getElementById('history-rows').innerHTML = rowsHtml;
     }
 
-}
-
-
-/* ============================================================
-   RENDER DASHBOARD
-   ============================================================ */
-
-function renderDashboard(records) {
-
-    if (
-        !records ||
-        records.length === 0
-    ) {
-
-        document
-            .getElementById("total-due-val")
-            .innerText = "₹0";
-
-
-        document
-            .getElementById("history-rows")
-            .innerHTML =
-            "<tr><td colspan='8'>Koi fee record nahi mila.</td></tr>";
-
-        return;
-
+    function logout() {
+        document.getElementById('dashboard-screen').style.display = 'none';
+        document.getElementById('login-screen').style.display = 'flex';
+        document.getElementById('login-sid').value = '';
+        document.getElementById('login-mobile').value = '';
+        
+        let submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = false;
+        document.getElementById('btnText').innerText = "Login to Portal";
+        document.getElementById('btnIcon').className = "fas fa-arrow-right";
     }
-
-
-    let latestRecord =
-        records[records.length - 1];
-
-
-    let totalRemainingDues =
-        fetchAnyProp(
-            latestRecord,
-            [
-                "Remaining",
-                "Due Balance",
-                "Dues"
-            ]
-        ) ||
-        0;
-
-
-    document
-        .getElementBy
+</script>
+</body>
+</html>
