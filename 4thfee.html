@@ -268,7 +268,6 @@
                     </a>
                 </li>
                 
-                <!-- CHANGE PASSWORD OPTION ADDED AT THE BOTTOM OF HAMBURGER MENU -->
                 <li class="nav-item" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">
                     <a onclick="openChangePasswordModal()" class="nav-link" style="color: #ffe082;">
                         <span>🔑</span> Change Password
@@ -381,7 +380,7 @@
 </div>
 
 <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyoI6duD86YjAkAzjsGWzT4fcf0pxqDE9bcpZD33ONI3M8lCAPjfKhr-MBZ3wgc-dLQ/exec";
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz34IIAmjfpKZeO5fvnchhGuj5vu0hxryox_S44PYqfkAJf_wCZPZCOCozhdphAnMdR/exec";
     
     let allRecords = [];
     let currentActiveReceipt = null;
@@ -415,7 +414,6 @@
         const user = document.getElementById('username').value.trim().toLowerCase();
         const pass = document.getElementById('password').value;
 
-        // Dynamic Server Password Verification Fallback
         Swal.fire({ title: 'Logging in...', didOpen: () => Swal.showLoading(), allowOutsideClick: false });
 
         try {
@@ -434,7 +432,6 @@
                 Swal.fire('Login Failed', resData.message || 'Wrong Username or Password!', 'error');
             }
         } catch (err) {
-            // Local Static Password Fallback Check
             Swal.close();
             if (selectedRole === 'admin' && user === 'admin' && pass === 'admin123') {
                 sessionStorage.setItem('isLoggedIn', 'true');
@@ -457,7 +454,6 @@
         showLogin();
     }
 
-    // Change Password Interactive SweetAlert Function
     function openChangePasswordModal() {
         const currentRole = sessionStorage.getItem('userRole') || 'admin';
         
@@ -601,9 +597,9 @@
         const monthOrder = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
         data.forEach(r => {
-            let paid = parseFloat(r["Total Paid"]) || 0;
-            let due = parseFloat(r["Remaining"]) || 0;
-            let disc = parseFloat(r["Discount"]) || 0;
+            let paid = parseFloat(r["Total Paid"] || r["Paid"] || 0) || 0;
+            let due = parseFloat(r["Remaining"] || r["Due Balance"] || 0) || 0;
+            let disc = parseFloat(r["Discount"] || 0) || 0;
             let month = (r["Month"] || "Other").toString().trim();
             let className = (r["Class"] || "Unassigned").toString().trim().toUpperCase();
 
@@ -642,13 +638,18 @@
         const recentFive = [...data].reverse().slice(0, 5);
 
         recentFive.forEach(item => {
-            const recNo = item["Receipt No"] || item["ID"] || "N/A";
-            const name = item["Student Name"] || "N/A";
+            const recNo = item["Receipt No"] || item["ReceiptNo"] || item["ID"] || "N/A";
+            const stId = item["Student Id"] || item["Student ID"] || item["Reg No"] || "";
+            const name = item["Student Name"] || item["Name"] || "N/A";
             const cls = item["Class"] || "N/A";
             const month = item["Month"] || "N/A";
-            const paid = parseFloat(item["Total Paid"] || 0).toLocaleString('en-IN');
+            const paid = parseFloat(item["Total Paid"] || item["Paid"] || 0).toLocaleString('en-IN');
 
-            const recordIndex = allRecords.findIndex(r => r["Receipt No"] === item["Receipt No"] && r["Student Id"] === item["Student Id"]);
+            const recordIndex = allRecords.findIndex(r => {
+                const rRec = r["Receipt No"] || r["ReceiptNo"] || r["ID"];
+                const rId = r["Student Id"] || r["Student ID"] || r["Reg No"];
+                return (rRec && rRec === recNo) || (rId && rId === stId && r["Month"] === month);
+            });
 
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -665,7 +666,7 @@
     }
 
     function openReceiptFromIndex(index) {
-        if (index === -1 || !allRecords[index]) {
+        if (index === -1 || index === undefined || !allRecords[index]) {
             Swal.fire("Error", "Receipt record not found", "error");
             return;
         }
@@ -724,7 +725,7 @@
         }
 
         let receiptNo = d["Receipt No"] || "";
-        let downloadLink = `https://barsoipublicschool-fees.onrender.com/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"] || "")}`;
+        let downloadLink = `https://barsoipublicschool-fees.onrender.com/receipt.html?receiptNo=${encodeURIComponent(receiptNo)}&id=${encodeURIComponent(d["Student Id"] || d["Student ID"] || "")}`;
 
         let msg = `*BARSOI PUBLIC SCHOOL - FEE RECEIPT*\n` +
                   `📍 Nehar Nagar, Barsoi (Katihar)\n` +
@@ -732,7 +733,7 @@
                   `📄 *Receipt No:* ${receiptNo}\n` +
                   `📅 *Date:* ${displayDate}\n` +
                   `👤 *Student Name:* ${d["Student Name"] || "N/A"}\n` +
-                  `🆔 *Student ID:* ${d["Student Id"] || "N/A"}\n` +
+                  `🆔 *Student ID:* ${d["Student Id"] || d["Student ID"] || "N/A"}\n` +
                   `🏫 *Class:* ${d["Class"] || "N/A"}\n` +
                   `🗓️ *Month:* ${d["Month"] || "N/A"}\n` +
                   `-----------------------------------\n` +
@@ -801,7 +802,7 @@
                 </div>
                 <div class="top-info"><span>Receipt No: <b>${d["Receipt No"] || "________"}</b></span><span>Month: <b>${d["Month"]}</b></span><span>Date: ${displayDate}</span></div>
                 <div class="student-details">
-                    <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"]}</div>
+                    <div><b>Name:</b> ${d["Student Name"]}</div><div><b>ID:</b> ${d["Student Id"] || d["Student ID"]}</div>
                     <div><b>Father:</b> ${d["Father Name"]}</div><div><b>Class:</b> ${d["Class"]}</div>
                     <div><b>Address:</b> ${d["Address"]}</div><div><b>Mobile:</b> ${d["Mobile"] || d["Phone"] || ""}</div>
                 </div>
