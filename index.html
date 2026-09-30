@@ -429,7 +429,7 @@
                 Swal.fire({ icon: 'success', title: `Welcome ${resData.name}!`, timer: 1000, showConfirmButton: false })
                 .then(() => showDashboard());
             } else {
-                Swal.fire('Login Failed', resData.message || 'Wrong Username or Password!', 'error');
+                Swal.fire('Login Failed', resData.message || 'Incorrect Username or Password!', 'error');
             }
         } catch (err) {
             Swal.close();
@@ -444,7 +444,7 @@
                 sessionStorage.setItem('userName', 'Counter Staff');
                 showDashboard();
             } else {
-                Swal.fire('Login Failed', 'Wrong Username, Password or Selected Role!', 'error');
+                Swal.fire('Login Failed', 'Incorrect Username, Password or Selected Role!', 'error');
             }
         }
     }
@@ -462,13 +462,13 @@
             html: `
                 <div style="text-align: left; font-size: 13px;">
                     <label style="font-weight:600;">Current Password</label>
-                    <input type="password" id="swalOldPass" class="swal2-input" placeholder="Purana Password Daalein" style="margin-top: 5px; margin-bottom: 15px; width:100%;">
+                    <input type="password" id="swalOldPass" class="swal2-input" placeholder="Enter Old Password " style="margin-top: 5px; margin-bottom: 15px; width:100%;">
                     
                     <label style="font-weight:600;">New Password</label>
-                    <input type="password" id="swalNewPass" class="swal2-input" placeholder="Naya Password Daalein" style="margin-top: 5px; margin-bottom: 15px; width:100%;">
+                    <input type="password" id="swalNewPass" class="swal2-input" placeholder="Enter New Password " style="margin-top: 5px; margin-bottom: 15px; width:100%;">
                     
                     <label style="font-weight:600;">Confirm New Password</label>
-                    <input type="password" id="swalConfirmPass" class="swal2-input" placeholder="Naya Password Dobara Daalein" style="margin-top: 5px; width:100%;">
+                    <input type="password" id="swalConfirmPass" class="swal2-input" placeholder="Re-enter New Password " style="margin-top: 5px; width:100%;">
                 </div>
             `,
             showCancelButton: true,
@@ -480,15 +480,15 @@
                 const confirmPass = document.getElementById('swalConfirmPass').value;
 
                 if (!oldPass || !newPass || !confirmPass) {
-                    Swal.showValidationMessage('Kripya sabhi fields ko bharein!');
+                    Swal.showValidationMessage('All fields are required!');
                     return false;
                 }
                 if (newPass !== confirmPass) {
-                    Swal.showValidationMessage('Naya password match nahi ho raha hai!');
+                    Swal.showValidationMessage('The new password does not match!');
                     return false;
                 }
                 if (newPass.length < 5) {
-                    Swal.showValidationMessage('Naya password kam se kam 5 characters ka hona chahiye!');
+                    Swal.showValidationMessage('The new password must be at least 5 characters long!');
                     return false;
                 }
                 return { oldPass, newPass };
@@ -524,7 +524,7 @@
             if (res.status === 'success') {
                 Swal.fire('Success 🎉', res.message, 'success');
             } else {
-                Swal.fire('Error ❌', res.message || 'Password update nahi ho saka.', 'error');
+                Swal.fire('Error ❌', res.message || 'Failed to update password.', 'error');
             }
         } catch (e) {
             Swal.fire('Error', 'Server Connection Error!', 'error');
