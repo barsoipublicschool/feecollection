@@ -522,8 +522,8 @@
             Swal.close();
 
             if (res.status === 'success') {
-    Swal.fire('Success 🎉', res.message || 'Password updated successfully!', 'success');
-}
+            Swal.fire('Success 🎉', res.message, 'success');
+
             } else {
                 Swal.fire('Error ❌', res.message || 'Failed to update password.', 'error');
             }
